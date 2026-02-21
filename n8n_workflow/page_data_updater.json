@@ -1,0 +1,917 @@
+{
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "bc04dd9a-1c0c-45ed-b6ba-9b25d070fdc3",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2.1,
+            "position": [
+                240,
+                0
+            ],
+            "id": "9e60095c-5a11-4d89-9369-4aea1105090e",
+            "name": "Webhook",
+            "webhookId": "bc04dd9a-1c0c-45ed-b6ba-9b25d070fdc3"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "6fce1b58-0d37-4b25-affa-3b18c66d8da2",
+                            "name": "body.selectedField",
+                            "value": "={{ $json.body.selectedField }}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                352,
+                0
+            ],
+            "id": "748330f3-70af-41d1-a238-55b45f517cfc",
+            "name": "Edit Fields"
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.4,
+            "position": [
+                944,
+                128
+            ],
+            "id": "f9cb285a-ecb5-4ba2-bb99-ccfae210f85a",
+            "name": "Respond to Webhook"
+        },
+        {
+            "parameters": {
+                "rules": {
+                    "values": [
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "leftValue": "={{ $json.body.selectedField }}",
+                                        "rightValue": "=Update Full WebPage",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals"
+                                        },
+                                        "id": "86407c5c-5555-4570-9148-b790648eacb7"
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "6a9d2bde-14bd-4473-bf2e-1d8e76373b38",
+                                        "leftValue": "={{ $json.body.selectedField }}",
+                                        "rightValue": "Update Selected Part",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.switch",
+            "typeVersion": 3.3,
+            "position": [
+                464,
+                0
+            ],
+            "id": "e8914aee-7195-41f8-b0d0-75704a854c5a",
+            "name": "Switch"
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.4,
+            "position": [
+                1168,
+                -128
+            ],
+            "id": "a43d51af-a130-4c64-b046-50faabd42f7e",
+            "name": "Respond to Webhook1"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=### ROLE\nYou are a precise Content Editor specializing in structured Markdown conversion. Your task is to update the provided HTML content while adhering to strict formatting and density rules.\n\n### INPUT DATA\n- SOURCE CONTENT: {{ $json.data }}\n- REQUIRED CHANGES: {{ $('FullWebPage').item.json.requiredChanges }}\n\n### GLOBAL PRIORITY & COMPLIANCE RULES\nYou must treat the **REQUIRED CHANGES** as the highest‑priority instructions in this task.  \nIf any instruction in this prompt conflicts with the **REQUIRED CHANGES**, you must follow the **REQUIRED CHANGES** and ignore the conflicting lower‑priority instructions.\n\nBefore generating the final answer:\n1. Carefully read and interpret the **REQUIRED CHANGES**.\n2. Plan how each **REQUIRED CHANGE** will be applied to the **SOURCE CONTENT**.\n3. Ensure that every **REQUIRED CHANGE** is fully reflected in the final Markdown output.\n\nIf you cannot apply any **REQUIRED CHANGE** because information is missing, ambiguous, or conflicting:\n- Do **not** guess or improvise that part.\n- Clearly state which specific REQUIRED CHANGE you cannot apply and why.\n- Still apply all other REQUIRED CHANGES that are clear and feasible.\n\nYou must **not** ignore, partially apply, or loosely approximate the **REQUIRED CHANGES** under any circumstance.\n\n### RULES & CONSTRAINTS\n1. **Output Format**: Return the full updated content in clean Markdown ONLY.\n2. **Hierarchy**: Use ## (H2) for main sections and ### (H3) for sub-sections.\n3. **Point Density**: Every description or bullet point must be approximately 1 to 1.5 lines long. Maintain this consistency across the entire document.\n4. **Keyword Control**: Mention the company name exactly 4 to 5 times throughout the entire text. No more, no less. Ensure these mentions feel natural, not forced.\n5. **Tone & Style**: \n    - Use a professional, conversational tone.\n    - Strictly avoid \"marketing fluff,\" \"salesy hype,\" or generic buzzwords.\n    - Do not copy phrases verbatim from the source; rewrite for clarity and flow.\n    - Eliminate unnecessary filler words.\n\n### GOAL\nUpdate the content to reflect the **REQUIRED CHANGES** while restructuring the **SOURCE CONTENT** into the Markdown format defined above.  \nYour answer must be a single, self‑contained Markdown document that:\n- Fully incorporates all applicable **REQUIRED CHANGES**.\n- Respects all formatting and style rules listed under **RULES & CONSTRAINTS**.\n",
+                "needsFallback": true,
+                "messages": {
+                    "messageValues": [
+                        {
+                            "message": "• Use clear, simple language.\n• Be spartan and informative.\n• Use short, impactful sentences with steady flow.\n• Write in active voice. Avoid passive voice.\n• Focus on practical, actionable insights. Tell the reader what to do and how to do your task step by step.\n• Use bullet point lists in social media posts.\n• Support claims with data and concrete examples. Include numbers, time frames, costs, percentages, or results.\n• Address the reader directly. Use you and your.\n\n• Avoid em dashes. Use periods or commas only.\n• Avoid the structure “not just this, but also this.”\n• Avoid metaphors and clichés.\n• Avoid vague generalizations. Be specific.\n• Avoid setup phrases such as in conclusion or in closing.\n• Avoid warnings or extra notes. Provide only the requested output.\n• Avoid unnecessary adjectives and adverbs.\n• Avoid choppy stop start rhythm. Keep sentences tight and connected.\n• Avoid rhetorical questions.\n• Avoid hashtags.\n• Avoid semicolons.\n• Avoid markdown formatting.\n• Avoid asterisks.\n\n• Do not use these words:\ncan,may,just,very,really,literally,actually,certainly,probably,basically,could,maybe,delve,embark,enlightening,esteemed,,shed light,craft,crafting,imagine,realm,game changer,unlock,discover,skyrocket,abyss,not alone,in a world where,revolutionize,disruptive,utilize,utilizing,dive ,deep,tapestry,illuminate,unveil,pivotal,intricate,elucidate,hence,furthermore,however,harness,exciting,groundbreaking,cutting edge,remarkable,remains to be seen,glimpse ,into,navigating,landscape,stark,testament,in summary,in conclusion,moreover,boost,skyrocketing,opened up,powerful,inquiries,ever evolving.\n\n# IMPORTANT: Review your response and ensure no em dashes!\n"
+                        }
+                    ]
+                },
+                "batching": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.chainLlm",
+            "typeVersion": 1.7,
+            "position": [
+                928,
+                -128
+            ],
+            "id": "e77aa380-acbb-43c5-b2a5-ed651b529149",
+            "name": "Basic LLM Chain"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=SOURCE CONTENT:\n{{ $json.content }}\n\nREQUIRED UPDATES:\n{{ $json.requiredChanges }}",
+                "needsFallback": true,
+                "messages": {
+                    "messageValues": [
+                        {
+                            "message": "You are a Content Editor and SEO Specialist. Your task: rewrite HTML/text into clean Markdown optimized for Google's latest ranking factors while maintaining the EXACT SAME LENGTH as the original content.|STRUCTURE RULES:- Use ## (H2) for main sections- Use ### (H3) for subsections only- Never skip heading levels- Include primary keyword in at least one H2 heading- NEVER use negative words in headings or content (avoid: don't, won't, can't, never, no, not, without, avoid, prevent, stop, fail, problem, issue, mistake, error, etc.)- Frame everything positively and solution-focusedLENGTH MATCHING (CRITICAL):- Final word count MUST match source content (±5% maximum)- If source = 500 words, output = 475-525 words- Match original paragraph count and approximate length- Same number of bullet points as source- Expand thin sections, condense redundant ones to maintain total length- Add substance, never fillerFORMAT & READABILITY:- Paragraphs: 2-4 sentences (40-100 words each)- Bullet points: 1-2 sentences per point- Short sentences: 15-20 words average- Use **bold** for key terms- Headings every 200-300 words- Conversational, professional tone (8th-9th grade reading level)- Active voice preferred- Positive, solution-oriented language throughoutSEO OPTIMIZATION (2024-2025):✅ E-E-A-T: Use specific examples, data, credible sources✅ User Intent: Address search intent in first 100 words✅ Keywords: Primary keyword in first H2 + first paragraph + naturally throughout (1-2% density)✅ LSI Keywords: Include semantic variations and related terms✅ Scannability: Lists, formatting, transition words✅ Actionability: Provide clear takeaways✅ Positive Framing: Focus on benefits and solutions, not problemsSTRICTLY AVOID:❌ Marketing hype (\"revolutionary,\" \"game-changing,\" \"amazing\")❌ Keyword stuffing or unnatural placement❌ Passive voice overuse❌ Vague claims without supporting details❌ Copy-pasting original text❌ Negative words and problem-focused language (don't, won't, can't, never, avoid, prevent, fail, problem, mistake, etc.)POSITIVE LANGUAGE EXAMPLES:Instead of: \"Avoid these mistakes\" → Use: \"Best practices for success\"Instead of: \"Don't waste time\" → Use: \"Save time with these methods\"Instead of: \"Problems with X\" → Use: \"Solutions for X\" or \"Optimizing X\"Instead of: \"Never do this\" → Use: \"Always do this instead\"Instead of: \"Without errors\" → Use: \"With accuracy\"PROCESS:1. Count source words (must match this in output ±5%)2. Identify topics, keywords, required updates3. Create H2/H3 outline with keyword placement (all positive framing)4. Rewrite with SEO optimization while maintaining exact length5. Replace all negative words with positive alternatives6. Validate final word count matches sourceOUTPUT FORMAT:- Pure Markdown only- No commentary, explanations, or meta-text- No introductory phrases like \"Here's the content...\"- Start directly with the rewritten Markdown content- Same total word count as source content- All headings and content use positive language onlyThe user will provide:- SOURCE CONTENT (to rewrite)- REQUIRED UPDATES (specific changes needed)- TARGET KEYWORDS (primary + secondary)- SEARCH INTENT (informational/navigational/transactional)You must output ONLY the rewritten Markdown content with the same word count as the source, using positive language throughout."
+                        },
+                        {
+                            "message": "• Use clear, simple language.\n• Be spartan and informative.\n• Use short, impactful sentences with steady flow.\n• Write in active voice. Avoid passive voice.\n• Focus on practical, actionable insights. Tell the reader what to do and how to do your task step by step.\n• Use bullet point lists in social media posts.\n• Support claims with data and concrete examples. Include numbers, time frames, costs, percentages, or results.\n• Address the reader directly. Use you and your.\n\n• Avoid em dashes. Use periods or commas only.\n• Avoid the structure “not just this, but also this.”\n• Avoid metaphors and clichés.\n• Avoid vague generalizations. Be specific.\n• Avoid setup phrases such as in conclusion or in closing.\n• Avoid warnings or extra notes. Provide only the requested output.\n• Avoid unnecessary adjectives and adverbs.\n• Avoid choppy stop start rhythm. Keep sentences tight and connected.\n• Avoid rhetorical questions.\n• Avoid hashtags.\n• Avoid semicolons.\n• Avoid markdown formatting.\n• Avoid asterisks.\n\n• Do not use these words:\ncan,may,just,very,really,literally,actually,certainly,probably,basically,could,maybe,delve,embark,enlightening,esteemed,,shed light,craft,crafting,imagine,realm,game changer,unlock,discover,skyrocket,abyss,not alone,in a world where,revolutionize,disruptive,utilize,utilizing,dive deep,tapestry,illuminate,unveil,pivotal,intricate,elucidate,hence,furthermore,however,harness,exciting,groundbreaking,cutting edge,remarkable,remains to be seen,glimpse into,navigating,landscape,stark,testament,in summary,in conclusion,moreover,boost,skyrocketing,opened up,powerful,inquiries,ever evolving.\n\n# IMPORTANT: Review your response and ensure no em dashes!\n"
+                        }
+                    ]
+                },
+                "batching": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.chainLlm",
+            "typeVersion": 1.7,
+            "position": [
+                704,
+                128
+            ],
+            "id": "71286558-61a7-4569-89f2-3263e0ccc195",
+            "name": "Basic LLM Chain1"
+        },
+        {
+            "parameters": {
+                "model": "anthropic/claude-haiku-4.5",
+                "options": {
+                    "temperature": 0.4
+                }
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+            "typeVersion": 1,
+            "position": [
+                704,
+                272
+            ],
+            "id": "f318be5a-26e7-4580-aadd-c84565ac9f49",
+            "name": "OpenRouter Chat Model",
+            "credentials": {
+                "openRouterApi": {
+                    "id": "Q7VWeDG2LQcdO3eU",
+                    "name": "Kedeyo"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "model": "anthropic/claude-haiku-4.5",
+                "options": {
+                    "temperature": 0.4
+                }
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+            "typeVersion": 1,
+            "position": [
+                912,
+                0
+            ],
+            "id": "52ad84be-63fa-4923-92be-fca139f67b8d",
+            "name": "OpenRouter Chat Model1",
+            "credentials": {
+                "openRouterApi": {
+                    "id": "Q7VWeDG2LQcdO3eU",
+                    "name": "Kedeyo"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "url": "={{ $json.webUrl }}",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.3,
+            "position": [
+                704,
+                -128
+            ],
+            "id": "68b0a2df-462c-42d4-ad61-57df93b79904",
+            "name": "HTTP Request"
+        },
+        {
+            "parameters": {
+                "jsCode": "// Get the input data\nconst inputData = $input.first().json.data;\n\n// Function to remove CSS and JS from HTML\nfunction removeCSSAndJSFromHTML(html) {\n  let cleaned = html;\n  \n  // Remove <style> tags and their content\n  cleaned = cleaned.replace(/<style[^>]*>[\\s\\S]*?<\\/style>/gi, '');\n  \n  // Remove inline style attributes\n  cleaned = cleaned.replace(/style\\s*=\\s*[\"'][^\"']*[\"']/gi, '');\n  \n  // Remove <link> tags for stylesheets\n  cleaned = cleaned.replace(/<link[^>]*rel\\s*=\\s*[\"']stylesheet[\"'][^>]*>/gi, '');\n  \n  // Remove <script> tags and their content (JavaScript)\n  cleaned = cleaned.replace(/<script\\b[^>]*>[\\s\\S]*?<\\/script>/gi, '');\n  \n  // Remove inline event handlers (onclick, onload, etc.)\n  cleaned = cleaned.replace(/\\s+on\\w+\\s*=\\s*[\"'][^\"']*[\"']/gi, '');\n  \n  // Remove noscript tags and their content\n  cleaned = cleaned.replace(/<noscript[^>]*>[\\s\\S]*?<\\/noscript>/gi, '');\n  \n  // Remove JavaScript URLs in href/src (javascript:)\n  cleaned = cleaned.replace(/\\s+(?:href|src)\\s*=\\s*[\"']javascript:[^\"']*[\"']/gi, '');\n  \n  return cleaned;\n}\n\n// Process the input data\nconst processedData = removeCSSAndJSFromHTML(inputData);\n\n// Return the result\nreturn [{\n  json: {\n    data: processedData\n  }\n}];"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                816,
+                -128
+            ],
+            "id": "434582e6-558f-4e6d-b973-e7d6587cafb5",
+            "name": "Code in JavaScript1"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "4696368c-9d83-43d2-b6df-aab0aa90d8ab",
+                            "name": "content",
+                            "value": "={{ $('Webhook').item.json.body.content }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "566c02a5-3002-43ff-9ba7-9b7056557af5",
+                            "name": "requiredChanges",
+                            "value": "={{ $('Webhook').item.json.body.requiredChanges }}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                592,
+                128
+            ],
+            "id": "dd99713d-65be-4291-b3c6-9a5978833a62",
+            "name": "SelectedPart"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "2ed7e1dc-14dc-4a29-999d-2db6f1aee14a",
+                            "name": "webUrl",
+                            "value": "={{ $('Webhook').item.json.body.webUrl }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "a2104391-78f1-4898-a503-bc4589c086ff",
+                            "name": "requiredChanges",
+                            "value": "={{ $('Webhook').item.json.body.requiredChanges }}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                592,
+                -128
+            ],
+            "id": "a0cb545d-4b37-439f-8cc3-b6845e0d1ecc",
+            "name": "FullWebPage"
+        },
+        {
+            "parameters": {
+                "options": {
+                    "temperature": 0.7
+                }
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                1024,
+                0
+            ],
+            "id": "49b7908f-a71e-4887-b1de-ad064945f767",
+            "name": "Google Gemini Chat Model1",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "MzMAELLX7ocbTJNT",
+                    "name": "Google Gemini(PaLM) Api account 31"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "content": "\n",
+                "height": 608,
+                "width": 1440
+            },
+            "type": "n8n-nodes-base.stickyNote",
+            "position": [
+                32,
+                -192
+            ],
+            "typeVersion": 1,
+            "id": "3c157158-a73a-4c27-8884-d42110e91a90",
+            "name": "Sticky Note"
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                752,
+                272
+            ],
+            "id": "9296b56f-1518-44be-8a36-a00ae27acc35",
+            "name": "Google Gemini Chat Model",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "KYoGPvTyGMmv9elG",
+                    "name": "Aman API "
+                }
+            }
+        },
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "a21b68c7-cf4d-4747-b9c3-ef04bebf2864",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2.1,
+            "position": [
+                256,
+                704
+            ],
+            "id": "cd8db523-dd09-488b-a87d-5d3547a076b7",
+            "name": "Webhook1",
+            "webhookId": "a21b68c7-cf4d-4747-b9c3-ef04bebf2864"
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.4,
+            "position": [
+                1184,
+                624
+            ],
+            "id": "bbd1e24f-e356-4cb1-b300-c61389181b63",
+            "name": "Respond to Webhook2"
+        },
+        {
+            "parameters": {
+                "rules": {
+                    "values": [
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "leftValue": "={{ $json.mode }}",
+                                        "rightValue": "fullPage",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals"
+                                        },
+                                        "id": "599224c8-d610-432b-9a6c-c1801ac24d97"
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "4f65d371-01ca-46a6-91be-b47bc06628b7",
+                                        "leftValue": "={{ $json.mode }}",
+                                        "rightValue": "selectedPart",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.switch",
+            "typeVersion": 3.3,
+            "position": [
+                512,
+                704
+            ],
+            "id": "142c0b00-a82a-4eee-8cb5-d816fc92a0f0",
+            "name": "Switch1"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "7af51427-27e7-4763-a2de-98c6fca44418",
+                            "name": "mode",
+                            "value": "={{ $json.body.mode }}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                384,
+                704
+            ],
+            "id": "f4d7ca99-4dc1-488e-a102-65ae801c8c63",
+            "name": "Edit Fields1"
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.4,
+            "position": [
+                1072,
+                800
+            ],
+            "id": "10b2c595-e4e5-4176-b801-e6758144086b",
+            "name": "Respond to Webhook3"
+        },
+        {
+            "parameters": {
+                "url": "={{ $('Webhook1').item.json.body.webUrl }}",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.3,
+            "position": [
+                672,
+                624
+            ],
+            "id": "7c5cecec-5820-4bd4-8652-ef1338e20649",
+            "name": "HTTP Request1"
+        },
+        {
+            "parameters": {
+                "jsCode": "// Get the input data\nconst inputData = $input.first().json.data;\n\n// Function to remove CSS and JS from HTML\nfunction removeCSSAndJSFromHTML(html) {\n  let cleaned = html;\n  \n  // Remove <style> tags and their content\n  cleaned = cleaned.replace(/<style[^>]*>[\\s\\S]*?<\\/style>/gi, '');\n  \n  // Remove inline style attributes\n  cleaned = cleaned.replace(/style\\s*=\\s*[\"'][^\"']*[\"']/gi, '');\n  \n  // Remove <link> tags for stylesheets\n  cleaned = cleaned.replace(/<link[^>]*rel\\s*=\\s*[\"']stylesheet[\"'][^>]*>/gi, '');\n  \n  // Remove <script> tags and their content (JavaScript)\n  cleaned = cleaned.replace(/<script\\b[^>]*>[\\s\\S]*?<\\/script>/gi, '');\n  \n  // Remove inline event handlers (onclick, onload, etc.)\n  cleaned = cleaned.replace(/\\s+on\\w+\\s*=\\s*[\"'][^\"']*[\"']/gi, '');\n  \n  // Remove noscript tags and their content\n  cleaned = cleaned.replace(/<noscript[^>]*>[\\s\\S]*?<\\/noscript>/gi, '');\n  \n  // Remove JavaScript URLs in href/src (javascript:)\n  cleaned = cleaned.replace(/\\s+(?:href|src)\\s*=\\s*[\"']javascript:[^\"']*[\"']/gi, '');\n  \n  return cleaned;\n}\n\n// Process the input data\nconst processedData = removeCSSAndJSFromHTML(inputData);\n\n// Return the result\nreturn [{\n  json: {\n    data: processedData\n  }\n}];"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                800,
+                624
+            ],
+            "id": "fdd9e2a3-d257-4f8e-a9fc-3e3e1ab0b35e",
+            "name": "Code in JavaScript"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are a Content Comparison Assistant.\n\n### INPUTS\n1. OLD PAGE DATA:\n{{ $json.data }}\n\n2. NEW PAGE DATA:\n{{ $('Webhook1').item.json.body.newContent }}\n\n3. TOP 5 GOOGLE RESULTS (SAME TOPIC/KEYWORD)\nFor the same main topic as OLD/NEW, provide:\n- Page title\n- URL\n\n### OBJECTIVE\nCompare the OLD PAGE DATA and NEW PAGE DATA, identify key differences, and evaluate both versions using defined quality criteria.\nAlso compare both against the current top 5 Google results for the same topic, and show each top result’s score clearly under its name.\n\n### OUTPUT FORMAT (MANDATORY)\n- Output must be in Markdown\n- Keep the comparison simple and easy to understand\n\n### OUTPUT STRUCTURE\nYour response must follow this structure:\n\n## Summary\nBriefly describe what has changed overall (what was added, removed, or updated).\nAlso mention which one is better New or Old.\n\n## Content Quality Scores\nEvaluate all versions using a **score from 1–10** for each criterion.\n\n- Row 1 (Names): show the content names only.\n- Row 2 (Scores): show the numeric scores only (1–10), aligned under the correct name.\n\n| Criteria | Old Content | New Content | Top Result 1 | Top Result 2 | Top Result 3 | Top Result 4 | Top Result 5 | Notes |\n|---------|-------------|------------|--------------|--------------|--------------|--------------|--------------|-------|\n| Name    | Old Page    | New Page   | Competitor 1 Name | Competitor 2 Name | Competitor 3 Name | Competitor 4 Name | Competitor 5 Name | Short label of what this row measures. |\n| Score (1–10) |  |  |  |  |  |  |  | Brief reason for the scores. |\n\nRepeat the above 2-row block for each criterion:\n\n- Conciseness  \n- Clarity & Readability  \n- Professionalism & Polish  \n- Persuasiveness  \n- Structure & Flow  \n- Call-to-Action Strength  \n- Credibility & Trust  \n- Completeness (e.g., FAQs)  \n- Overall Engagement  \n\nAfter each 2-row block, clearly state the winner for that criterion in one short line:\n- “Winner: Old / New / Tie” (based on Old vs New only)\n\n### RULES\n- Focus only on meaningful changes\n- Scores must be justified briefly in the Notes column\n- Do not invent or assume content\n- Keep language neutral, short, and clear\n",
+                "needsFallback": true,
+                "batching": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.chainLlm",
+            "typeVersion": 1.7,
+            "position": [
+                928,
+                624
+            ],
+            "id": "d6917004-a61f-4dc3-bbdc-0f85c4cb4e83",
+            "name": "Basic LLM Chain2"
+        },
+        {
+            "parameters": {
+                "model": "x-ai/grok-4-fast",
+                "options": {
+                    "temperature": 0.4
+                }
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+            "typeVersion": 1,
+            "position": [
+                928,
+                752
+            ],
+            "id": "9e9db92b-d962-4630-bcf4-adf92fcd9c06",
+            "name": "OpenRouter Chat Model2",
+            "credentials": {
+                "openRouterApi": {
+                    "id": "Q7VWeDG2LQcdO3eU",
+                    "name": "Kedeyo"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                976,
+                752
+            ],
+            "id": "8996846b-72b2-4203-beb6-849f982d9d6b",
+            "name": "Google Gemini Chat Model2",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "KYoGPvTyGMmv9elG",
+                    "name": "Aman API "
+                }
+            }
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are a Content Comparison Assistant.\n\n### INPUTS\n1. OLD PAGE DATA:\n{{ $('Webhook1').item.json.body.oldContent }}\n\n2. NEW PAGE DATA:\n{{ $('Webhook1').item.json.body.newContent }}\n\n### OBJECTIVE\nCompare the OLD PAGE DATA and NEW PAGE DATA, identify key differences, and evaluate both versions using defined quality criteria.\n\n### OUTPUT FORMAT (MANDATORY)\n- Output must be in Markdown\n- Keep the comparison simple and easy to understand\n\n### OUTPUT STRUCTURE\nYour response must follow this structure:\n\n## Summary\nBriefly describe what has changed overall (what was added, removed, or updated).\nAlso mention which one is better New or Old.\n\n## Content Quality Scores\nEvaluate both versions using a **score from 1–10** for each criterion.\nThen determine a clear winner for each row.\n\n| Criteria | Old Content Score | New Content Score | Winner | Notes |\n|--------|------------------|------------------|--------|------|\n| Conciseness | | | Old / New / Tie | |\n| Clarity & Readability | | | Old / New / Tie | |\n| Professionalism & Polish | | | Old / New / Tie | |\n| Persuasiveness | | | Old / New / Tie | |\n| Structure & Flow | | | Old / New / Tie | |\n| Call-to-Action Strength | | | Old / New / Tie | |\n| Credibility & Trust | | | Old / New / Tie | |\n| Completeness (e.g., FAQs) | | | Old / New / Tie | |\n| Overall Engagement | | | Old / New / Tie | |\n\n### RULES\n- Focus only on meaningful changes\n- Scores must be justified briefly in the Notes column\n- Avoid deep analysis or long explanations\n- Do not invent or assume content\n- Keep language neutral, short, and clear\n",
+                "needsFallback": true,
+                "batching": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.chainLlm",
+            "typeVersion": 1.7,
+            "position": [
+                672,
+                800
+            ],
+            "id": "cf82e6b4-6bdc-4eaf-9b0f-137e1c110238",
+            "name": "Basic LLM Chain3"
+        },
+        {
+            "parameters": {
+                "model": "x-ai/grok-4-fast",
+                "options": {
+                    "temperature": 0.4
+                }
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+            "typeVersion": 1,
+            "position": [
+                672,
+                928
+            ],
+            "id": "2949bce8-ec8a-46bf-a7eb-067ded553794",
+            "name": "OpenRouter Chat Model3",
+            "credentials": {
+                "openRouterApi": {
+                    "id": "Q7VWeDG2LQcdO3eU",
+                    "name": "Kedeyo"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                720,
+                928
+            ],
+            "id": "27fbef8d-d3a7-4660-8623-d9b96421b3b6",
+            "name": "Google Gemini Chat Model3",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "KYoGPvTyGMmv9elG",
+                    "name": "Aman API "
+                }
+            }
+        }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Edit Fields",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields": {
+            "main": [
+                [
+                    {
+                        "node": "Switch",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Switch": {
+            "main": [
+                [
+                    {
+                        "node": "FullWebPage",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "SelectedPart",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Basic LLM Chain": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Basic LLM Chain1": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenRouter Chat Model": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Basic LLM Chain1",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenRouter Chat Model1": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Basic LLM Chain",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "HTTP Request": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript1": {
+            "main": [
+                [
+                    {
+                        "node": "Basic LLM Chain",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "SelectedPart": {
+            "main": [
+                [
+                    {
+                        "node": "Basic LLM Chain1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "FullWebPage": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP Request",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model1": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Basic LLM Chain",
+                        "type": "ai_languageModel",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Basic LLM Chain1",
+                        "type": "ai_languageModel",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "Webhook1": {
+            "main": [
+                [
+                    {
+                        "node": "Edit Fields1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Switch1": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP Request1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Basic LLM Chain3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields1": {
+            "main": [
+                [
+                    {
+                        "node": "Switch1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "HTTP Request1": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript": {
+            "main": [
+                [
+                    {
+                        "node": "Basic LLM Chain2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Basic LLM Chain2": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenRouter Chat Model2": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Basic LLM Chain2",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model2": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Basic LLM Chain2",
+                        "type": "ai_languageModel",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "Basic LLM Chain3": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenRouter Chat Model3": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Basic LLM Chain3",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model3": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Basic LLM Chain3",
+                        "type": "ai_languageModel",
+                        "index": 1
+                    }
+                ]
+            ]
+        }
+    },
+    "pinData": {},
+    "meta": {
+        "templateCredsSetupCompleted": true,
+        "instanceId": "5b533a58b55c9cfffb3ca6a1fd154d9ee56f64098154b77dce684a20e62b0a1a"
+    }
+}

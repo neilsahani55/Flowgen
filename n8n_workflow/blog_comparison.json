@@ -1,0 +1,2019 @@
+{
+    "nodes": [
+        {
+            "parameters": {
+                "respondWith": "allIncomingItems",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.4,
+            "position": [
+                80,
+                -1088
+            ],
+            "id": "0e9ba5a3-c42d-401b-9d54-336bdb947cb8",
+            "name": "Respond to Webhook"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "ca007e2d-653b-4dbf-add2-4d286d5950fc",
+                            "name": "blogContent",
+                            "value": "={{ $json.body.formattedBlog }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "bf52de48-4d02-4d8f-a137-3415376cfff9",
+                            "name": "AIAgent",
+                            "value": "={{ $json.body.AIAgent }}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                -768,
+                -832
+            ],
+            "id": "9412b99a-35c5-4024-ba3d-b6dbe66801a2",
+            "name": "Edit Fields"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert SEO/content analyst and must return **only a single JSON object** that strictly matches the schema below.\nDo not include Markdown, comments, explanations, or extra keys.\nThe response must begin with `{` and end with `}`.\n\n---\n\n## ✅ INPUT\n\nblogContent (HTML, Markdown, or plain text): **{{ $json.blogContent }}**\n\n---\n\n## ✅ OBJECTIVE\n\nPerform a complete SEO/content analysis and produce:\n✅ Accurate score\n✅ Correct metadata extraction (meta title & description if present)\n✅ High-quality, rhythmic, SEO-oriented titles/descriptions\n✅ **At least 10 TitleSuggestions**\n✅ **At least 10 metaTitleSuggestions**\n✅ **At least 10 metaDescriptionSuggestions**\n✅ Every title/meta title suggestion must include:\n\n* **1 focus keyword**, and\n* **2–3 related keywords**, when natural and non-stuffed\n\nAlso determine the **narrative perspective** of the blog:\n\n* 1st person (I, we)\n* 2nd person (you)\n* 3rd person (they, the company, the user, names)\n\nThe identified perspective must be output in `\"perspective\"` as: `\"first-person\"`, `\"second-person\"`, or `\"third-person\"`.\n\n---\n\n# ✅ METADATA EXTRACTION (ROBUST FIX)\n\n### Extract existing metaTitle (in this order):\n\n1. `<meta name=\"title\" ...>`\n2. `<meta property=\"og:title\" ...>`\n3. `<meta name=\"twitter:title\" ...>`\n4. `<title>…</title>`\n\n### Extract existing metaDescription (in this order):\n\n1. `<meta name=\"description\" ...>`\n2. `<meta property=\"og:description\" ...>`\n3. `<meta name=\"twitter:description\" ...>`\n\n### Extract on-page H1 title:\n\n1. First `<h1>`\n2. Else Markdown `# ` heading\n3. Else first descriptive line (10–120 chars)\n\n### Validation\n\nReject extracted meta title if:\n\n* <20 or >60 chars\n* Similar to H1 (≥60% match)\n\nReject extracted meta description if:\n\n* <80 or >180 chars\n* No verb\n* Starts with brand/site name\n\nIf invalid → generate new ones.\n\n---\n\n# ✅ TELECOM / WHOLESALE VOIP DETECTION (Conditional)\n\nIf {{ $json.blogContent }} includes telecom language (e.g., “voip”, “sip”, “routes”, “carrier”, “termination”, “wholesale”),\nthen enrich keyword extraction and suggestions by naturally incorporating:\n\n* Wholesale VoIP\n* Wholesale Voice\n* Wholesale VoIP Providers\n* VoIP Termination\n* Voice Termination\n* Wholesale VoIP Rates\n* Wholesale Voice Providers\n* Wholesale VoIP Routes\n\nOtherwise ignore these completely.\n\n---\n\n# ✅ METADATA GENERATION RULES\n\n### metaTitle (≤60 chars)\n\n* Includes **1 focus keyword**\n* Includes **2–3 related keywords** where natural\n* Must differ from H1\n* Rhythmic, human-readable, SEO-optimized\n\n### metaDescription (150–160 chars)\n\n* Includes **1 focus keyword** + **1 related keyword**\n* Rhythmic (smooth flow, natural pacing)\n* Benefit-focused & intent-aligned\n\n---\n\n# ✅ TitleSuggestions (≥10)\n\n* Each suggestion is unique\n* Each includes **1 focus keyword + 2–3 related keywords naturally**\n* Must be rhythmic, clear, readable, and SEO-oriented\n* Must NOT duplicate H1 or metaTitle\n\n---\n\n# ✅ metaTitleSuggestions (≥10)\n\n* Each suggestion includes **1 focus keyword + 2–3 related keywords**\n* Must be rhythmic, readable, and high-CTR\n* No repeated structures\n\n---\n\n# ✅ metaDescriptionSuggestions (≥10)\n\n* Natural, human, rhythmic\n* Must include **focus + related keywords**\n* Benefit-oriented but not forced\n* All unique\n\n---\n\n# ✅ KEYWORDS\n\nExtract automatically from {{ $json.blogContent }}:\n\n* **3–6 focus keywords** (most important phrases)\n* **8–20 related keywords** (LSI, semantic variations)\n\nIf telecom-related → merge with predefined telecom keyword list.\nKeyword usage must remain **natural (no stuffing).**\n\n---\n\n# ✅ **IMPROVED SEO SCORE**\n\nUse the following scoring model (0–100):\n\n### Metadata (20)\n\n• meta title quality\n• meta description quality\n• relevance & keyword usage\n\n### Structure (20)\n\n• header structure\n• paragraph clarity\n• presence of intro, body, conclusion\n\n### Keywords (20)\n\n• focus keyword usage\n• related keyword distribution\n• lack of keyword stuffing\n\n### Readability & Mobile (15)\n\n• sentence length\n• pacing & flow\n• scannability\n\n### Depth & Length (15)\n\n• informational depth\n• completeness\n• topical coverage\n\n### Grammar & Clarity (10)\n\n• grammar accuracy\n• clarity of ideas\n\n### Bonus (up to +5)\n\n• +3 if >1800 words\n• +2 if Flesch Reading Ease >60\n\nTotal possible: **100**\n\nReturn integer score in `\"seoScore\"`.\n\n---\n\n# ✅ RECOMMENDATIONS\n\nMust include **at least 12 unique, actionable, non-overlapping items**.\nFirst five begin with `\"Priority #1 —\"` through `\"Priority #5 —\"`.\n\nInclude EXACTLY ONCE:\n\n* `\"Suggested perspective: …\"`\n* `\"Suggested tones: […, …]\"`\n* `\"Suggested title: …\"` (must NOT match any TitleSuggestions or meta titles)\n* `\"Suggested description: …\"` (must NOT match any description suggestions)\n\nUse imperative, measurable language (e.g., “Add 3 internal links…”).\n\n---\n\n# ✅ OUTPUT CONTRACT\n\nReturn exactly:\n\n{\n\"success\": true,\n\"data\": {\n\"perspective\": \"...\",\n\"tone\": [...],\n\"seoScore\": 0,\n\"title\": \"...\",\n\"metaTitle\": \"...\",\n\"metaDescription\": \"...\",\n\"TitleSuggestions\": [...],\n\"metaTitleSuggestions\": [...],\n\"metaDescriptionSuggestions\": [...],\n\"focusKeywords\": [...],\n\"relatedKeywords\": [...],\n\"recommendations\": [...]\n}\n}\n\n---\n\n# ✅ SELF-CHECK BEFORE RESPONDING\n\n* Output starts `{` and ends `}`\n* metaTitle ≠ title & not overly similar\n* All suggestions contain required keywords\n* No duplicates in any suggestion list\n* Telecom keywords used only if contextually relevant\n* No style-category language\n* All content is rhythmic, natural, and SEO-oriented\n* Perspective returned as: `\"first-person\"`, `\"second-person\"`, or `\"third-person\"`\n\n",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "typeVersion": 2.2,
+            "position": [
+                -320,
+                -1088
+            ],
+            "id": "275ddb23-ad1d-4904-9ebd-1ca285f85606",
+            "name": "AI Agent"
+        },
+        {
+            "parameters": {
+                "jsCode": "// Step 1: Get the input field\nconst raw = $json.output;\n\n// Step 2: Clean unwanted markdown or code block syntax\nconst cleaned = raw\n  .replace(/```json/g, '')   // remove ```json\n  .replace(/```/g, '')       // remove closing ```\n  .trim();\n\n// Step 3: Parse safely\nlet parsed;\ntry {\n  parsed = JSON.parse(cleaned);\n} catch (err) {\n  throw new Error(\"❌ Failed to parse cleaned JSON: \" + err.message + \"\\nCleaned content:\\n\" + cleaned);\n}\n\n// Step 4: Check for data key\nif (!parsed.data) {\n  throw new Error(\"❌ 'data' field not found in JSON.\");\n}\n\n// Step 5: Extract data\nconst data = parsed.data;\n\n// Step 6: Create unique outputs (each key becomes its own JSON)\nconst outputItems = Object.entries(data).map(([key, value]) => ({\n  json: { [key]: value },\n}));\n\n// Step 7: Return final output\nreturn outputItems;\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                -64,
+                -1088
+            ],
+            "id": "e5bf62cc-cbde-40c7-9e8b-6bcede21622f",
+            "name": "Code in JavaScript"
+        },
+        {
+            "parameters": {
+                "respondWith": "allIncomingItems",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.4,
+            "position": [
+                64,
+                -96
+            ],
+            "id": "bfbe240c-d721-4e27-83e2-81c283de4320",
+            "name": "Respond to Webhook1"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "7e63632a-0c8f-4f66-b6ff-3cc1b6931b7d",
+                            "name": "Perspective",
+                            "value": "={{ $json.body.optimizedData.perspective }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "63ff1724-7055-495c-ab59-f7af58683a4f",
+                            "name": "Tone",
+                            "value": "={{ $json.body.optimizedData.tone }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "34e49f14-9a5f-423a-99de-181ab20c2ee7",
+                            "name": "Title",
+                            "value": "={{ $json.body.optimizedData.blogTitle }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "74dc2858-ecaf-45d7-8b89-e989806b884c",
+                            "name": "metaTitle",
+                            "value": "={{ $json.body.optimizedData.metaTitle }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "f4965f42-a742-423b-a8fd-5352c0e1b217",
+                            "name": "metaDescription",
+                            "value": "={{ $json.body.optimizedData.metaDescription }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "acf09591-aae4-4d91-a3c6-457dfbabd843",
+                            "name": "Blog",
+                            "value": "={{ $json.body.formattedBlog }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "5b19b606-de29-477d-a3fd-e015b25bf037",
+                            "name": "AIAgent",
+                            "value": "={{ $json.body.AIAgent }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "109607b5-099d-4a8a-8532-60b7274113bf",
+                            "name": "focusKeywords",
+                            "value": "={{ $json.body.optimizedData.focusKeywords }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "c26db577-f4e4-4bd6-b188-e6cba2d71eea",
+                            "name": "relatedKeywords",
+                            "value": "={{ $json.body.optimizedData.relatedKeywords }}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                -800,
+                192
+            ],
+            "id": "d3958014-f6ca-4fa9-a207-33bb5c97adb6",
+            "name": "Edit Fields1"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert SEO editor and senior copywriter. Update the given blog EXACTLY according to the new inputs. Keep structure clean, avoid hallucinations, and preserve factual accuracy.\n\n---\n\n### INPUTS\n\n* Perspective: {{ $json.Perspective }}             // e.g., \"first person\", \"second person\", or \"third person\"\n* Tone: {{ $json.Tone }}                           // may be a list; apply in listed priority\n* Title: {{ $json.Title }}                         // updated page title (H1)\n* Meta Title: {{ $json.metaTitle }}                // SEO meta title (used for <title> tag)\n* Meta Description: {{ $json.metaDescription }}    // meta + opening pitch\n* Blog: {{ $json.Blog }}                           // the full current/plan/formatted blog (may include HTML/Markdown)\n* Focus Keywords: {{ $json.focusKeywords }}         // main keyword for SEO\n* Related Keywords: {{ $json.relatedKeywords }}     // supporting keyword for SEO\n\n---\n\n### GOAL\n\nRewrite the BLOG so it reflects the requested **Perspective**, **Tone**, **Title**, **Meta Title**, **Meta Description**, **Focus Keywords**, and **Related Keywords** — without losing meaning, accuracy, or structure.\nImprove clarity, flow, and SEO while preserving all facts, data, links, and lists unless they clearly conflict with the new inputs.\n\n---\n\n### RULES (follow all)\n\n1. **Perspective:**\n\n   * Apply consistently across all content (pronouns, verbs, and CTAs).\n   * `first person` → “I/we”\n     `second person` → “you”\n     `third person` → “they/organizations”.\n\n2. **Tone:**\n\n   * Blend multiple tones in listed order (first = dominant).\n   * Keep tone professional, engaging, and easy to read.\n\n3. **Title & H-tags:**\n\n   * Replace **H1** with updated **Title**.\n   * Integrate **Focus Keywords** in the **H1**.\n   * Use **Related Keywords** naturally in content.\n   * Maintain proper heading hierarchy (H2 > H3).\n   * Preserve all valid lists, tables, links, and structured sections (e.g., FAQs).\n\n4. **Meta Title & Description:**\n\n   * Use `metaTitle` for the `<title>` tag.\n   * Use `metaDescription` for `<meta name=\"description\">` and as the opening paragraph/hook (slightly adapted to sound natural).\n   * Include `<meta charset>` and `<meta viewport>`.\n\n5. **SEO:**\n\n   * Maintain topical scope and search intent.\n   * Integrate **Focus Keywords** in **H1**, and **Related Keywords** in other sections but don’t overuse them.\n   * Ensure **Focus Keywords** and **Related Keywords** are used only 3–4 times each throughout the blog.\n   * Keep and validate all internal/external links.\n   * Never fabricate URLs or statistics.\n\n6. **Content Quality:**\n\n   * Tighten readability, remove redundancy, and improve flow.\n   * Keep overall length within ±10% of original unless clarity improves.\n   * Generalize uncertain claims instead of inventing data.\n\n7. **Formatting:**\n\n   * Output must be a **fully valid, responsive HTML5 document** including:\n\n     ```\n     <!DOCTYPE html>\n     <html lang=\"en\">\n       <head>\n         <meta charset=\"UTF-8\">\n         <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n         <title>...</title>\n         <meta name=\"description\" content=\"...\">\n         <style>\n           body {\n             font-family: 'Segoe UI', Roboto, Arial, sans-serif;\n             color: #222;\n             background-color: #fff;\n             line-height: 1.7;\n             margin: 0;\n             padding: 0 1rem;\n           }\n           h1, h2, h3 {\n             color: #0a0a0a;\n             margin-top: 1.5rem;\n             line-height: 1.3;\n           }\n           h1 { font-size: 2rem; margin-top: 2rem; }\n           h2 { font-size: 1.5rem; margin-top: 1.75rem; }\n           h3 { font-size: 1.25rem; margin-top: 1.5rem; }\n           p { margin: 0.8rem 0; }\n           ul, ol { margin-left: 1.5rem; }\n           a { color: #0077cc; text-decoration: none; }\n           a:hover { text-decoration: underline; }\n           table {\n             border-collapse: collapse;\n             width: 100%;\n             margin: 1.5rem 0;\n           }\n           th, td {\n             border: 1px solid #ccc;\n             padding: 0.5rem 0.75rem;\n             text-align: left;\n           }\n           th {\n             background: #f7f7f7;\n             font-weight: 600;\n           }\n           blockquote {\n             border-left: 4px solid #0077cc;\n             padding-left: 1rem;\n             color: #555;\n             margin: 1rem 0;\n             font-style: italic;\n           }\n           .cta {\n             margin: 2rem 0;\n             background: #0077cc;\n             color: #fff;\n             padding: 1rem 1.5rem;\n             border-radius: 8px;\n             text-align: center;\n           }\n           .cta a {\n             color: #fff;\n             font-weight: 600;\n             text-decoration: underline;\n           }\n         </style>\n       </head>\n       <body>\n         ...updated blog content...\n       </body>\n     </html>\n     ```\n\n   * Do not use inline styles or external CSS.\n\n   * Ensure accessibility-friendly and mobile-responsive HTML.\n\n8. **Compliance:**\n\n   * No legal, medical, or financial advice beyond general info.\n   * No personal data, bias, or offensive text.\n\n9. **Missing Inputs:**\n\n   * If any of Perspective, Tone, Title, metaTitle, or metaDescription are missing → retain original equivalents.\n\n---\n\n### OUTPUT\n\nReturn a **single JSON object** (no extra text):\n\n```json\n{\n  \"updated_blog\": \"<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>...</title><meta name='description' content='...'><style>...CSS STYLES...</style></head><body>...UPDATED BLOG CONTENT...</body></html>\",\n  \"meta_title\": \"<metaTitle or fallback to trimmed Title (≤60 chars)>\",\n  \"meta_description\": \"<metaDescription, 140–160 chars>\",\n  \"title_plain\": \"<H1 text without tags>\",\n  \"description_plain\": \"<Opening hook text without tags>\",\n  \"changelog\": [\n    \"Summary bullet of major change #1\",\n    \"Summary bullet of major change #2\"\n  ],\n  \"quality_checks\": {\n    \"perspective_applied\": true,\n    \"tone_applied\": \"<dominant + secondary tones>\",\n    \"h_tags_valid\": true,\n    \"links_preserved\": true,\n    \"no_fabrication\": true\n  }\n}\n```\n\n---\n\n### PROCESS\n\n1. Parse input and detect structure (H1–H3, lists, tables, FAQs, CTAs, etc.).\n2. Apply **Perspective** and **Tone** globally.\n3. Replace:\n   * `<h1>` → Title  \n   * `<title>` → metaTitle  \n   * `<meta name=\"description\">` → metaDescription  \n4. Add intro hook adapted from metaDescription.\n5. Validate:\n   * Proper HTML structure with `<html>`, `<head>`, `<body>`  \n   * Functional CSS, clean layout  \n   * Heading hierarchy and preserved links  \n   * No hallucinations or fabricated info  \n6. Return JSON exactly as shown — no extra commentary.\n",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "typeVersion": 2.2,
+            "position": [
+                -384,
+                -96
+            ],
+            "id": "c36d6e94-a050-4534-a6d7-53c66bebe7d0",
+            "name": "AI Agent1"
+        },
+        {
+            "parameters": {
+                "options": {
+                    "temperature": 0.8
+                }
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                -384,
+                80
+            ],
+            "id": "bc54e290-14ac-4354-9666-5623ebee2a4f",
+            "name": "Google Gemini Chat Model1",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "KYoGPvTyGMmv9elG",
+                    "name": "Aman API "
+                }
+            }
+        },
+        {
+            "parameters": {
+                "jsCode": "// Get input data\nconst data = $json[\"output\"];\n\n// Parse the JSON string safely\nlet parsed;\ntry {\n  parsed = JSON.parse(data.match(/```json([\\s\\S]*?)```/)[1]);\n} catch (error) {\n  throw new Error(\"Failed to parse JSON: \" + error.message);\n}\n\n// Return all keys as separate fields\nreturn [\n  {\n    json: {\n      updated_blog: parsed.updated_blog,\n      meta_title: parsed.meta_title,\n      meta_description: parsed.meta_description,\n      title_plain: parsed.title_plain,\n      description_plain: parsed.description_plain,\n      changelog: parsed.changelog,\n      quality_checks: parsed.quality_checks\n    }\n  }\n];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                -80,
+                -96
+            ],
+            "id": "7481d070-4851-4b46-8f80-5207787178fe",
+            "name": "Code in JavaScript1"
+        },
+        {
+            "parameters": {
+                "model": "x-ai/grok-4",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+            "typeVersion": 1,
+            "position": [
+                -336,
+                -688
+            ],
+            "id": "3b261031-a70a-4994-bdd2-d0d361b508b8",
+            "name": "OpenRouter Chat Model",
+            "credentials": {
+                "openRouterApi": {
+                    "id": "Q7VWeDG2LQcdO3eU",
+                    "name": "Kedeyo"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "options": {
+                    "temperature": 0.8
+                }
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                -320,
+                -944
+            ],
+            "id": "687aeb06-0eaf-4335-826e-5432df7e642d",
+            "name": "Google Gemini Chat Model",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "KYoGPvTyGMmv9elG",
+                    "name": "Aman API "
+                }
+            }
+        },
+        {
+            "parameters": {
+                "respondWith": "allIncomingItems",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.4,
+            "position": [
+                1776,
+                -1056
+            ],
+            "id": "dca3ccc2-b252-4ba8-925f-fc1c6cd8a0f3",
+            "name": "Respond to Webhook2"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "7e63632a-0c8f-4f66-b6ff-3cc1b6931b7d",
+                            "name": "Perspective",
+                            "value": "={{ $json.body.optimizedData.perspective }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "63ff1724-7055-495c-ab59-f7af58683a4f",
+                            "name": "Tone",
+                            "value": "={{ $json.body.optimizedData.tone }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "34e49f14-9a5f-423a-99de-181ab20c2ee7",
+                            "name": "Title",
+                            "value": "={{ $json.body.optimizedData.blogTitle }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "74dc2858-ecaf-45d7-8b89-e989806b884c",
+                            "name": "metaTitle",
+                            "value": "={{ $json.body.optimizedData.metaTitle }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "f4965f42-a742-423b-a8fd-5352c0e1b217",
+                            "name": "metaDescription",
+                            "value": "={{ $json.body.optimizedData.metaDescription }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "acf09591-aae4-4d91-a3c6-457dfbabd843",
+                            "name": "Blog",
+                            "value": "={{ $json.body.formattedBlog }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "350e94c9-0c7e-465d-8ed8-500dbcce8f13",
+                            "name": "AIAgent",
+                            "value": "={{ $json.body.AIAgent }}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                880,
+                -784
+            ],
+            "id": "e7012c5f-ded7-47fe-9f46-1f4233a48748",
+            "name": "Edit Fields2"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are a **precise HTML updater and metadata editor**.\nPerform **only** the H1, `<title>`, and `<meta name=\"description\">` updates described below. The input `Blog` may be HTML, Markdown, plain text, or a Word/docx payload (plain text or base64). Detect and handle each case; do not modify other content.\n\n### INPUT JSON\n\n```json\n{\n  \"Title\": \"{{ $json.Title }}\",\n  \"metaTitle\": \"{{ $json.metaTitle }}\",\n  \"metaDescription\": \"{{ $json.metaDescription }}\",\n  \"Blog\": \"{{ $json.Blog }}\"\n}\n```\n\n### OVERVIEW (quick)\n\n1. Detect input type: HTML, Markdown, plain text, or Word/docx (binary/base64).\n2. Convert non-HTML to a safe HTML wrapper while preserving original visible content and line breaks.\n3. Update/insert H1 in the body, `<title>` in head, and `<meta name=\"description\">` in head — nothing else.\n4. Return one JSON object (exact schema below) and nothing else.\n\n### DETECTION & CONVERSION RULES\n\n* If `Blog` contains `<html` or `<body` or other HTML tags → treat as HTML and parse.\n* Else if `Blog` looks like Markdown (has `# ` headings, lists `- ` / `* `, or fenced code) → convert to HTML (preserve headings and inline formatting).\n* Else if `Blog` is clearly base64 or binary-like and filename or metadata indicates docx/word → attempt to extract plain text. If extraction fails, insert a plain-text fallback wrapper and note failure in `changelog`.\n* Else treat as plain text: convert newlines to paragraphs (`<p>`) and preserve original line breaks.\n\nAlways produce a **well-formed HTML** output: `<!DOCTYPE html><html lang=\"en\"><head>…</head><body>…</body></html>`.\n\n### UPDATES (surgical)\n\n1. **H1**\n\n   * If the HTML body contains an `<h1>`, replace the **first** `<h1>` inner text with `Title` (preserve attributes).\n   * If no `<h1>` exists, insert `<h1>Title</h1>` at the **very top** of `<body>` (before other content).\n   * If input was plain text/markdown/docx, convert to HTML first and then apply the rule.\n\n2. **<title>**\n\n   * Set `<title>` to `metaTitle`. If `metaTitle` is missing/empty, use `Title` trimmed and truncated to **≤60 chars** (do not break words if possible).\n   * Replace existing `<title>` or insert inside `<head>`.\n\n3. **meta description**\n\n   * Set `<meta name=\"description\" content=\"...\">` to `metaDescription`.\n   * If `metaDescription` is missing/empty, produce a fallback excerpt (140–160 chars) from the visible text (strip tags, prefer opening sentences). Trim to nearest word boundary.\n   * Replace existing meta description or insert immediately after `<title>`.\n\n### HEADHOUSEKEEPING\n\n* Ensure `<meta charset=\"UTF-8\">` and `<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">` exist in `<head>` (add if missing).\n* Add/retain a minimal non-intrusive `<style>` block in `<head>` for basic formatting.\n* Preserve all other head elements (canonical, structured data, scripts) unchanged.\n\n### EDGE CASES (explicit)\n\n* If input is invalid HTML, wrap it in a valid HTML shell and place the original content inside `<body>` (converted as above).\n* If multiple `<h1>` exist, modify only the **first**.\n* If Word/docx extraction fails, include original raw `Blog` content inside `<pre>` in the body and note extraction failure in `changelog`.\n* Do not reformat or normalize body text except necessary conversions (markdown → HTML, plain text → paragraphs). Never paraphrase or invent content.\n\n### LENGTH RULES (strict)\n\n* metaTitle fallback: ≤ 60 characters (truncate to last whole word within limit).\n* metaDescription fallback: 140–160 characters (trim to nearest word boundary).\n\n### OUTPUT (single JSON — no extra text)\n\nReturn exactly this JSON object with string values (no templates):\n\n```json\n{\n  \"updated_blog\": \"<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>...metaTitle or fallback...</title><meta name='description' content='...metaDescription or fallback...'><style>body{font-family:sans-serif;line-height:1.6;margin:20px auto;max-width:900px;padding:0 1rem}img{max-width:100%;height:auto}h1{margin-bottom:1rem}</style></head><body>...FINAL BLOG HTML (H1 updated; body otherwise unchanged)...</body></html>\",\n  \"meta_title\": \"metaTitle or fallback (≤60 chars)\",\n  \"meta_description\": \"metaDescription (140–160 chars or fallback excerpt)\",\n  \"title_plain\": \"Title text without tags\",\n  \"description_plain\": \"First 1–2 sentences or opening hook (no tags)\",\n  \"changelog\": [\n    \"Updated/Inserted <h1> using Title\",\n    \"Updated/Inserted <title> using metaTitle or fallback\",\n    \"Updated/Inserted meta description using metaDescription or fallback\",\n    \"Notes about conversion (if Blog was non-HTML) and any extraction issues\"\n  ],\n  \"quality_checks\": {\n    \"h1_updated\": true,\n    \"meta_title_set\": true,\n    \"meta_description_set\": true,\n    \"html_valid\": true,\n    \"no_other_body_changes\": true\n  }\n}\n```\n\n### EXECUTION STYLE\n\n* Be **literal, surgical, and deterministic**.\n* Minimize processing and avoid any text rewriting beyond required conversions.\n* If you trimmed for length or used fallback conversions, add a concise entry to `changelog`.\n\n---\n\n",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "typeVersion": 2.2,
+            "position": [
+                1328,
+                -1056
+            ],
+            "id": "5e9bc78f-eea1-4621-aac6-fbabc54351df",
+            "name": "AI Agent2"
+        },
+        {
+            "parameters": {
+                "options": {
+                    "temperature": 0.4
+                }
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                1328,
+                -896
+            ],
+            "id": "9d5fb454-d0df-468e-b60c-0f8b17438a7a",
+            "name": "Google Gemini Chat Model2",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "KYoGPvTyGMmv9elG",
+                    "name": "Aman API "
+                }
+            }
+        },
+        {
+            "parameters": {
+                "jsCode": "// Get input data\nconst data = $json[\"output\"];\n\n// Parse the JSON string safely\nlet parsed;\ntry {\n  parsed = JSON.parse(data.match(/```json([\\s\\S]*?)```/)[1]);\n} catch (error) {\n  throw new Error(\"Failed to parse JSON: \" + error.message);\n}\n\n// Return all keys as separate fields\nreturn [\n  {\n    json: {\n      updated_blog: parsed.updated_blog,\n      meta_title: parsed.meta_title,\n      meta_description: parsed.meta_description,\n      title_plain: parsed.title_plain,\n      description_plain: parsed.description_plain,\n      changelog: parsed.changelog,\n      quality_checks: parsed.quality_checks\n    }\n  }\n];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1600,
+                -1056
+            ],
+            "id": "57991ede-9089-4077-b496-f9ee0d4a4795",
+            "name": "Code in JavaScript2"
+        },
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "89a60977-6a3f-4736-a3c7-b74540d1f54e",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2.1,
+            "position": [
+                -976,
+                192
+            ],
+            "id": "e04f2200-fa14-4ee0-9ab8-9d55d50a7aaf",
+            "name": "Complete Blog Update",
+            "webhookId": "89a60977-6a3f-4736-a3c7-b74540d1f54e"
+        },
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "b49d431d-5f94-4238-a099-20cae77efdef",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2.1,
+            "position": [
+                -944,
+                -832
+            ],
+            "id": "2a35e221-f9bc-4d83-b827-c63c7d260ae0",
+            "name": "Input Your Blog",
+            "webhookId": "b49d431d-5f94-4238-a099-20cae77efdef"
+        },
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "89b3efe1-ab1c-4099-8e9a-80936d710938",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2.1,
+            "position": [
+                704,
+                -784
+            ],
+            "id": "06474f5a-2145-4610-8420-02765567c92f",
+            "name": "Just Update Details",
+            "webhookId": "89b3efe1-ab1c-4099-8e9a-80936d710938"
+        },
+        {
+            "parameters": {
+                "respondWith": "allIncomingItems",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.4,
+            "position": [
+                1760,
+                -80
+            ],
+            "id": "25e4c404-6648-432a-b689-311f863dca9f",
+            "name": "Respond to Webhook3"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "b166a757-de1e-48dd-a446-c85646e3f1af",
+                            "name": "blogTitles",
+                            "value": "={{ $json.body.selectedSuggestions.blogTitles }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "c5cc1495-18d6-4e88-8449-d3c12abecfc7",
+                            "name": "metaTitles",
+                            "value": "={{ $json.body.selectedSuggestions.metaTitles }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "89c395ee-6e2f-401b-90d0-c085838b7821",
+                            "name": "descriptions",
+                            "value": "={{ $json.body.selectedSuggestions.descriptions }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "0ca1a159-cc8e-4dd8-a3ef-e04b02e94d74",
+                            "name": "message",
+                            "value": "={{ $json.body.message }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "f1cdfb1b-851e-42cf-806e-6504becaffaa",
+                            "name": "AIAgent",
+                            "value": "={{ $json.body.AIAgent }}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                736,
+                192
+            ],
+            "id": "b9278896-5751-4571-bdc3-cb38f467d355",
+            "name": "Edit Fields3"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are a **professional SEO strategist and creative editor**.\nYour goal: enhance the provided input by generating **3 high-quality, SEO-optimized, natural-sounding alternatives** for every title, meta title, and description.\n\n---\n\n## 🔹 **INPUT (JSON)**\n\n```json\n{\n  \"blogTitles\": \"{{ $json.blogTitles }}\",\n  \"metaTitles\": \"{{ $json.metaTitles }}\",\n  \"descriptions\": \"{{ $json.descriptions }}\",\n  \"message\": \"{{ $json.message }}\"\n}\n```\n\n### Notes:\n\n* Each of `blogTitles`, `metaTitles`, and `descriptions` may contain **one or multiple comma-separated values**.\n* `message` is **optional** and should influence the tone, keywords, audience, style, or CTA **whenever present**.\n\n---\n\n## 🔹 **BEHAVIOR RULES**\n\n### **1. Splitting & Processing**\n\n* Split comma-separated inputs.\n* Treat each item **individually**.\n* Generate **3 unique enhanced alternatives** per item.\n\n### **2. How to Use `message` (Only if Present)**\n\nIf `message` includes:\n\n* **Tone keywords** → apply them (e.g., formal, friendly, bold, technical).\n* **Audience** → tailor writing to that audience (e.g., startups, IT teams, enterprises).\n* **Focus keywords** → incorporate them naturally (e.g., “affordable,” “secure,” “fast deployment”).\n* **CTA instructions** → embed subtle, natural CTAs (e.g., “Start your free trial”).\n* **SEO intent** → match style (informational / transactional / commercial).\n\nIf no message is present → write in a neutral, professional SEO tone.\n\n### **3. SEO Requirements**\n\n* **Blog Titles:** 55–65 characters preferred.\n* **Meta Titles:** short, descriptive, keyword-driven.\n* **Descriptions:** under 160 characters, persuasive, action-friendly.\n* Keywords should appear **naturally**, not stuffed.\n\n### **4. Style Rules**\n\n* No words like: *AI, generated, machine, algorithm*.\n* Everything must feel human-written.\n* Maintain clean rhythm and natural readability.\n\n---\n\n## 🔹 **OUTPUT FORMAT (IMPORTANT — MUST FOLLOW STRICTLY)**\n\nYou must output **valid flat JSON**, with unique sequential key names.\n\n### **Key Naming Rules:**\n\n* For blog titles:\n  `enhancedBlogTitles1`, `enhancedBlogTitles2`, `enhancedBlogTitles3`, …\n\n* For meta titles:\n  `enhancedMetaTitles1`, `enhancedMetaTitles2`, `enhancedMetaTitles3`, …\n\n* For descriptions:\n  `enhancedDescriptions1`, `enhancedDescriptions2`, `enhancedDescriptions3`, …\n\n### **Sequential Numbering:**\n\n* Numbering continues across multiple inputs.\n  Example:\n  If the first blog title uses keys 1–3,\n  the second blog title must use keys 4–6.\n\n### **Value Rules:**\n\n* Each value = one enhanced alternative.\n* Do **not** include arrays, nested objects, explanations, or comments.\n* Output **only** the flat JSON — nothing else.\n\n---\n",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "typeVersion": 2.2,
+            "position": [
+                1296,
+                -80
+            ],
+            "id": "595ee118-cba1-488b-80e8-e64c0323e4b3",
+            "name": "AI Agent3"
+        },
+        {
+            "parameters": {
+                "options": {
+                    "temperature": 0.8
+                }
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                1296,
+                64
+            ],
+            "id": "dc621cec-6ea2-420c-821e-63c3d601a753",
+            "name": "Google Gemini Chat Model3",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "KYoGPvTyGMmv9elG",
+                    "name": "Aman API "
+                }
+            }
+        },
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "4494d063-c53e-4599-ac9f-8d1bc9b01f64",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2.1,
+            "position": [
+                592,
+                192
+            ],
+            "id": "bed4945f-7c7a-4296-af7f-ff2dc7a1d412",
+            "name": "AI ChatBot",
+            "webhookId": "4494d063-c53e-4599-ac9f-8d1bc9b01f64"
+        },
+        {
+            "parameters": {
+                "jsCode": "// Step 1: Get the raw string from the first item\nlet rawString = items[0].json.output;\n\n// Step 2: Remove ```json and ``` wrapping\nrawString = rawString.replace(/^```json\\s*/, '').replace(/```$/, '');\n\n// Step 3: Parse the string into JSON\nconst outputJson = JSON.parse(rawString);\n\n// Step 4: Return as a single JSON object\nreturn [{ json: outputJson }];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1600,
+                -80
+            ],
+            "id": "0418eab5-e16f-4f03-81d7-94bcf737dac0",
+            "name": "Code in JavaScript3",
+            "alwaysOutputData": false
+        },
+        {
+            "parameters": {
+                "rules": {
+                    "values": [
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "leftValue": "={{ $json.AIAgent }}",
+                                        "rightValue": "Google Gemini",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals"
+                                        },
+                                        "id": "ec4ead31-09b3-41a0-9aea-e3d7d39a6777"
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "600c24fd-4eb0-4a4b-89e4-ea48c5c875bf",
+                                        "leftValue": "={{ $json.AIAgent }}",
+                                        "rightValue": "Grok",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "56861c01-65f6-43ea-bae4-2a8048857603",
+                                        "leftValue": "={{ $json.AIAgent }}",
+                                        "rightValue": "Chat GPT",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.switch",
+            "typeVersion": 3.3,
+            "position": [
+                -592,
+                -848
+            ],
+            "id": "654253a1-2251-4aa4-b7cf-3a1f3b11dceb",
+            "name": "Switch"
+        },
+        {
+            "parameters": {
+                "respondWith": "allIncomingItems",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.4,
+            "position": [
+                64,
+                -832
+            ],
+            "id": "aa899ce2-a9e5-4f72-a313-2bb7da79e7e7",
+            "name": "Respond to Webhook4"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert SEO/content analyst and must return **only a single JSON object** that strictly matches the schema below.\nDo not include Markdown, comments, explanations, or extra keys.\nThe response must begin with `{` and end with `}`.\n\n---\n\n## ✅ INPUT\n\nblogContent (HTML, Markdown, or plain text): **{{ $json.blogContent }}**\n\n---\n\n## ✅ OBJECTIVE\n\nPerform a complete SEO/content analysis and produce:\n✅ Accurate score\n✅ Correct metadata extraction (meta title & description if present)\n✅ High-quality, rhythmic, SEO-oriented titles/descriptions\n✅ **At least 10 TitleSuggestions**\n✅ **At least 10 metaTitleSuggestions**\n✅ **At least 10 metaDescriptionSuggestions**\n✅ Every title/meta title suggestion must include:\n\n* **1 focus keyword**, and\n* **2–3 related keywords**, when natural and non-stuffed\n\nAlso determine the **narrative perspective** of the blog:\n\n* 1st person (I, we)\n* 2nd person (you)\n* 3rd person (they, the company, the user, names)\n\nThe identified perspective must be output in `\"perspective\"` as: `\"first-person\"`, `\"second-person\"`, or `\"third-person\"`.\n\n---\n\n# ✅ METADATA EXTRACTION (ROBUST FIX)\n\n### Extract existing metaTitle (in this order):\n\n1. `<meta name=\"title\" ...>`\n2. `<meta property=\"og:title\" ...>`\n3. `<meta name=\"twitter:title\" ...>`\n4. `<title>…</title>`\n\n### Extract existing metaDescription (in this order):\n\n1. `<meta name=\"description\" ...>`\n2. `<meta property=\"og:description\" ...>`\n3. `<meta name=\"twitter:description\" ...>`\n\n### Extract on-page H1 title:\n\n1. First `<h1>`\n2. Else Markdown `# ` heading\n3. Else first descriptive line (10–120 chars)\n\n### Validation\n\nReject extracted meta title if:\n\n* <20 or >60 chars\n* Similar to H1 (≥60% match)\n\nReject extracted meta description if:\n\n* <80 or >180 chars\n* No verb\n* Starts with brand/site name\n\nIf invalid → generate new ones.\n\n---\n\n# ✅ TELECOM / WHOLESALE VOIP DETECTION (Conditional)\n\nIf {{ $json.blogContent }} includes telecom language (e.g., “voip”, “sip”, “routes”, “carrier”, “termination”, “wholesale”),\nthen enrich keyword extraction and suggestions by naturally incorporating:\n\n* Wholesale VoIP\n* Wholesale Voice\n* Wholesale VoIP Providers\n* VoIP Termination\n* Voice Termination\n* Wholesale VoIP Rates\n* Wholesale Voice Providers\n* Wholesale VoIP Routes\n\nOtherwise ignore these completely.\n\n---\n\n# ✅ METADATA GENERATION RULES\n\n### metaTitle (≤60 chars)\n\n* Includes **1 focus keyword**\n* Includes **2–3 related keywords** where natural\n* Must differ from H1\n* Rhythmic, human-readable, SEO-optimized\n\n### metaDescription (150–160 chars)\n\n* Includes **1 focus keyword** + **1 related keyword**\n* Rhythmic (smooth flow, natural pacing)\n* Benefit-focused & intent-aligned\n\n---\n\n# ✅ TitleSuggestions (≥10)\n\n* Each suggestion is unique\n* Each includes **1 focus keyword + 2–3 related keywords naturally**\n* Must be rhythmic, clear, readable, and SEO-oriented\n* Must NOT duplicate H1 or metaTitle\n\n---\n\n# ✅ metaTitleSuggestions (≥10)\n\n* Each suggestion includes **1 focus keyword + 2–3 related keywords**\n* Must be rhythmic, readable, and high-CTR\n* No repeated structures\n\n---\n\n# ✅ metaDescriptionSuggestions (≥10)\n\n* Natural, human, rhythmic\n* Must include **focus + related keywords**\n* Benefit-oriented but not forced\n* All unique\n\n---\n\n# ✅ KEYWORDS\n\nExtract automatically from {{ $json.blogContent }}:\n\n* **3–6 focus keywords** (most important phrases)\n* **8–20 related keywords** (LSI, semantic variations)\n\nIf telecom-related → merge with predefined telecom keyword list.\nKeyword usage must remain **natural (no stuffing).**\n\n---\n\n# ✅ **IMPROVED SEO SCORE**\n\nUse the following scoring model (0–100):\n\n### Metadata (20)\n\n• meta title quality\n• meta description quality\n• relevance & keyword usage\n\n### Structure (20)\n\n• header structure\n• paragraph clarity\n• presence of intro, body, conclusion\n\n### Keywords (20)\n\n• focus keyword usage\n• related keyword distribution\n• lack of keyword stuffing\n\n### Readability & Mobile (15)\n\n• sentence length\n• pacing & flow\n• scannability\n\n### Depth & Length (15)\n\n• informational depth\n• completeness\n• topical coverage\n\n### Grammar & Clarity (10)\n\n• grammar accuracy\n• clarity of ideas\n\n### Bonus (up to +5)\n\n• +3 if >1800 words\n• +2 if Flesch Reading Ease >60\n\nTotal possible: **100**\n\nReturn integer score in `\"seoScore\"`.\n\n---\n\n# ✅ RECOMMENDATIONS\n\nMust include **at least 12 unique, actionable, non-overlapping items**.\nFirst five begin with `\"Priority #1 —\"` through `\"Priority #5 —\"`.\n\nInclude EXACTLY ONCE:\n\n* `\"Suggested perspective: …\"`\n* `\"Suggested tones: […, …]\"`\n* `\"Suggested title: …\"` (must NOT match any TitleSuggestions or meta titles)\n* `\"Suggested description: …\"` (must NOT match any description suggestions)\n\nUse imperative, measurable language (e.g., “Add 3 internal links…”).\n\n---\n\n# ✅ OUTPUT CONTRACT\n\nReturn exactly:\n\n{\n\"success\": true,\n\"data\": {\n\"perspective\": \"...\",\n\"tone\": [...],\n\"seoScore\": 0,\n\"title\": \"...\",\n\"metaTitle\": \"...\",\n\"metaDescription\": \"...\",\n\"TitleSuggestions\": [...],\n\"metaTitleSuggestions\": [...],\n\"metaDescriptionSuggestions\": [...],\n\"focusKeywords\": [...],\n\"relatedKeywords\": [...],\n\"recommendations\": [...]\n}\n}\n\n---\n\n# ✅ SELF-CHECK BEFORE RESPONDING\n\n* Output starts `{` and ends `}`\n* metaTitle ≠ title & not overly similar\n* All suggestions contain required keywords\n* No duplicates in any suggestion list\n* Telecom keywords used only if contextually relevant\n* No style-category language\n* All content is rhythmic, natural, and SEO-oriented\n* Perspective returned as: `\"first-person\"`, `\"second-person\"`, or `\"third-person\"`\n\n",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "typeVersion": 2.2,
+            "position": [
+                -336,
+                -832
+            ],
+            "id": "c3a9ef8e-28b6-46a8-9869-8cf7b36a9113",
+            "name": "AI Agent4"
+        },
+        {
+            "parameters": {
+                "jsCode": "// Step 1: Get the input field\nconst raw = $json.output;\n\n// Step 2: Clean unwanted markdown or code block syntax\nconst cleaned = raw\n  .replace(/```json/g, '')   // remove ```json\n  .replace(/```/g, '')       // remove closing ```\n  .trim();\n\n// Step 3: Parse safely\nlet parsed;\ntry {\n  parsed = JSON.parse(cleaned);\n} catch (err) {\n  throw new Error(\"❌ Failed to parse cleaned JSON: \" + err.message + \"\\nCleaned content:\\n\" + cleaned);\n}\n\n// Step 4: Check for data key\nif (!parsed.data) {\n  throw new Error(\"❌ 'data' field not found in JSON.\");\n}\n\n// Step 5: Extract data\nconst data = parsed.data;\n\n// Step 6: Create unique outputs (each key becomes its own JSON)\nconst outputItems = Object.entries(data).map(([key, value]) => ({\n  json: { [key]: value },\n}));\n\n// Step 7: Return final output\nreturn outputItems;\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                -80,
+                -832
+            ],
+            "id": "6166413d-950c-4eae-9bd9-c893746c88be",
+            "name": "Code in JavaScript4"
+        },
+        {
+            "parameters": {
+                "respondWith": "allIncomingItems",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.4,
+            "position": [
+                80,
+                -576
+            ],
+            "id": "4b45287c-79e3-4b9c-96ff-68a1314efd6a",
+            "name": "Respond to Webhook5"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert SEO/content analyst and must return **only a single JSON object** that strictly matches the schema below.\nDo not include Markdown, comments, explanations, or extra keys.\nThe response must begin with `{` and end with `}`.\n\n---\n\n## ✅ INPUT\n\nblogContent (HTML, Markdown, or plain text): **{{ $json.blogContent }}**\n\n---\n\n## ✅ OBJECTIVE\n\nPerform a complete SEO/content analysis and produce:\n✅ Accurate score\n✅ Correct metadata extraction (meta title & description if present)\n✅ High-quality, rhythmic, SEO-oriented titles/descriptions\n✅ **At least 10 TitleSuggestions**\n✅ **At least 10 metaTitleSuggestions**\n✅ **At least 10 metaDescriptionSuggestions**\n✅ Every title/meta title suggestion must include:\n\n* **1 focus keyword**, and\n* **2–3 related keywords**, when natural and non-stuffed\n\nAlso determine the **narrative perspective** of the blog:\n\n* 1st person (I, we)\n* 2nd person (you)\n* 3rd person (they, the company, the user, names)\n\nThe identified perspective must be output in `\"perspective\"` as: `\"first-person\"`, `\"second-person\"`, or `\"third-person\"`.\n\n---\n\n# ✅ METADATA EXTRACTION (ROBUST FIX)\n\n### Extract existing metaTitle (in this order):\n\n1. `<meta name=\"title\" ...>`\n2. `<meta property=\"og:title\" ...>`\n3. `<meta name=\"twitter:title\" ...>`\n4. `<title>…</title>`\n\n### Extract existing metaDescription (in this order):\n\n1. `<meta name=\"description\" ...>`\n2. `<meta property=\"og:description\" ...>`\n3. `<meta name=\"twitter:description\" ...>`\n\n### Extract on-page H1 title:\n\n1. First `<h1>`\n2. Else Markdown `# ` heading\n3. Else first descriptive line (10–120 chars)\n\n### Validation\n\nReject extracted meta title if:\n\n* <20 or >60 chars\n* Similar to H1 (≥60% match)\n\nReject extracted meta description if:\n\n* <80 or >180 chars\n* No verb\n* Starts with brand/site name\n\nIf invalid → generate new ones.\n\n---\n\n# ✅ TELECOM / WHOLESALE VOIP DETECTION (Conditional)\n\nIf {{ $json.blogContent }} includes telecom language (e.g., “voip”, “sip”, “routes”, “carrier”, “termination”, “wholesale”),\nthen enrich keyword extraction and suggestions by naturally incorporating:\n\n* Wholesale VoIP\n* Wholesale Voice\n* Wholesale VoIP Providers\n* VoIP Termination\n* Voice Termination\n* Wholesale VoIP Rates\n* Wholesale Voice Providers\n* Wholesale VoIP Routes\n\nOtherwise ignore these completely.\n\n---\n\n# ✅ METADATA GENERATION RULES\n\n### metaTitle (≤60 chars)\n\n* Includes **1 focus keyword**\n* Includes **2–3 related keywords** where natural\n* Must differ from H1\n* Rhythmic, human-readable, SEO-optimized\n\n### metaDescription (150–160 chars)\n\n* Includes **1 focus keyword** + **1 related keyword**\n* Rhythmic (smooth flow, natural pacing)\n* Benefit-focused & intent-aligned\n\n---\n\n# ✅ TitleSuggestions (≥10)\n\n* Each suggestion is unique\n* Each includes **1 focus keyword + 2–3 related keywords naturally**\n* Must be rhythmic, clear, readable, and SEO-oriented\n* Must NOT duplicate H1 or metaTitle\n\n---\n\n# ✅ metaTitleSuggestions (≥10)\n\n* Each suggestion includes **1 focus keyword + 2–3 related keywords**\n* Must be rhythmic, readable, and high-CTR\n* No repeated structures\n\n---\n\n# ✅ metaDescriptionSuggestions (≥10)\n\n* Natural, human, rhythmic\n* Must include **focus + related keywords**\n* Benefit-oriented but not forced\n* All unique\n\n---\n\n# ✅ KEYWORDS\n\nExtract automatically from {{ $json.blogContent }}:\n\n* **3–6 focus keywords** (most important phrases)\n* **8–20 related keywords** (LSI, semantic variations)\n\nIf telecom-related → merge with predefined telecom keyword list.\nKeyword usage must remain **natural (no stuffing).**\n\n---\n\n# ✅ **IMPROVED SEO SCORE**\n\nUse the following scoring model (0–100):\n\n### Metadata (20)\n\n• meta title quality\n• meta description quality\n• relevance & keyword usage\n\n### Structure (20)\n\n• header structure\n• paragraph clarity\n• presence of intro, body, conclusion\n\n### Keywords (20)\n\n• focus keyword usage\n• related keyword distribution\n• lack of keyword stuffing\n\n### Readability & Mobile (15)\n\n• sentence length\n• pacing & flow\n• scannability\n\n### Depth & Length (15)\n\n• informational depth\n• completeness\n• topical coverage\n\n### Grammar & Clarity (10)\n\n• grammar accuracy\n• clarity of ideas\n\n### Bonus (up to +5)\n\n• +3 if >1800 words\n• +2 if Flesch Reading Ease >60\n\nTotal possible: **100**\n\nReturn integer score in `\"seoScore\"`.\n\n---\n\n# ✅ RECOMMENDATIONS\n\nMust include **at least 12 unique, actionable, non-overlapping items**.\nFirst five begin with `\"Priority #1 —\"` through `\"Priority #5 —\"`.\n\nInclude EXACTLY ONCE:\n\n* `\"Suggested perspective: …\"`\n* `\"Suggested tones: […, …]\"`\n* `\"Suggested title: …\"` (must NOT match any TitleSuggestions or meta titles)\n* `\"Suggested description: …\"` (must NOT match any description suggestions)\n\nUse imperative, measurable language (e.g., “Add 3 internal links…”).\n\n---\n\n# ✅ OUTPUT CONTRACT\n\nReturn exactly:\n\n{\n\"success\": true,\n\"data\": {\n\"perspective\": \"...\",\n\"tone\": [...],\n\"seoScore\": 0,\n\"title\": \"...\",\n\"metaTitle\": \"...\",\n\"metaDescription\": \"...\",\n\"TitleSuggestions\": [...],\n\"metaTitleSuggestions\": [...],\n\"metaDescriptionSuggestions\": [...],\n\"focusKeywords\": [...],\n\"relatedKeywords\": [...],\n\"recommendations\": [...]\n}\n}\n\n---\n\n# ✅ SELF-CHECK BEFORE RESPONDING\n\n* Output starts `{` and ends `}`\n* metaTitle ≠ title & not overly similar\n* All suggestions contain required keywords\n* No duplicates in any suggestion list\n* Telecom keywords used only if contextually relevant\n* No style-category language\n* All content is rhythmic, natural, and SEO-oriented\n* Perspective returned as: `\"first-person\"`, `\"second-person\"`, or `\"third-person\"`\n\n",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "typeVersion": 2.2,
+            "position": [
+                -320,
+                -576
+            ],
+            "id": "a5a449e0-c4be-4c7f-b56b-1958a949ee9e",
+            "name": "AI Agent5"
+        },
+        {
+            "parameters": {
+                "jsCode": "// Step 1: Get the input field\nconst raw = $json.output;\n\n// Step 2: Clean unwanted markdown or code block syntax\nconst cleaned = raw\n  .replace(/```json/g, '')   // remove ```json\n  .replace(/```/g, '')       // remove closing ```\n  .trim();\n\n// Step 3: Parse safely\nlet parsed;\ntry {\n  parsed = JSON.parse(cleaned);\n} catch (err) {\n  throw new Error(\"❌ Failed to parse cleaned JSON: \" + err.message + \"\\nCleaned content:\\n\" + cleaned);\n}\n\n// Step 4: Check for data key\nif (!parsed.data) {\n  throw new Error(\"❌ 'data' field not found in JSON.\");\n}\n\n// Step 5: Extract data\nconst data = parsed.data;\n\n// Step 6: Create unique outputs (each key becomes its own JSON)\nconst outputItems = Object.entries(data).map(([key, value]) => ({\n  json: { [key]: value },\n}));\n\n// Step 7: Return final output\nreturn outputItems;\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                -64,
+                -576
+            ],
+            "id": "c3d46811-c69f-4186-bda0-1aeb3b15d0f6",
+            "name": "Code in JavaScript5"
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+            "typeVersion": 1,
+            "position": [
+                -320,
+                -416
+            ],
+            "id": "e4c40b69-9a85-48f2-9604-ad581c8f5c35",
+            "name": "OpenRouter Chat Model1",
+            "credentials": {
+                "openRouterApi": {
+                    "id": "Q7VWeDG2LQcdO3eU",
+                    "name": "Kedeyo"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "respondWith": "allIncomingItems",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.4,
+            "position": [
+                1792,
+                -784
+            ],
+            "id": "16e0f670-34c7-4349-acc2-3f67606f4374",
+            "name": "Respond to Webhook6"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are a **precise HTML updater and metadata editor**.\nPerform **only** the H1, `<title>`, and `<meta name=\"description\">` updates described below. The input `Blog` may be HTML, Markdown, plain text, or a Word/docx payload (plain text or base64). Detect and handle each case; do not modify other content.\n\n### INPUT JSON\n\n```json\n{\n  \"Title\": \"{{ $json.Title }}\",\n  \"metaTitle\": \"{{ $json.metaTitle }}\",\n  \"metaDescription\": \"{{ $json.metaDescription }}\",\n  \"Blog\": \"{{ $json.Blog }}\"\n}\n```\n\n### OVERVIEW (quick)\n\n1. Detect input type: HTML, Markdown, plain text, or Word/docx (binary/base64).\n2. Convert non-HTML to a safe HTML wrapper while preserving original visible content and line breaks.\n3. Update/insert H1 in the body, `<title>` in head, and `<meta name=\"description\">` in head — nothing else.\n4. Return one JSON object (exact schema below) and nothing else.\n\n### DETECTION & CONVERSION RULES\n\n* If `Blog` contains `<html` or `<body` or other HTML tags → treat as HTML and parse.\n* Else if `Blog` looks like Markdown (has `# ` headings, lists `- ` / `* `, or fenced code) → convert to HTML (preserve headings and inline formatting).\n* Else if `Blog` is clearly base64 or binary-like and filename or metadata indicates docx/word → attempt to extract plain text. If extraction fails, insert a plain-text fallback wrapper and note failure in `changelog`.\n* Else treat as plain text: convert newlines to paragraphs (`<p>`) and preserve original line breaks.\n\nAlways produce a **well-formed HTML** output: `<!DOCTYPE html><html lang=\"en\"><head>…</head><body>…</body></html>`.\n\n### UPDATES (surgical)\n\n1. **H1**\n\n   * If the HTML body contains an `<h1>`, replace the **first** `<h1>` inner text with `Title` (preserve attributes).\n   * If no `<h1>` exists, insert `<h1>Title</h1>` at the **very top** of `<body>` (before other content).\n   * If input was plain text/markdown/docx, convert to HTML first and then apply the rule.\n\n2. **<title>**\n\n   * Set `<title>` to `metaTitle`. If `metaTitle` is missing/empty, use `Title` trimmed and truncated to **≤60 chars** (do not break words if possible).\n   * Replace existing `<title>` or insert inside `<head>`.\n\n3. **meta description**\n\n   * Set `<meta name=\"description\" content=\"...\">` to `metaDescription`.\n   * If `metaDescription` is missing/empty, produce a fallback excerpt (140–160 chars) from the visible text (strip tags, prefer opening sentences). Trim to nearest word boundary.\n   * Replace existing meta description or insert immediately after `<title>`.\n\n### HEADHOUSEKEEPING\n\n* Ensure `<meta charset=\"UTF-8\">` and `<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">` exist in `<head>` (add if missing).\n* Add/retain a minimal non-intrusive `<style>` block in `<head>` for basic formatting.\n* Preserve all other head elements (canonical, structured data, scripts) unchanged.\n\n### EDGE CASES (explicit)\n\n* If input is invalid HTML, wrap it in a valid HTML shell and place the original content inside `<body>` (converted as above).\n* If multiple `<h1>` exist, modify only the **first**.\n* If Word/docx extraction fails, include original raw `Blog` content inside `<pre>` in the body and note extraction failure in `changelog`.\n* Do not reformat or normalize body text except necessary conversions (markdown → HTML, plain text → paragraphs). Never paraphrase or invent content.\n\n### LENGTH RULES (strict)\n\n* metaTitle fallback: ≤ 60 characters (truncate to last whole word within limit).\n* metaDescription fallback: 140–160 characters (trim to nearest word boundary).\n\n### OUTPUT (single JSON — no extra text)\n\nReturn exactly this JSON object with string values (no templates):\n\n```json\n{\n  \"updated_blog\": \"<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>...metaTitle or fallback...</title><meta name='description' content='...metaDescription or fallback...'><style>body{font-family:sans-serif;line-height:1.6;margin:20px auto;max-width:900px;padding:0 1rem}img{max-width:100%;height:auto}h1{margin-bottom:1rem}</style></head><body>...FINAL BLOG HTML (H1 updated; body otherwise unchanged)...</body></html>\",\n  \"meta_title\": \"metaTitle or fallback (≤60 chars)\",\n  \"meta_description\": \"metaDescription (140–160 chars or fallback excerpt)\",\n  \"title_plain\": \"Title text without tags\",\n  \"description_plain\": \"First 1–2 sentences or opening hook (no tags)\",\n  \"changelog\": [\n    \"Updated/Inserted <h1> using Title\",\n    \"Updated/Inserted <title> using metaTitle or fallback\",\n    \"Updated/Inserted meta description using metaDescription or fallback\",\n    \"Notes about conversion (if Blog was non-HTML) and any extraction issues\"\n  ],\n  \"quality_checks\": {\n    \"h1_updated\": true,\n    \"meta_title_set\": true,\n    \"meta_description_set\": true,\n    \"html_valid\": true,\n    \"no_other_body_changes\": true\n  }\n}\n```\n\n### EXECUTION STYLE\n\n* Be **literal, surgical, and deterministic**.\n* Minimize processing and avoid any text rewriting beyond required conversions.\n* If you trimmed for length or used fallback conversions, add a concise entry to `changelog`.\n\n---\n\n",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "typeVersion": 2.2,
+            "position": [
+                1328,
+                -784
+            ],
+            "id": "b09ec76d-2977-4a02-ac6f-d0fe22381b05",
+            "name": "AI Agent6"
+        },
+        {
+            "parameters": {
+                "jsCode": "// Get input data\nconst data = $json[\"output\"];\n\n// Parse the JSON string safely\nlet parsed;\ntry {\n  parsed = JSON.parse(data.match(/```json([\\s\\S]*?)```/)[1]);\n} catch (error) {\n  throw new Error(\"Failed to parse JSON: \" + error.message);\n}\n\n// Return all keys as separate fields\nreturn [\n  {\n    json: {\n      updated_blog: parsed.updated_blog,\n      meta_title: parsed.meta_title,\n      meta_description: parsed.meta_description,\n      title_plain: parsed.title_plain,\n      description_plain: parsed.description_plain,\n      changelog: parsed.changelog,\n      quality_checks: parsed.quality_checks\n    }\n  }\n];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1616,
+                -784
+            ],
+            "id": "141dc0bd-6ee6-4010-829c-38783dc84982",
+            "name": "Code in JavaScript6"
+        },
+        {
+            "parameters": {
+                "respondWith": "allIncomingItems",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.4,
+            "position": [
+                1776,
+                -528
+            ],
+            "id": "dd09e809-3f97-4c49-9783-11c34070b4dc",
+            "name": "Respond to Webhook7"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are a **precise HTML updater and metadata editor**.\nPerform **only** the H1, `<title>`, and `<meta name=\"description\">` updates described below. The input `Blog` may be HTML, Markdown, plain text, or a Word/docx payload (plain text or base64). Detect and handle each case; do not modify other content.\n\n### INPUT JSON\n\n```json\n{\n  \"Title\": \"{{ $json.Title }}\",\n  \"metaTitle\": \"{{ $json.metaTitle }}\",\n  \"metaDescription\": \"{{ $json.metaDescription }}\",\n  \"Blog\": \"{{ $json.Blog }}\"\n}\n```\n\n### OVERVIEW (quick)\n\n1. Detect input type: HTML, Markdown, plain text, or Word/docx (binary/base64).\n2. Convert non-HTML to a safe HTML wrapper while preserving original visible content and line breaks.\n3. Update/insert H1 in the body, `<title>` in head, and `<meta name=\"description\">` in head — nothing else.\n4. Return one JSON object (exact schema below) and nothing else.\n\n### DETECTION & CONVERSION RULES\n\n* If `Blog` contains `<html` or `<body` or other HTML tags → treat as HTML and parse.\n* Else if `Blog` looks like Markdown (has `# ` headings, lists `- ` / `* `, or fenced code) → convert to HTML (preserve headings and inline formatting).\n* Else if `Blog` is clearly base64 or binary-like and filename or metadata indicates docx/word → attempt to extract plain text. If extraction fails, insert a plain-text fallback wrapper and note failure in `changelog`.\n* Else treat as plain text: convert newlines to paragraphs (`<p>`) and preserve original line breaks.\n\nAlways produce a **well-formed HTML** output: `<!DOCTYPE html><html lang=\"en\"><head>…</head><body>…</body></html>`.\n\n### UPDATES (surgical)\n\n1. **H1**\n\n   * If the HTML body contains an `<h1>`, replace the **first** `<h1>` inner text with `Title` (preserve attributes).\n   * If no `<h1>` exists, insert `<h1>Title</h1>` at the **very top** of `<body>` (before other content).\n   * If input was plain text/markdown/docx, convert to HTML first and then apply the rule.\n\n2. **<title>**\n\n   * Set `<title>` to `metaTitle`. If `metaTitle` is missing/empty, use `Title` trimmed and truncated to **≤60 chars** (do not break words if possible).\n   * Replace existing `<title>` or insert inside `<head>`.\n\n3. **meta description**\n\n   * Set `<meta name=\"description\" content=\"...\">` to `metaDescription`.\n   * If `metaDescription` is missing/empty, produce a fallback excerpt (140–160 chars) from the visible text (strip tags, prefer opening sentences). Trim to nearest word boundary.\n   * Replace existing meta description or insert immediately after `<title>`.\n\n### HEADHOUSEKEEPING\n\n* Ensure `<meta charset=\"UTF-8\">` and `<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">` exist in `<head>` (add if missing).\n* Add/retain a minimal non-intrusive `<style>` block in `<head>` for basic formatting.\n* Preserve all other head elements (canonical, structured data, scripts) unchanged.\n\n### EDGE CASES (explicit)\n\n* If input is invalid HTML, wrap it in a valid HTML shell and place the original content inside `<body>` (converted as above).\n* If multiple `<h1>` exist, modify only the **first**.\n* If Word/docx extraction fails, include original raw `Blog` content inside `<pre>` in the body and note extraction failure in `changelog`.\n* Do not reformat or normalize body text except necessary conversions (markdown → HTML, plain text → paragraphs). Never paraphrase or invent content.\n\n### LENGTH RULES (strict)\n\n* metaTitle fallback: ≤ 60 characters (truncate to last whole word within limit).\n* metaDescription fallback: 140–160 characters (trim to nearest word boundary).\n\n### OUTPUT (single JSON — no extra text)\n\nReturn exactly this JSON object with string values (no templates):\n\n```json\n{\n  \"updated_blog\": \"<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>...metaTitle or fallback...</title><meta name='description' content='...metaDescription or fallback...'><style>body{font-family:sans-serif;line-height:1.6;margin:20px auto;max-width:900px;padding:0 1rem}img{max-width:100%;height:auto}h1{margin-bottom:1rem}</style></head><body>...FINAL BLOG HTML (H1 updated; body otherwise unchanged)...</body></html>\",\n  \"meta_title\": \"metaTitle or fallback (≤60 chars)\",\n  \"meta_description\": \"metaDescription (140–160 chars or fallback excerpt)\",\n  \"title_plain\": \"Title text without tags\",\n  \"description_plain\": \"First 1–2 sentences or opening hook (no tags)\",\n  \"changelog\": [\n    \"Updated/Inserted <h1> using Title\",\n    \"Updated/Inserted <title> using metaTitle or fallback\",\n    \"Updated/Inserted meta description using metaDescription or fallback\",\n    \"Notes about conversion (if Blog was non-HTML) and any extraction issues\"\n  ],\n  \"quality_checks\": {\n    \"h1_updated\": true,\n    \"meta_title_set\": true,\n    \"meta_description_set\": true,\n    \"html_valid\": true,\n    \"no_other_body_changes\": true\n  }\n}\n```\n\n### EXECUTION STYLE\n\n* Be **literal, surgical, and deterministic**.\n* Minimize processing and avoid any text rewriting beyond required conversions.\n* If you trimmed for length or used fallback conversions, add a concise entry to `changelog`.\n\n---\n\n",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "typeVersion": 2.2,
+            "position": [
+                1328,
+                -528
+            ],
+            "id": "589c1d68-dba0-4050-959a-60bf1cadab88",
+            "name": "AI Agent7"
+        },
+        {
+            "parameters": {
+                "jsCode": "// Get input data\nconst data = $json[\"output\"];\n\n// Parse the JSON string safely\nlet parsed;\ntry {\n  parsed = JSON.parse(data.match(/```json([\\s\\S]*?)```/)[1]);\n} catch (error) {\n  throw new Error(\"Failed to parse JSON: \" + error.message);\n}\n\n// Return all keys as separate fields\nreturn [\n  {\n    json: {\n      updated_blog: parsed.updated_blog,\n      meta_title: parsed.meta_title,\n      meta_description: parsed.meta_description,\n      title_plain: parsed.title_plain,\n      description_plain: parsed.description_plain,\n      changelog: parsed.changelog,\n      quality_checks: parsed.quality_checks\n    }\n  }\n];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1600,
+                -528
+            ],
+            "id": "768145af-424a-46d1-9a44-48fc4c7f729c",
+            "name": "Code in JavaScript7"
+        },
+        {
+            "parameters": {
+                "model": "x-ai/grok-4",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+            "typeVersion": 1,
+            "position": [
+                1328,
+                -624
+            ],
+            "id": "71496069-60d5-437b-9b6b-d1902880736c",
+            "name": "OpenRouter Chat Model2",
+            "credentials": {
+                "openRouterApi": {
+                    "id": "Q7VWeDG2LQcdO3eU",
+                    "name": "Kedeyo"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+            "typeVersion": 1,
+            "position": [
+                1328,
+                -352
+            ],
+            "id": "77e94e59-16a0-4d40-a3a4-cbe5e53b2acc",
+            "name": "OpenRouter Chat Model3",
+            "credentials": {
+                "openRouterApi": {
+                    "id": "Q7VWeDG2LQcdO3eU",
+                    "name": "Kedeyo"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "rules": {
+                    "values": [
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "leftValue": "={{ $json.AIAgent }}",
+                                        "rightValue": "Google Gemini",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals"
+                                        },
+                                        "id": "ec4ead31-09b3-41a0-9aea-e3d7d39a6777"
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "600c24fd-4eb0-4a4b-89e4-ea48c5c875bf",
+                                        "leftValue": "={{ $json.AIAgent }}",
+                                        "rightValue": "Grok",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "56861c01-65f6-43ea-bae4-2a8048857603",
+                                        "leftValue": "={{ $json.AIAgent }}",
+                                        "rightValue": "Chat GPT",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.switch",
+            "typeVersion": 3.3,
+            "position": [
+                1056,
+                -800
+            ],
+            "id": "0cb4ca0a-a7a2-4aa4-aceb-8c37e78f1179",
+            "name": "Switch1"
+        },
+        {
+            "parameters": {
+                "rules": {
+                    "values": [
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "leftValue": "={{ $json.AIAgent }}",
+                                        "rightValue": "Google Gemini",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals"
+                                        },
+                                        "id": "ec4ead31-09b3-41a0-9aea-e3d7d39a6777"
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "600c24fd-4eb0-4a4b-89e4-ea48c5c875bf",
+                                        "leftValue": "={{ $json.AIAgent }}",
+                                        "rightValue": "Grok",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "56861c01-65f6-43ea-bae4-2a8048857603",
+                                        "leftValue": "={{ $json.AIAgent }}",
+                                        "rightValue": "Chat GPT",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.switch",
+            "typeVersion": 3.3,
+            "position": [
+                -640,
+                176
+            ],
+            "id": "789d3bc2-8d78-4913-883e-33fbbf55ad85",
+            "name": "Switch2"
+        },
+        {
+            "parameters": {
+                "rules": {
+                    "values": [
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "leftValue": "={{ $json.AIAgent }}",
+                                        "rightValue": "Google Gemini",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals"
+                                        },
+                                        "id": "ec4ead31-09b3-41a0-9aea-e3d7d39a6777"
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "600c24fd-4eb0-4a4b-89e4-ea48c5c875bf",
+                                        "leftValue": "={{ $json.AIAgent }}",
+                                        "rightValue": "Grok",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "56861c01-65f6-43ea-bae4-2a8048857603",
+                                        "leftValue": "={{ $json.AIAgent }}",
+                                        "rightValue": "Chat GPT",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.switch",
+            "typeVersion": 3.3,
+            "position": [
+                896,
+                176
+            ],
+            "id": "91587049-a39f-4ac5-be78-8acba59baa00",
+            "name": "Switch3"
+        },
+        {
+            "parameters": {
+                "respondWith": "allIncomingItems",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.4,
+            "position": [
+                48,
+                192
+            ],
+            "id": "a85a2181-9643-460e-a954-db417ba7aacb",
+            "name": "Respond to Webhook8"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert SEO editor and senior copywriter. Update the given blog EXACTLY according to the new inputs. Keep structure clean, avoid hallucinations, and preserve factual accuracy.\n\n---\n\n### INPUTS\n\n* Perspective: {{ $json.Perspective }}             // e.g., \"first person\", \"second person\", or \"third person\"\n* Tone: {{ $json.Tone }}                           // may be a list; apply in listed priority\n* Title: {{ $json.Title }}                         // updated page title (H1)\n* Meta Title: {{ $json.metaTitle }}                // SEO meta title (used for <title> tag)\n* Meta Description: {{ $json.metaDescription }}    // meta + opening pitch\n* Blog: {{ $json.Blog }}                           // the full current/plan/formatted blog (may include HTML/Markdown)\n* Focus Keywords: {{ $json.focusKeywords }}         // main keyword for SEO\n* Related Keywords: {{ $json.relatedKeywords }}     // supporting keyword for SEO\n\n---\n\n### GOAL\n\nRewrite the BLOG so it reflects the requested **Perspective**, **Tone**, **Title**, **Meta Title**, **Meta Description**, **Focus Keywords**, and **Related Keywords** — without losing meaning, accuracy, or structure.\nImprove clarity, flow, and SEO while preserving all facts, data, links, and lists unless they clearly conflict with the new inputs.\n\n---\n\n### RULES (follow all)\n\n1. **Perspective:**\n\n   * Apply consistently across all content (pronouns, verbs, and CTAs).\n   * `first person` → “I/we”\n     `second person` → “you”\n     `third person` → “they/organizations”.\n\n2. **Tone:**\n\n   * Blend multiple tones in listed order (first = dominant).\n   * Keep tone professional, engaging, and easy to read.\n\n3. **Title & H-tags:**\n\n   * Replace **H1** with updated **Title**.\n   * Integrate **Focus Keywords** in the **H1**.\n   * Use **Related Keywords** naturally in content.\n   * Maintain proper heading hierarchy (H2 > H3).\n   * Preserve all valid lists, tables, links, and structured sections (e.g., FAQs).\n\n4. **Meta Title & Description:**\n\n   * Use `metaTitle` for the `<title>` tag.\n   * Use `metaDescription` for `<meta name=\"description\">` and as the opening paragraph/hook (slightly adapted to sound natural).\n   * Include `<meta charset>` and `<meta viewport>`.\n\n5. **SEO:**\n\n   * Maintain topical scope and search intent.\n   * Integrate **Focus Keywords** in **H1**, and **Related Keywords** in other sections but don’t overuse them.\n   * Ensure **Focus Keywords** and **Related Keywords** are used only 3–4 times each throughout the blog.\n   * Keep and validate all internal/external links.\n   * Never fabricate URLs or statistics.\n\n6. **Content Quality:**\n\n   * Tighten readability, remove redundancy, and improve flow.\n   * Keep overall length within ±10% of original unless clarity improves.\n   * Generalize uncertain claims instead of inventing data.\n\n7. **Formatting:**\n\n   * Output must be a **fully valid, responsive HTML5 document** including:\n\n     ```\n     <!DOCTYPE html>\n     <html lang=\"en\">\n       <head>\n         <meta charset=\"UTF-8\">\n         <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n         <title>...</title>\n         <meta name=\"description\" content=\"...\">\n         <style>\n           body {\n             font-family: 'Segoe UI', Roboto, Arial, sans-serif;\n             color: #222;\n             background-color: #fff;\n             line-height: 1.7;\n             margin: 0;\n             padding: 0 1rem;\n           }\n           h1, h2, h3 {\n             color: #0a0a0a;\n             margin-top: 1.5rem;\n             line-height: 1.3;\n           }\n           h1 { font-size: 2rem; margin-top: 2rem; }\n           h2 { font-size: 1.5rem; margin-top: 1.75rem; }\n           h3 { font-size: 1.25rem; margin-top: 1.5rem; }\n           p { margin: 0.8rem 0; }\n           ul, ol { margin-left: 1.5rem; }\n           a { color: #0077cc; text-decoration: none; }\n           a:hover { text-decoration: underline; }\n           table {\n             border-collapse: collapse;\n             width: 100%;\n             margin: 1.5rem 0;\n           }\n           th, td {\n             border: 1px solid #ccc;\n             padding: 0.5rem 0.75rem;\n             text-align: left;\n           }\n           th {\n             background: #f7f7f7;\n             font-weight: 600;\n           }\n           blockquote {\n             border-left: 4px solid #0077cc;\n             padding-left: 1rem;\n             color: #555;\n             margin: 1rem 0;\n             font-style: italic;\n           }\n           .cta {\n             margin: 2rem 0;\n             background: #0077cc;\n             color: #fff;\n             padding: 1rem 1.5rem;\n             border-radius: 8px;\n             text-align: center;\n           }\n           .cta a {\n             color: #fff;\n             font-weight: 600;\n             text-decoration: underline;\n           }\n         </style>\n       </head>\n       <body>\n         ...updated blog content...\n       </body>\n     </html>\n     ```\n\n   * Do not use inline styles or external CSS.\n\n   * Ensure accessibility-friendly and mobile-responsive HTML.\n\n8. **Compliance:**\n\n   * No legal, medical, or financial advice beyond general info.\n   * No personal data, bias, or offensive text.\n\n9. **Missing Inputs:**\n\n   * If any of Perspective, Tone, Title, metaTitle, or metaDescription are missing → retain original equivalents.\n\n---\n\n### OUTPUT\n\nReturn a **single JSON object** (no extra text):\n\n```json\n{\n  \"updated_blog\": \"<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>...</title><meta name='description' content='...'><style>...CSS STYLES...</style></head><body>...UPDATED BLOG CONTENT...</body></html>\",\n  \"meta_title\": \"<metaTitle or fallback to trimmed Title (≤60 chars)>\",\n  \"meta_description\": \"<metaDescription, 140–160 chars>\",\n  \"title_plain\": \"<H1 text without tags>\",\n  \"description_plain\": \"<Opening hook text without tags>\",\n  \"changelog\": [\n    \"Summary bullet of major change #1\",\n    \"Summary bullet of major change #2\"\n  ],\n  \"quality_checks\": {\n    \"perspective_applied\": true,\n    \"tone_applied\": \"<dominant + secondary tones>\",\n    \"h_tags_valid\": true,\n    \"links_preserved\": true,\n    \"no_fabrication\": true\n  }\n}\n```\n\n---\n\n### PROCESS\n\n1. Parse input and detect structure (H1–H3, lists, tables, FAQs, CTAs, etc.).\n2. Apply **Perspective** and **Tone** globally.\n3. Replace:\n   * `<h1>` → Title  \n   * `<title>` → metaTitle  \n   * `<meta name=\"description\">` → metaDescription  \n4. Add intro hook adapted from metaDescription.\n5. Validate:\n   * Proper HTML structure with `<html>`, `<head>`, `<body>`  \n   * Functional CSS, clean layout  \n   * Heading hierarchy and preserved links  \n   * No hallucinations or fabricated info  \n6. Return JSON exactly as shown — no extra commentary.\n",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "typeVersion": 2.2,
+            "position": [
+                -400,
+                192
+            ],
+            "id": "ec7a3b8e-7791-47f4-b641-c24868b5e563",
+            "name": "AI Agent8"
+        },
+        {
+            "parameters": {
+                "jsCode": "const data = $json[\"output\"];\n\n// Try to extract ```json ... ``` block\nlet match = data.match(/```json([\\s\\S]*?)```/);\nlet jsonString;\n\nif (match) {\n  jsonString = match[1].trim();\n} else {\n  // Fallback: assume the entire output is JSON\n  jsonString = data.trim();\n}\n\nlet parsed;\ntry {\n  parsed = JSON.parse(jsonString);\n} catch (e) {\n  throw new Error(\"Failed to parse JSON: \" + e.message + \"\\nString was:\\n\" + jsonString);\n}\n\nreturn [\n  {\n    json: {\n      updated_blog: parsed.updated_blog,\n      meta_title: parsed.meta_title,\n      meta_description: parsed.meta_description,\n      title_plain: parsed.title_plain,\n      description_plain: parsed.description_plain,\n      changelog: parsed.changelog,\n      quality_checks: parsed.quality_checks\n    }\n  }\n];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                -96,
+                192
+            ],
+            "id": "d143a236-52ef-42b0-a33f-ffe24ea0850d",
+            "name": "Code in JavaScript8"
+        },
+        {
+            "parameters": {
+                "respondWith": "allIncomingItems",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.4,
+            "position": [
+                48,
+                464
+            ],
+            "id": "c841a568-79bb-45a4-9688-919c86728c7e",
+            "name": "Respond to Webhook9"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert SEO editor and senior copywriter. Update the given blog EXACTLY according to the new inputs. Keep structure clean, avoid hallucinations, and preserve factual accuracy.\n\n---\n\n### INPUTS\n\n* Perspective: {{ $json.Perspective }}             // e.g., \"first person\", \"second person\", or \"third person\"\n* Tone: {{ $json.Tone }}                           // may be a list; apply in listed priority\n* Title: {{ $json.Title }}                         // updated page title (H1)\n* Meta Title: {{ $json.metaTitle }}                // SEO meta title (used for <title> tag)\n* Meta Description: {{ $json.metaDescription }}    // meta + opening pitch\n* Blog: {{ $json.Blog }}                           // the full current/plan/formatted blog (may include HTML/Markdown)\n* Focus Keywords: {{ $json.focusKeywords }}         // main keyword for SEO\n* Related Keywords: {{ $json.relatedKeywords }}     // supporting keyword for SEO\n\n---\n\n### GOAL\n\nRewrite the BLOG so it reflects the requested **Perspective**, **Tone**, **Title**, **Meta Title**, **Meta Description**, **Focus Keywords**, and **Related Keywords** — without losing meaning, accuracy, or structure.\nImprove clarity, flow, and SEO while preserving all facts, data, links, and lists unless they clearly conflict with the new inputs.\n\n---\n\n### RULES (follow all)\n\n1. **Perspective:**\n\n   * Apply consistently across all content (pronouns, verbs, and CTAs).\n   * `first person` → “I/we”\n     `second person` → “you”\n     `third person` → “they/organizations”.\n\n2. **Tone:**\n\n   * Blend multiple tones in listed order (first = dominant).\n   * Keep tone professional, engaging, and easy to read.\n\n3. **Title & H-tags:**\n\n   * Replace **H1** with updated **Title**.\n   * Integrate **Focus Keywords** in the **H1**.\n   * Use **Related Keywords** naturally in content.\n   * Maintain proper heading hierarchy (H2 > H3).\n   * Preserve all valid lists, tables, links, and structured sections (e.g., FAQs).\n\n4. **Meta Title & Description:**\n\n   * Use `metaTitle` for the `<title>` tag.\n   * Use `metaDescription` for `<meta name=\"description\">` and as the opening paragraph/hook (slightly adapted to sound natural).\n   * Include `<meta charset>` and `<meta viewport>`.\n\n5. **SEO:**\n\n   * Maintain topical scope and search intent.\n   * Integrate **Focus Keywords** in **H1**, and **Related Keywords** in other sections but don’t overuse them.\n   * Ensure **Focus Keywords** and **Related Keywords** are used only 3–4 times each throughout the blog.\n   * Keep and validate all internal/external links.\n   * Never fabricate URLs or statistics.\n\n6. **Content Quality:**\n\n   * Tighten readability, remove redundancy, and improve flow.\n   * Keep overall length within ±10% of original unless clarity improves.\n   * Generalize uncertain claims instead of inventing data.\n\n7. **Formatting:**\n\n   * Output must be a **fully valid, responsive HTML5 document** including:\n\n     ```\n     <!DOCTYPE html>\n     <html lang=\"en\">\n       <head>\n         <meta charset=\"UTF-8\">\n         <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n         <title>...</title>\n         <meta name=\"description\" content=\"...\">\n         <style>\n           body {\n             font-family: 'Segoe UI', Roboto, Arial, sans-serif;\n             color: #222;\n             background-color: #fff;\n             line-height: 1.7;\n             margin: 0;\n             padding: 0 1rem;\n           }\n           h1, h2, h3 {\n             color: #0a0a0a;\n             margin-top: 1.5rem;\n             line-height: 1.3;\n           }\n           h1 { font-size: 2rem; margin-top: 2rem; }\n           h2 { font-size: 1.5rem; margin-top: 1.75rem; }\n           h3 { font-size: 1.25rem; margin-top: 1.5rem; }\n           p { margin: 0.8rem 0; }\n           ul, ol { margin-left: 1.5rem; }\n           a { color: #0077cc; text-decoration: none; }\n           a:hover { text-decoration: underline; }\n           table {\n             border-collapse: collapse;\n             width: 100%;\n             margin: 1.5rem 0;\n           }\n           th, td {\n             border: 1px solid #ccc;\n             padding: 0.5rem 0.75rem;\n             text-align: left;\n           }\n           th {\n             background: #f7f7f7;\n             font-weight: 600;\n           }\n           blockquote {\n             border-left: 4px solid #0077cc;\n             padding-left: 1rem;\n             color: #555;\n             margin: 1rem 0;\n             font-style: italic;\n           }\n           .cta {\n             margin: 2rem 0;\n             background: #0077cc;\n             color: #fff;\n             padding: 1rem 1.5rem;\n             border-radius: 8px;\n             text-align: center;\n           }\n           .cta a {\n             color: #fff;\n             font-weight: 600;\n             text-decoration: underline;\n           }\n         </style>\n       </head>\n       <body>\n         ...updated blog content...\n       </body>\n     </html>\n     ```\n\n   * Do not use inline styles or external CSS.\n\n   * Ensure accessibility-friendly and mobile-responsive HTML.\n\n8. **Compliance:**\n\n   * No legal, medical, or financial advice beyond general info.\n   * No personal data, bias, or offensive text.\n\n9. **Missing Inputs:**\n\n   * If any of Perspective, Tone, Title, metaTitle, or metaDescription are missing → retain original equivalents.\n\n---\n\n### OUTPUT\n\nReturn a **single JSON object** (no extra text):\n\n```json\n{\n  \"updated_blog\": \"<!DOCTYPE html><html lang='en'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'><title>...</title><meta name='description' content='...'><style>...CSS STYLES...</style></head><body>...UPDATED BLOG CONTENT...</body></html>\",\n  \"meta_title\": \"<metaTitle or fallback to trimmed Title (≤60 chars)>\",\n  \"meta_description\": \"<metaDescription, 140–160 chars>\",\n  \"title_plain\": \"<H1 text without tags>\",\n  \"description_plain\": \"<Opening hook text without tags>\",\n  \"changelog\": [\n    \"Summary bullet of major change #1\",\n    \"Summary bullet of major change #2\"\n  ],\n  \"quality_checks\": {\n    \"perspective_applied\": true,\n    \"tone_applied\": \"<dominant + secondary tones>\",\n    \"h_tags_valid\": true,\n    \"links_preserved\": true,\n    \"no_fabrication\": true\n  }\n}\n```\n\n---\n\n### PROCESS\n\n1. Parse input and detect structure (H1–H3, lists, tables, FAQs, CTAs, etc.).\n2. Apply **Perspective** and **Tone** globally.\n3. Replace:\n   * `<h1>` → Title  \n   * `<title>` → metaTitle  \n   * `<meta name=\"description\">` → metaDescription  \n4. Add intro hook adapted from metaDescription.\n5. Validate:\n   * Proper HTML structure with `<html>`, `<head>`, `<body>`  \n   * Functional CSS, clean layout  \n   * Heading hierarchy and preserved links  \n   * No hallucinations or fabricated info  \n6. Return JSON exactly as shown — no extra commentary.\n",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "typeVersion": 2.2,
+            "position": [
+                -400,
+                464
+            ],
+            "id": "acc88ebf-e0bc-41f6-ae9a-1765288cf540",
+            "name": "AI Agent9"
+        },
+        {
+            "parameters": {
+                "jsCode": "// Get input data\nconst data = $json[\"output\"];\n\n// Parse the JSON string safely\nlet parsed;\ntry {\n  parsed = JSON.parse(data.match(/```json([\\s\\S]*?)```/)[1]);\n} catch (error) {\n  throw new Error(\"Failed to parse JSON: \" + error.message);\n}\n\n// Return all keys as separate fields\nreturn [\n  {\n    json: {\n      updated_blog: parsed.updated_blog,\n      meta_title: parsed.meta_title,\n      meta_description: parsed.meta_description,\n      title_plain: parsed.title_plain,\n      description_plain: parsed.description_plain,\n      changelog: parsed.changelog,\n      quality_checks: parsed.quality_checks\n    }\n  }\n];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                -96,
+                464
+            ],
+            "id": "f1081a5e-62ca-4bff-98b5-a09f53587c4f",
+            "name": "Code in JavaScript9"
+        },
+        {
+            "parameters": {
+                "respondWith": "allIncomingItems",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.4,
+            "position": [
+                1776,
+                192
+            ],
+            "id": "45d34e5a-ed63-469d-9974-c32f1231fb7d",
+            "name": "Respond to Webhook10"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are a **professional SEO strategist and creative editor**.\nYour goal: enhance the provided input by generating **3 high-quality, SEO-optimized, natural-sounding alternatives** for every title, meta title, and description.\n\n---\n\n## 🔹 **INPUT (JSON)**\n\n```json\n{\n  \"blogTitles\": \"{{ $json.blogTitles }}\",\n  \"metaTitles\": \"{{ $json.metaTitles }}\",\n  \"descriptions\": \"{{ $json.descriptions }}\",\n  \"message\": \"{{ $json.message }}\"\n}\n```\n\n### Notes:\n\n* Each of `blogTitles`, `metaTitles`, and `descriptions` may contain **one or multiple comma-separated values**.\n* `message` is **optional** and should influence the tone, keywords, audience, style, or CTA **whenever present**.\n\n---\n\n## 🔹 **BEHAVIOR RULES**\n\n### **1. Splitting & Processing**\n\n* Split comma-separated inputs.\n* Treat each item **individually**.\n* Generate **3 unique enhanced alternatives** per item.\n\n### **2. How to Use `message` (Only if Present)**\n\nIf `message` includes:\n\n* **Tone keywords** → apply them (e.g., formal, friendly, bold, technical).\n* **Audience** → tailor writing to that audience (e.g., startups, IT teams, enterprises).\n* **Focus keywords** → incorporate them naturally (e.g., “affordable,” “secure,” “fast deployment”).\n* **CTA instructions** → embed subtle, natural CTAs (e.g., “Start your free trial”).\n* **SEO intent** → match style (informational / transactional / commercial).\n\nIf no message is present → write in a neutral, professional SEO tone.\n\n### **3. SEO Requirements**\n\n* **Blog Titles:** 55–65 characters preferred.\n* **Meta Titles:** short, descriptive, keyword-driven.\n* **Descriptions:** under 160 characters, persuasive, action-friendly.\n* Keywords should appear **naturally**, not stuffed.\n\n### **4. Style Rules**\n\n* No words like: *AI, generated, machine, algorithm*.\n* Everything must feel human-written.\n* Maintain clean rhythm and natural readability.\n\n---\n\n## 🔹 **OUTPUT FORMAT (IMPORTANT — MUST FOLLOW STRICTLY)**\n\nYou must output **valid flat JSON**, with unique sequential key names.\n\n### **Key Naming Rules:**\n\n* For blog titles:\n  `enhancedBlogTitles1`, `enhancedBlogTitles2`, `enhancedBlogTitles3`, …\n\n* For meta titles:\n  `enhancedMetaTitles1`, `enhancedMetaTitles2`, `enhancedMetaTitles3`, …\n\n* For descriptions:\n  `enhancedDescriptions1`, `enhancedDescriptions2`, `enhancedDescriptions3`, …\n\n### **Sequential Numbering:**\n\n* Numbering continues across multiple inputs.\n  Example:\n  If the first blog title uses keys 1–3,\n  the second blog title must use keys 4–6.\n\n### **Value Rules:**\n\n* Each value = one enhanced alternative.\n* Do **not** include arrays, nested objects, explanations, or comments.\n* Output **only** the flat JSON — nothing else.\n\n---\n",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "typeVersion": 2.2,
+            "position": [
+                1312,
+                192
+            ],
+            "id": "8c1fa0a1-a284-4d47-9bf7-0b5b271b4a45",
+            "name": "AI Agent10"
+        },
+        {
+            "parameters": {
+                "jsCode": "// Step 1: Get the raw string from the first item\nlet rawString = items[0].json.output;\n\n// Step 2: Remove ```json and ``` wrapping\nrawString = rawString.replace(/^```json\\s*/, '').replace(/```$/, '');\n\n// Step 3: Parse the string into JSON\nconst outputJson = JSON.parse(rawString);\n\n// Step 4: Return as a single JSON object\nreturn [{ json: outputJson }];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1616,
+                192
+            ],
+            "id": "491aef1e-15c2-4baa-ab7e-a034c9fc89e4",
+            "name": "Code in JavaScript10",
+            "alwaysOutputData": false
+        },
+        {
+            "parameters": {
+                "respondWith": "allIncomingItems",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.4,
+            "position": [
+                1776,
+                432
+            ],
+            "id": "5161fd4e-b994-4fcd-b1db-430d2d0bd1c2",
+            "name": "Respond to Webhook11"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are a **professional SEO strategist and creative editor**.\nYour goal: enhance the provided input by generating **3 high-quality, SEO-optimized, natural-sounding alternatives** for every title, meta title, and description.\n\n---\n\n## 🔹 **INPUT (JSON)**\n\n```json\n{\n  \"blogTitles\": \"{{ $json.blogTitles }}\",\n  \"metaTitles\": \"{{ $json.metaTitles }}\",\n  \"descriptions\": \"{{ $json.descriptions }}\",\n  \"message\": \"{{ $json.message }}\"\n}\n```\n\n### Notes:\n\n* Each of `blogTitles`, `metaTitles`, and `descriptions` may contain **one or multiple comma-separated values**.\n* `message` is **optional** and should influence the tone, keywords, audience, style, or CTA **whenever present**.\n\n---\n\n## 🔹 **BEHAVIOR RULES**\n\n### **1. Splitting & Processing**\n\n* Split comma-separated inputs.\n* Treat each item **individually**.\n* Generate **3 unique enhanced alternatives** per item.\n\n### **2. How to Use `message` (Only if Present)**\n\nIf `message` includes:\n\n* **Tone keywords** → apply them (e.g., formal, friendly, bold, technical).\n* **Audience** → tailor writing to that audience (e.g., startups, IT teams, enterprises).\n* **Focus keywords** → incorporate them naturally (e.g., “affordable,” “secure,” “fast deployment”).\n* **CTA instructions** → embed subtle, natural CTAs (e.g., “Start your free trial”).\n* **SEO intent** → match style (informational / transactional / commercial).\n\nIf no message is present → write in a neutral, professional SEO tone.\n\n### **3. SEO Requirements**\n\n* **Blog Titles:** 55–65 characters preferred.\n* **Meta Titles:** short, descriptive, keyword-driven.\n* **Descriptions:** under 160 characters, persuasive, action-friendly.\n* Keywords should appear **naturally**, not stuffed.\n\n### **4. Style Rules**\n\n* No words like: *AI, generated, machine, algorithm*.\n* Everything must feel human-written.\n* Maintain clean rhythm and natural readability.\n\n---\n\n## 🔹 **OUTPUT FORMAT (IMPORTANT — MUST FOLLOW STRICTLY)**\n\nYou must output **valid flat JSON**, with unique sequential key names.\n\n### **Key Naming Rules:**\n\n* For blog titles:\n  `enhancedBlogTitles1`, `enhancedBlogTitles2`, `enhancedBlogTitles3`, …\n\n* For meta titles:\n  `enhancedMetaTitles1`, `enhancedMetaTitles2`, `enhancedMetaTitles3`, …\n\n* For descriptions:\n  `enhancedDescriptions1`, `enhancedDescriptions2`, `enhancedDescriptions3`, …\n\n### **Sequential Numbering:**\n\n* Numbering continues across multiple inputs.\n  Example:\n  If the first blog title uses keys 1–3,\n  the second blog title must use keys 4–6.\n\n### **Value Rules:**\n\n* Each value = one enhanced alternative.\n* Do **not** include arrays, nested objects, explanations, or comments.\n* Output **only** the flat JSON — nothing else.\n\n---\n",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "typeVersion": 2.2,
+            "position": [
+                1312,
+                432
+            ],
+            "id": "7d164cfc-0473-4916-be82-1b5079ac9881",
+            "name": "AI Agent11"
+        },
+        {
+            "parameters": {
+                "jsCode": "// Step 1: Get the raw string from the first item\nlet rawString = items[0].json.output;\n\n// Step 2: Remove ```json and ``` wrapping\nrawString = rawString.replace(/^```json\\s*/, '').replace(/```$/, '');\n\n// Step 3: Parse the string into JSON\nconst outputJson = JSON.parse(rawString);\n\n// Step 4: Return as a single JSON object\nreturn [{ json: outputJson }];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1616,
+                432
+            ],
+            "id": "0d28b3b1-375b-460d-8e58-555b7e43d32f",
+            "name": "Code in JavaScript11",
+            "alwaysOutputData": false
+        },
+        {
+            "parameters": {
+                "model": "x-ai/grok-4",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+            "typeVersion": 1,
+            "position": [
+                1312,
+                336
+            ],
+            "id": "14dc28be-3f6f-4579-b137-06a59ec85599",
+            "name": "OpenRouter Chat Model4",
+            "credentials": {
+                "openRouterApi": {
+                    "id": "Q7VWeDG2LQcdO3eU",
+                    "name": "Kedeyo"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "model": "x-ai/grok-4",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+            "typeVersion": 1,
+            "position": [
+                -400,
+                352
+            ],
+            "id": "9832794e-9378-4c51-884f-c94cb018f77c",
+            "name": "OpenRouter Chat Model5",
+            "credentials": {
+                "openRouterApi": {
+                    "id": "Q7VWeDG2LQcdO3eU",
+                    "name": "Kedeyo"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+            "typeVersion": 1,
+            "position": [
+                -400,
+                640
+            ],
+            "id": "527088e6-b120-4e30-a41d-16a1d98205fe",
+            "name": "OpenRouter Chat Model6",
+            "credentials": {
+                "openRouterApi": {
+                    "id": "Q7VWeDG2LQcdO3eU",
+                    "name": "Kedeyo"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+            "typeVersion": 1,
+            "position": [
+                1312,
+                592
+            ],
+            "id": "95a7b480-6086-43ec-b549-ac5ead29265b",
+            "name": "OpenRouter Chat Model7",
+            "credentials": {
+                "openRouterApi": {
+                    "id": "Q7VWeDG2LQcdO3eU",
+                    "name": "Kedeyo"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "content": "",
+                "height": 944,
+                "width": 1824
+            },
+            "type": "n8n-nodes-base.stickyNote",
+            "position": [
+                -1488,
+                -1120
+            ],
+            "typeVersion": 1,
+            "id": "fda93d91-472c-45ba-a5c8-391efdad9db8",
+            "name": "Sticky Note"
+        },
+        {
+            "parameters": {
+                "content": "",
+                "height": 912,
+                "width": 1824,
+                "color": 2
+            },
+            "type": "n8n-nodes-base.stickyNote",
+            "position": [
+                -1488,
+                -128
+            ],
+            "typeVersion": 1,
+            "id": "1d72de3f-335a-4cdb-9b1c-cc298c96add0",
+            "name": "Sticky Note2"
+        },
+        {
+            "parameters": {
+                "content": "",
+                "height": 944,
+                "width": 1712,
+                "color": 4
+            },
+            "type": "n8n-nodes-base.stickyNote",
+            "position": [
+                384,
+                -1120
+            ],
+            "typeVersion": 1,
+            "id": "80e1a13a-814d-4f9d-8271-b958e66f0787",
+            "name": "Sticky Note4"
+        },
+        {
+            "parameters": {
+                "content": "",
+                "height": 896,
+                "width": 1712,
+                "color": 5
+            },
+            "type": "n8n-nodes-base.stickyNote",
+            "position": [
+                384,
+                -112
+            ],
+            "typeVersion": 1,
+            "id": "cc45176b-12df-4ad3-9dd8-5d6d19c12b3f",
+            "name": "Sticky Note6"
+        }
+    ],
+    "connections": {
+        "Edit Fields": {
+            "main": [
+                [
+                    {
+                        "node": "Switch",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AI Agent": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields1": {
+            "main": [
+                [
+                    {
+                        "node": "Switch2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AI Agent1": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model1": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript1": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenRouter Chat Model": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "AI Agent4",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "AI Agent",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields2": {
+            "main": [
+                [
+                    {
+                        "node": "Switch1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AI Agent2": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model2": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "AI Agent2",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript2": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Complete Blog Update": {
+            "main": [
+                [
+                    {
+                        "node": "Edit Fields1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Input Your Blog": {
+            "main": [
+                [
+                    {
+                        "node": "Edit Fields",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Just Update Details": {
+            "main": [
+                [
+                    {
+                        "node": "Edit Fields2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields3": {
+            "main": [
+                [
+                    {
+                        "node": "Switch3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AI Agent3": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model3": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "AI Agent3",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AI ChatBot": {
+            "main": [
+                [
+                    {
+                        "node": "Edit Fields3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript3": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Switch": {
+            "main": [
+                [
+                    {
+                        "node": "AI Agent",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "AI Agent4",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "AI Agent5",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AI Agent4": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript4",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript4": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook4",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AI Agent5": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript5",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript5": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook5",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenRouter Chat Model1": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "AI Agent5",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AI Agent6": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript6",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript6": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook6",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AI Agent7": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript7",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript7": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook7",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenRouter Chat Model2": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "AI Agent6",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenRouter Chat Model3": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "AI Agent7",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Switch1": {
+            "main": [
+                [
+                    {
+                        "node": "AI Agent2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "AI Agent6",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "AI Agent7",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Switch2": {
+            "main": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "AI Agent8",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "AI Agent9",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Switch3": {
+            "main": [
+                [
+                    {
+                        "node": "AI Agent3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "AI Agent10",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "AI Agent11",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AI Agent8": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript8",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript8": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook8",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AI Agent9": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript9",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript9": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook9",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AI Agent10": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript10",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript10": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook10",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AI Agent11": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript11",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript11": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook11",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenRouter Chat Model4": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "AI Agent10",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenRouter Chat Model5": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "AI Agent8",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenRouter Chat Model6": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "AI Agent9",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenRouter Chat Model7": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "AI Agent11",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "pinData": {},
+    "meta": {
+        "templateCredsSetupCompleted": true,
+        "instanceId": "5b533a58b55c9cfffb3ca6a1fd154d9ee56f64098154b77dce684a20e62b0a1a"
+    }
+}

@@ -1,0 +1,659 @@
+{
+    "nodes": [
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are a conversion architect + SEO strategist + UX storyteller building a premium, high-converting, design-rich homepage (NOT a blog). **Total: 700–800 words.** Every line sells. NEVER use company name in headings, meta, or first line. Use \"we\" **only in bullets/answers**. CTA appears **exactly 2 times (Hero + Final)**. NO competitor names. NO tables. NO paragraph >2 lines. Avoid phrases like \"powered by\". Mention **{{ $json.body.entityName }}** naturally in sublines, sentences, bullets, or FAQs for trust-building (3–5 times).\n\n### INPUTS (MANDATORY – MUST FOLLOW)\n\n* **Page Type**: {{ $json.body.contentType }} → **MUST SHAPE ENTIRE PAGE**.\n\n  * If \"Commercial\": High-conversion, benefit-driven, CTA-heavy, urgency, metrics, trial-focused.\n  * If \"Informational\": Educational, authority-building, long-term trust, no hard CTA.\n* **Domain Focus**: {{ $json.body.domainContent }} → **STRICT CONTENT BOUNDARY** (ZERO CROSSOVER):\n\n  * If \"Ucaas / Virtual Number\": **ONLY** discuss UCaaS, virtual numbers, omnichannel, AI contact center, WebRTC, global DIDs, scalability. **NEVER** mention wholesale VoIP, voice trading, carrier routes, SIP trunking, or termination.\n  * If \"Wholesale VoIP / Voice\": **ONLY** discuss wholesale voice, termination rates, A-Z routes, carrier-grade infrastructure, CLI, LCR, fraud protection. **NEVER** mention UCaaS, virtual numbers, contact centers, or end-user tools.\n  * If blank or mixed: Default to **Ucaas / Virtual Number**.\n* **Tone & Voice**: {{ $json.body.blogTone }} → **MUST INFUSE EVERY LINE**.\n* **Focus Keyword**: {{ $json.body.focus_keywords }}\n* **Entity Name**: {{ $json.body.entityName }} → Use naturally (3–5 mentions).\n* **Primary Goal / CTA**: {{ $json.body.primaryGoal }} → e.g., \"Claim Your Free Trial Today\".\n* **Generate Meta**: {{ $json.body.generateMeta }} → \"yes\" = include.\n\n---\n\n# === START NEW SECTION ===\n\n## 0. ENTITY SHEET LOOKUP (MUST BE FIRST TOOL STEP)\n\nYour AI Agent has Google Sheet tools (get_document) with **exact names**:\n\n`Teloz`, `TKOS`, `Letsdial`, `Meratalk`, `Callmama`, `Ajoxi`, `Rozper`, `SoftTop`, `Twiching`, `mycountry mobile`, `RingFlow`.\n\nEach tool name is **only** the entity name. There is **no** word “Sheet” in the tool name.\n\n**Before you call ANY other tool (SerpAPI, Date & Time, etc.):**\n\n1. Read the exact string in **{{ $json.body.entityName }}**.\n2. Ignore upper/lower case and any spaces at the very start or end only.\n3. If it matches one of these names, call **that tool and only that tool**:\n\n   - If entityName = \"Teloz\" → call tool **Teloz**.  \n   - If entityName = \"TKOS\" → call tool **TKOS**.  \n   - If entityName = \"Letsdial\" → call tool **Letsdial**.  \n   - If entityName = \"Meratalk\" → call tool **Meratalk**.  \n   - If entityName = \"Callmama\" → call tool **Callmama**.  \n   - If entityName = \"Ajoxi\" → call tool **Ajoxi**.  \n   - If entityName = \"Rozper\" → call tool **Rozper**.  \n   - If entityName = \"SoftTop\" → call tool **SoftTop**.  \n   - If entityName = \"Twiching\" → call tool **Twiching**.  \n   - If entityName = \"mycountry mobile\" → call tool **mycountry mobile**.  \n   - If entityName = \"RingFlow\" → call tool **RingFlow**.\n\n**Rules:**\n\n- Use the **tool name exactly as written above**.  \n- Do **NOT** add words like “Sheet”, “Doc”, “get_document”, etc.  \n- Do **NOT** guess or map similar names (e.g., do not map “MCM” to “mycountry mobile”).  \n- Do **NOT** call more than **one** of these tools.  \n- If {{ $json.body.entityName }} is anything else (no exact match), then **do not call any of these sheet tools at all**.\n\nIf a sheet tool is successfully called:\n\n- Use its content as authoritative data about {{ $json.body.entityName }}:\n  - Features and capabilities\n  - Coverage / routes / geography\n  - SLAs / uptime / latency\n  - Volumes, customers, segments\n  - Positioning or unique angles\n- Integrate sheet insights in **at least 4–6 places**:\n  - Hero subline or nearby sentence\n  - Benefits bullets\n  - Metrics/proof section\n  - Social proof statement\n  - 1–2 FAQ answers\n  - Final CTA/closing section\n\nIf **no** matching sheet tool exists or the call fails, **continue without sheet data** and rely on web research only.\n\n---\n\n### 1. ENTITY UNIQUENESS & PROOF (AFTER SHEET LOOKUP)\n\nNow use **SerpAPI** for live web research:\n\n→ Search: “[{{ $json.body.entityName }}] wholesale voip unique features 2025”  \n→ Search: “[{{ $json.body.entityName }}] reviews 2025”\n\nFrom the results:\n\n- Extract **4–6 real differentiators** (e.g., fraud control engine, routing AI, direct interconnects, uptime %, traffic scale, awards).\n- Use these differentiators in at least **5 places**: hero, bullets, metrics, social proof, FAQ, final section.\n\nIf the entity is more UCaaS-focused, pull uniqueness relevant to UCaaS / virtual numbers instead (still no domain crossover).\n\n---\n\n### 2. COMPETITOR BENCHMARK\n\nUse **SerpAPI** with query: `{{ $json.body.focus_keywords }}` to simulate a Google SERP.  \nFocus on the **top 3 results**.\n\nFrom those pages, extract:\n\n- H1 + main promise\n- Strongest metric or outcome\n- Proof style (logos, numbers, case studies, etc.)\n- How they structure USPs\n- FAQ themes\n\nYour page must be **clearer, more specific, and more up-to-date** (2025) than these three.\n\n---\n\n### 3. 2025 TRENDS & LSI HARVEST\n\nUse **SerpAPI**:\n\n- “wholesale voip trends 2025”  \n- “wholesale voice carrier concerns 2025”  \n\nExtract at least **3 trends** relevant to the current domain (Wholesale vs UCaaS), such as:\n\n- AI-based fraud and quality monitoring\n- Regulatory/compliance changes (e.g., FAS/robocall type rules, authentication frameworks)\n- Gray-route shutdowns and focus on quality routes\n- Real-time analytics expectations and uptime guarantees\n\nWeave **2–3 trends** naturally into the content where they fit.\n\n---\n\n### PHASE 0: KEYWORD RESEARCH + DOMAIN HARVEST\n\n**Domain Filter (FIRST CONTENT STEP):**\n\n* allowed_topics = split(\"{{ $json.body.domainContent }}\", \" / \")[0].toLowerCase()\n* If “ucaas” / “virtual” → only contact center, omnichannel, WebRTC, virtual numbers, cloud telephony.\n* If “wholesale” / “voip” → only A-Z routes, termination, LCR, carrier infrastructure, fraud, routing quality.\n* BLOCK ALL CROSS-DOMAIN TERMS.\n\nUsing **SerpAPI**, run:\n\n`\"{{ $json.body.domainContent }} 2025\" \"top keywords [domain focus]\"`\n\nFrom this, choose:\n\n* One **primary keyword** (50–60 chars).  \n* 15–20 LSI keywords strictly inside the domain.\n\n---\n\n### PHASE A: META (DOMAIN + TONE ALIGNED)\n\nIf `{{ $json.body.generateMeta }}` == \"yes\":\n\n- **Meta Title**: 50–60 chars, include Focus Keyword + 1 LSI.\n- **Meta Description**: 150–155 chars, include Focus Keyword + 2 LSIs + 1 metric + CTA if Page Type is Commercial.\n\nOutput exactly:\n\n`<!-- META -->`  \n`Meta Title: ...`  \n`Meta Description: ...`\n\n---\n\n### PHASE B: NAVIGATIONAL FLOW (TONE + DOMAIN LOCKED)\n\n## HERO SECTION\n\n* **H1**: Max 8 words, must include the Focus Keyword + 1 LSI.\n* **Subline**: One line that:\n  - Mentions {{ $json.body.entityName }} naturally.\n  - Uses sheet data (if available) to highlight 1–2 concrete strengths (e.g., “99.99% uptime”, “routes across X countries”).\n* **CTA #1** (Commercial): `[Start Your Free Trial Now]`  \n  For Informational pages, use a soft CTA like `[Explore In-Depth Insights]`.\n\n---\n\n## 10 H2 SECTIONS\n\nUse 10 H2 blocks (no tables). Example themes (adapt to domain, trends, and sheet facts):\n\n1. **H2: [Focus Keyword] for 2025 Networks**  \n2. **H2: Architecture for Carrier-Grade Reliability** (Wholesale)  \n   or **H2: Built for Omnichannel-Ready Teams** (UCaaS)  \n3. **H2: Key Benefits for Technical Decision-Makers**  \n4. **H2: Visibility, Control, and Quality Metrics**  \n5. **H2: Safeguards Against Modern Traffic Risks**  \n6. **H2: How It Fits Into Your Existing Stack**  \n7. **H2: What {{ $json.body.entityName }} Delivers Day to Day**  \n8. **H2: Metrics That Matter to NOC and Ops**  \n9. **H2: Onboarding, Support, and Scaling Path**  \n10. **H2: Social Proof and Real Outcomes**\n\nRules:\n\n- Each section = 1–2 short paragraphs (no paragraph >2 lines) and/or bullets.\n- Use **bold** for important phrases and numbers.\n- Mention {{ $json.body.entityName }} a total of **3–5 times** across the full page.\n- Include any reliable sheet metrics (if present) where they fit naturally.\n\n---\n\n### FINAL CTA (ONLY IF Commercial)\n\n**H2**: See Results in Minutes  \n\nWrite 1–1.5 lines that:\n\n- Include a domain-specific outcome or metric meaningful to a technical buyer.\n- Tie this clearly to {{ $json.body.entityName }} and, if available, sheet-based stats.\n\nThen:\n\n**CTA #2**: `[Claim Your Free Trial Today]`  \n\nThis is the **second and final CTA** on Commercial pages.  \nFor Informational pages, skip this final CTA block completely.\n\n---\n\n### FAQ SECTION\n\n**H2**: `{{ $json.body.focus_keywords }} Essentials`\n\nCreate **5 FAQs**:\n\n- Base question topics on SERP/competitor FAQs and 2025 technical concerns.\n- Each answer:\n  - Starts with “We…”.\n  - Uses objective, factual language (definition/explanation, not hype).\n  - Uses 2–3 LSI keywords where natural.\n  - Mentions {{ $json.body.entityName }} in **2–3 answers**, especially for reliability, routing, compliance, or integration topics.\n- Keep answers concise (2–4 lines).\n\n---\n\n### PHASE C: TONE, EEAT, PROMOTION\n\n- Tone: **Professional, Authoritative, Corporate B2B**.\n- Avoid: **seamless, unleash, enhance, trust, optimize, unlocking, maximize, boost, empowering, revolutionize, leverage, realm**.\n- Include:\n  - At least **one credible external source** (standards body, regulator, or respected telecom org) to support a claim.\n  - Social proof aligned with {{ $json.body.entityName }}, e.g.:  \n    “**Trusted by 500+ VoIP providers worldwide**”  \n    Adjust numbers or segments based on sheet data if available; otherwise keep realistic.\n- Use the current year from **Date & Time [{{ $today }}]** for any year or footer reference.\n\n---\n\n### PHASE D: SELF-EDIT & QUALITY GATE\n\nBefore returning the final response, internally confirm:\n\n- Total length: **700–800 words**.  \n- {{ $json.body.entityName }} appears **3–5 times**, naturally placed.  \n- Commercial pages: exactly **2 CTAs** (Hero + Final).  \n- Informational pages: 1 soft CTA in Hero only, no Final CTA.  \n- No domain crossover (UCaaS vs Wholesale rules).  \n- Sheet usage:\n  - Sheet tool was called **only if** entityName exactly matched one of the known tool names (case-insensitive).\n  - At most **one** entity tool used.\n  - If called, sheet-based facts appear in at least 4–6 places as proof.\n  - If no match, no sheet tool was called and no “sheet” wording appears.\n- Language:\n  - No forbidden buzzwords.\n  - Paragraphs short, layout scannable, strategic **bolding**.\n- Keyword usage:\n  - Strong focus on `{{ $json.body.focus_keywords }}` without obvious stuffing.\n- Goal:\n  - The page persuades a **technical buyer** to check rates or seriously evaluate the solution, aligned with {{ $json.body.primaryGoal }} and {{ $json.body.contentType }}.\n\nReturn only:\n\n- The meta block (if requested), and  \n- The complete homepage content, following all rules above.\n\n• SHOULD use clear, simple language.\n• SHOULD be Spartan and informative.\n• SHOULD use short, impactful sentences.\n• SHOULD use active voice; avoid passive voice.\n• SHOULD focus on practical, actionable insights.\n• SHOULD use bullet point lists in social media posts.\n• SHOULD use data and examples to support claims when possible.\n• SHOULD use \"you\" and \"your\" to directly address the reader.\n• AVOID using em dashes (-) anywhere in your response. Use only commas, periods, or other standard punctuation. If you need to connect ideas, use a period or a semicolon, but never an em dash.\n• AVOID constructions like \" ...not just this, but also this\".\n• AVOID metaphors and clichés.\n• AVOID generalisations.\n• AVOID common setup language in any sentence, including: in conclusion, in closing, etc.\n• AVOID output warnings or notes, just the output requested.\n• AVOID unnecessary adjectives and adverbs.\n• AVOID staccato stop-start sentences.\n• AVOID rhetorical questions.\n• AVOID hashtags.\n• AVOID semicolons.\n• AVOID markdown.\n• AVOID asterisks.\n• AVOID these words:\n\n\"can, may, just, that, very, really, literally, actually, certainly, probably, basically, could, maybe, delve, embark, enlightening, esteemed, shed light, craft, crafting, imagine, realm, game-changer, unlock, discover, skyrocket, abyss, not alone, in a world where, revolutionize, disruptive, utilize, utilizing, dive deep, tapestry, illuminate, unveil, pivotal, intricate, elucidate, hence, furthermore, realm, however, harness, exciting, groundbreaking, cutting-edge, remarkable, it, remains to be seen, glimpse into, navigating, landscape, stark, testament, in summary, in conclusion, moreover, boost, skyrocketing, opened up, powerful, inquiries, ever-evolving\"\n\n# IMPORTANT: Review your response and ensure no em dashes!",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "typeVersion": 2.2,
+            "position": [
+                752,
+                256
+            ],
+            "id": "461ac95f-a4de-4876-bf15-ba0560adb654",
+            "name": "AI Agent1"
+        },
+        {
+            "parameters": {
+                "model": "google/gemini-2.5-flash",
+                "options": {
+                    "temperature": 0.4
+                }
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+            "typeVersion": 1,
+            "position": [
+                432,
+                480
+            ],
+            "id": "5b21ce35-bc85-4986-a5e1-938a0cb09f70",
+            "name": "OpenRouter Chat Model3",
+            "credentials": {
+                "openRouterApi": {
+                    "id": "Q7VWeDG2LQcdO3eU",
+                    "name": "Kedeyo"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "respondWith": "text",
+                "responseBody": "={{ $json.output }}",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.4,
+            "position": [
+                1696,
+                256
+            ],
+            "id": "6ca88941-2a2e-47c7-b9e7-5a9981626455",
+            "name": "Respond to Webhook1"
+        },
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "landingpage",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2.1,
+            "position": [
+                512,
+                256
+            ],
+            "id": "657dcfd8-8481-4c24-b087-4a18948e0193",
+            "name": "Webhook",
+            "webhookId": "320102a5-45ab-4a44-b864-b2b0bb408f4a"
+        },
+        {
+            "parameters": {
+                "sessionIdType": "customKey",
+                "sessionKey": "={{ $json.body.job_id }}",
+                "contextWindowLength": 10
+            },
+            "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+            "typeVersion": 1.3,
+            "position": [
+                576,
+                480
+            ],
+            "id": "3468a444-8a44-46f9-bd7d-352069ec954d",
+            "name": "Simple Memory2"
+        },
+        {
+            "parameters": {
+                "options": {
+                    "temperature": 0.4
+                }
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                288,
+                480
+            ],
+            "id": "510d1a60-76b8-4ff1-b69b-5eacc69b5abd",
+            "name": "Google Gemini Chat Model2",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "KYoGPvTyGMmv9elG",
+                    "name": "Aman API "
+                }
+            }
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=⚠️ Output only the final HTML5 article — no markdown, no JSON, no explanations.\n\nSOURCE CONTENT:\n{{ $json.output }}\n\nTASK:\nConvert the source into a fully structured, SEO-optimized, publish-ready HTML5 article using 2026 ranking best practices.\n\nRULES:\n\n0. CONTENT REVIEW & GAP ANALYSIS (EXECUTE FIRST)\n- Analyze source content for completeness, logical flow, and missing information.\n- Identify gaps: incomplete explanations, missing data, unclear transitions, unsupported claims.\n- Auto-fill gaps with contextually relevant information while maintaining factual accuracy.\n- Ensure smooth narrative progression and resolve any contradictions.\n- Expand thin sections and add supporting details where needed.\n- **INFORMATIVE OVER DESCRIPTIVE:** Prioritize facts, data, specifications, and actionable insights over promotional language.\n- **ELIMINATE FLUFF:** Remove marketing adjectives (robust, premium, unparalleled, revolutionary, cutting-edge, world-class, industry-leading).\n- **CONVERT PARAGRAPHS TO BULLETS:** Transform long explanatory paragraphs into scannable bullet lists when listing features, benefits, specs, or steps.\n- **CUT REDUNDANCY:** Remove repetitive phrasing, filler sentences, and unnecessary elaboration.\n- **SHOW DON'T TELL:** Replace vague claims with specific data (e.g., \"99.99% uptime\" not \"reliable service\"; \"20% cost reduction\" not \"significant savings\").\n- **ONE IDEA PER SENTENCE:** Keep sentences focused, direct, and fact-driven.\n\n1. STRUCTURE\n- Use semantic HTML5: <html>, <head>, <body>, <article itemscope itemtype=\"https://schema.org/Article\">.\n- Include: <meta>, <title>, <header>, <section>, <footer>, <h1>-<h3>, <p>, <ul>, <ol>, <table>, <figure>.\n- Logical hierarchy: 1 <h1> (target primary keyword), followed by <h2>/<h3> sections.\n- Add <time datetime=\"\"> with actual date if available.\n- Maximum 3-4 sentences intro paragraph before first <h2>.\n- Prefer <ul>/<ol> over paragraphs for listing 3+ items.\n\n2. 2026 SEO OPTIMIZATION\n- **Search Intent Matching:** Align content precisely with user query intent (informational/navigational/transactional).\n- **E-E-A-T Signals:** Include specific credentials, data sources, industry standards, and measurable outcomes.\n- **Entity-Based SEO:** Include 5-10 semantically related entities beyond primary keyword (technical terms, standards, metrics, tools).\n- **Title & Meta:** Auto-generate <title> (≤60 chars, keyword-front-loaded) and <meta name=\"description\"> (≤160 chars, benefit-focused with numbers/data).\n- **Open Graph + Twitter Cards:** Complete social media meta tags.\n- **Keyword Optimization:** Bold primary keyword and semantic variations naturally (avoid keyword stuffing).\n- **Image SEO:** Descriptive alt text (5–10 words with keyword once), use descriptive filenames, add ImageObject schema.\n- **Internal Linking:** Insert 3-5 contextual internal link placeholders using descriptive anchor text (e.g., <a href=\"#\">VoIP routing optimization strategies</a>).\n- **Structured Data:** Add JSON-LD schema (Article, BreadcrumbList, FAQPage, HowTo as applicable).\n- **Core Web Vitals Ready:** Ensure HTML supports LCP <2.5s, INP <200ms, CLS <0.1 (lightweight inline CSS, responsive images).\n\n3. CONTENT DEPTH & QUALITY (2026 STANDARDS)\n- **Topic Cluster Approach:** Structure content as comprehensive hub-worthy material.\n- **Query-Based Content:** Answer \"People Also Ask\" queries and common user questions directly.\n- **Data-Driven Value:** Include specific metrics, statistics, technical specifications, pricing ranges, time estimates, and quantifiable benefits.\n- **Comprehensive > Verbose:** Cover topics thoroughly with facts, not filler (1500-2500 words for pillar content).\n- **Technical Precision:** Use exact terminology, industry standards, and protocol names.\n- **Actionable Format:** Structure for quick scanning and immediate utility.\n\n4. READABILITY & FORMATTING (SCANNABLE CONTENT)\n- **Short Paragraphs:** Maximum 3-4 sentences per paragraph (60-80 words).\n- **Bullet Lists:** Use <ul>/<ol> for any content with 3+ items, features, benefits, or steps.\n- **Numbered Lists:** Use for sequential processes, ranking, or prioritized items.\n- **Tables:** Use for comparisons, pricing, specifications, metrics (width=\"100%\", mobile-responsive).\n- **Visual Hierarchy:** Use <blockquote> for statistics/key data, <aside> for technical notes.\n- **Minimal Inline CSS:** style=\"margin-bottom:1.2em;line-height:1.6;max-width:100%;\"\n- **Sentence Length:** Average 15-20 words per sentence for clarity.\n- **Active Voice:** Use active constructions for directness.\n\n5. WRITING STYLE (INFORMATIVE NOT PROMOTIONAL)\n- **NO Marketing Fluff:** Eliminate adjectives like: premium, robust, revolutionary, cutting-edge, world-class, unparalleled, seamless, mission-critical, industry-leading.\n- **Replace With Data:** Use specific numbers, percentages, timeframes, technical specs instead of descriptive claims.\n- **Factual Tone:** Write like technical documentation, not sales copy.\n- **Concrete Examples:** Show specific use cases, implementations, or scenarios.\n- **Neutral Voice:** Informative and authoritative without selling.\n- **Direct Language:** \"Reduces latency to 45ms\" not \"significantly improves performance.\"\n\n6. ENHANCEMENTS\n- **FAQs:** Detect existing FAQs → wrap in <section class=\"faq\" itemscope itemtype=\"https://schema.org/FAQPage\">.\n- **Auto-Generate FAQs:** If none exist, create 4-6 technical Q&As with specific, data-rich answers (not generic responses).\n- **Featured Snippet Optimization:** Include concise, direct answers (40-60 words) with data to primary query early in content.\n- **CTA Section:** End with <section class=\"cta\"> containing specific action and <a href=\"#\">relevant link</a>.\n- **Data Tables:** Add comparison tables for features, pricing, or specifications when applicable.\n\n7. QUALITY ASSURANCE\n- No empty tags, no placeholder text, no lorem ipsum.\n- No subjective claims without supporting data.\n- Must pass: Lighthouse SEO audit (95+), accessibility standards (WCAG 2.1 AA), readability (Flesch 60+).\n- E-E-A-T aligned: Data-backed, factual, technically precise tone.\n- LLM-readable: Clear semantic structure for AI systems to cite.\n- Information density: Maximum value per sentence, zero fluff.\n\nDELIVERABLE:\nReturn **only** the complete, valid HTML5 document — factual, data-rich, scannable with bullet points, free of marketing fluff, and optimized for 2026 SERP rankings.\n",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "typeVersion": 2.2,
+            "position": [
+                1376,
+                256
+            ],
+            "id": "5be6c3fc-875b-4013-ac5d-ad8220aa9e7f",
+            "name": "AI Agent3"
+        },
+        {
+            "parameters": {
+                "options": {
+                    "temperature": 0.4
+                }
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                1296,
+                464
+            ],
+            "id": "b3596a73-7847-476a-93b7-b7365982b52c",
+            "name": "Google Gemini Chat Model3",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "KYoGPvTyGMmv9elG",
+                    "name": "Aman API "
+                }
+            }
+        },
+        {
+            "parameters": {
+                "authentication": "serviceAccount",
+                "operation": "get",
+                "documentURL": "https://docs.google.com/document/d/1mmtWvUOAiOjfUGm8WucEgegzo42cDHgPayfydINSfPE/edit?tab=t.0"
+            },
+            "type": "n8n-nodes-base.googleDocsTool",
+            "typeVersion": 2,
+            "position": [
+                720,
+                464
+            ],
+            "id": "96f6b32b-7725-4aef-9bd3-2927b73b82e8",
+            "name": "mycountry mobile",
+            "credentials": {
+                "googleApi": {
+                    "id": "CDRZ9a4G8paCJj5v",
+                    "name": "Do Not Use"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "n8n-nodes-base.dateTimeTool",
+            "typeVersion": 2,
+            "position": [
+                960,
+                480
+            ],
+            "id": "f261ae36-f052-4e9c-913e-5df45efa6532",
+            "name": "Date & Time"
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+            "typeVersion": 1,
+            "position": [
+                1072,
+                480
+            ],
+            "id": "a052f506-9c1e-43d7-af91-8eed9860f9fa",
+            "name": "SerpAPI",
+            "credentials": {
+                "serpApi": {
+                    "id": "dxdcjVs4iA8G5mjP",
+                    "name": "SerpApi account 4"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "authentication": "serviceAccount",
+                "operation": "get",
+                "documentURL": "https://docs.google.com/document/d/1qIkHpoqP6yV6lQCkepSgXum7uEbZPF8uVQFWyh3eLjA/edit?usp=sharing"
+            },
+            "type": "n8n-nodes-base.googleDocsTool",
+            "typeVersion": 2,
+            "position": [
+                848,
+                480
+            ],
+            "id": "fc9fc017-2554-461a-ba1a-b539c86bfdc0",
+            "name": "RingFlow",
+            "credentials": {
+                "googleApi": {
+                    "id": "CDRZ9a4G8paCJj5v",
+                    "name": "Do Not Use"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "authentication": "serviceAccount",
+                "operation": "get",
+                "documentURL": "https://docs.google.com/document/d/1Gp_Wgm9XfoKHyBRWdwOMs68Dn4ljjg42OW0Un6_RiaQ/edit?usp=sharing"
+            },
+            "type": "n8n-nodes-base.googleDocsTool",
+            "typeVersion": 2,
+            "position": [
+                848,
+                640
+            ],
+            "id": "eb531b65-cc96-4fb2-b6f6-fd165a2ec756",
+            "name": "Meratalk",
+            "credentials": {
+                "googleApi": {
+                    "id": "CDRZ9a4G8paCJj5v",
+                    "name": "Do Not Use"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "authentication": "serviceAccount",
+                "operation": "get",
+                "documentURL": "https://docs.google.com/document/d/1c-YeEDSuQMmeLkZMdL2PEffAtkLcFqd1IiWtojog1qo/edit?usp=sharing"
+            },
+            "type": "n8n-nodes-base.googleDocsTool",
+            "typeVersion": 2,
+            "position": [
+                720,
+                640
+            ],
+            "id": "c38b0180-2824-413c-944a-e9d888ef5b80",
+            "name": "Letsdail",
+            "credentials": {
+                "googleApi": {
+                    "id": "CDRZ9a4G8paCJj5v",
+                    "name": "Do Not Use"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "authentication": "serviceAccount",
+                "operation": "get",
+                "documentURL": "https://docs.google.com/document/d/1W3CBOG5ftgq-smqmGPDLUj0lq9mS6NB2x6oM_dK5xgc/edit?usp=sharing"
+            },
+            "type": "n8n-nodes-base.googleDocsTool",
+            "typeVersion": 2,
+            "position": [
+                960,
+                640
+            ],
+            "id": "2b43ea79-6ee9-4334-8830-a058d4bcda3b",
+            "name": "Callmama",
+            "credentials": {
+                "googleApi": {
+                    "id": "CDRZ9a4G8paCJj5v",
+                    "name": "Do Not Use"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "authentication": "serviceAccount",
+                "operation": "get",
+                "documentURL": "https://docs.google.com/document/d/1DZRxfqe2OI0aFQ5TPkNT1fgBdaA9HlKVDk8eijSC4fY/edit?usp=sharing"
+            },
+            "type": "n8n-nodes-base.googleDocsTool",
+            "typeVersion": 2,
+            "position": [
+                1088,
+                640
+            ],
+            "id": "1fdf94eb-6e25-4ee1-9f1c-b8667bbf1523",
+            "name": "Ajoxi",
+            "credentials": {
+                "googleApi": {
+                    "id": "CDRZ9a4G8paCJj5v",
+                    "name": "Do Not Use"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "authentication": "serviceAccount",
+                "operation": "get",
+                "documentURL": "https://docs.google.com/document/d/1ZVUKA26_CmRqbYZEU37zjcjUZfwVpnPFAHGFXJU3yws/edit?usp=sharing"
+            },
+            "type": "n8n-nodes-base.googleDocsTool",
+            "typeVersion": 2,
+            "position": [
+                720,
+                800
+            ],
+            "id": "cbf04b8b-a88a-4922-be56-8dc54ce8e7b1",
+            "name": "Rozper",
+            "credentials": {
+                "googleApi": {
+                    "id": "CDRZ9a4G8paCJj5v",
+                    "name": "Do Not Use"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "authentication": "serviceAccount",
+                "operation": "get",
+                "documentURL": "https://docs.google.com/document/d/1MlUM1N0XW7LBEk8XcKTaQjFSbHMp5tyeOtPAS3YZrjo/edit?usp=sharing"
+            },
+            "type": "n8n-nodes-base.googleDocsTool",
+            "typeVersion": 2,
+            "position": [
+                848,
+                800
+            ],
+            "id": "4edb0bd1-fbd5-4d18-8bbd-f6c4997ab5d3",
+            "name": "SoftTop",
+            "credentials": {
+                "googleApi": {
+                    "id": "CDRZ9a4G8paCJj5v",
+                    "name": "Do Not Use"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "authentication": "serviceAccount",
+                "operation": "get",
+                "documentURL": "https://docs.google.com/document/d/1vAySlw73btXXcTtjHm9meA_aGYVenFuLgMPyyPFsKPI/edit?usp=sharing"
+            },
+            "type": "n8n-nodes-base.googleDocsTool",
+            "typeVersion": 2,
+            "position": [
+                480,
+                640
+            ],
+            "id": "57ae4a36-e428-4a91-9785-c15d4c9d8409",
+            "name": "Teloz",
+            "credentials": {
+                "googleApi": {
+                    "id": "CDRZ9a4G8paCJj5v",
+                    "name": "Do Not Use"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "authentication": "serviceAccount",
+                "operation": "get",
+                "documentURL": "https://docs.google.com/document/d/1sHpnbRlDa1QKa-mMeuAdGzIElreyc9R7buixnWIwnyE/edit?usp=sharing"
+            },
+            "type": "n8n-nodes-base.googleDocsTool",
+            "typeVersion": 2,
+            "position": [
+                608,
+                640
+            ],
+            "id": "298b3307-d79f-4415-9103-b3cf95f41a67",
+            "name": "TKOS",
+            "credentials": {
+                "googleApi": {
+                    "id": "CDRZ9a4G8paCJj5v",
+                    "name": "Do Not Use"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "authentication": "serviceAccount",
+                "operation": "get",
+                "documentURL": "https://docs.google.com/document/d/1a4IrNi6s8XLu4S2BtnCGYuJxINz3sW_1AyPddmyBznQ/edit?usp=sharing"
+            },
+            "type": "n8n-nodes-base.googleDocsTool",
+            "typeVersion": 2,
+            "position": [
+                976,
+                800
+            ],
+            "id": "762f1c4e-efc8-4156-9aac-f617919acde4",
+            "name": "Twitching",
+            "credentials": {
+                "googleApi": {
+                    "id": "CDRZ9a4G8paCJj5v",
+                    "name": "Do Not Use"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "model": "google/gemini-2.5-flash",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+            "typeVersion": 1,
+            "position": [
+                1424,
+                464
+            ],
+            "id": "7c2a82af-1f03-42c7-844d-a3e227060a6d",
+            "name": "OpenRouter Chat Model",
+            "credentials": {
+                "openRouterApi": {
+                    "id": "Q7VWeDG2LQcdO3eU",
+                    "name": "Kedeyo"
+                }
+            }
+        }
+    ],
+    "connections": {
+        "AI Agent1": {
+            "main": [
+                [
+                    {
+                        "node": "AI Agent3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenRouter Chat Model3": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Respond to Webhook1": {
+            "main": [
+                []
+            ]
+        },
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Simple Memory2": {
+            "ai_memory": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "ai_memory",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model2": {
+            "ai_languageModel": [
+                []
+            ]
+        },
+        "AI Agent3": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model3": {
+            "ai_languageModel": [
+                []
+            ]
+        },
+        "mycountry mobile": {
+            "ai_tool": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "ai_tool",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Date & Time": {
+            "ai_tool": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "ai_tool",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "SerpAPI": {
+            "ai_tool": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "ai_tool",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "RingFlow": {
+            "ai_tool": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "ai_tool",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Meratalk": {
+            "ai_tool": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "ai_tool",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Letsdail": {
+            "ai_tool": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "ai_tool",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Callmama": {
+            "ai_tool": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "ai_tool",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Ajoxi": {
+            "ai_tool": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "ai_tool",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Rozper": {
+            "ai_tool": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "ai_tool",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "SoftTop": {
+            "ai_tool": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "ai_tool",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Teloz": {
+            "ai_tool": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "ai_tool",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "TKOS": {
+            "ai_tool": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "ai_tool",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Twitching": {
+            "ai_tool": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "ai_tool",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenRouter Chat Model": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "AI Agent3",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "pinData": {},
+    "meta": {
+        "templateCredsSetupCompleted": true,
+        "instanceId": "5b533a58b55c9cfffb3ca6a1fd154d9ee56f64098154b77dce684a20e62b0a1a"
+    }
+}

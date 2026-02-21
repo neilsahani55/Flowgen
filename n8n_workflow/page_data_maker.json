@@ -1,0 +1,254 @@
+{
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "c9db4311-9926-4e7c-b8d7-a152a4de9033",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2.1,
+            "position": [
+                0,
+                0
+            ],
+            "id": "a9643d8a-64f1-43c4-95e3-8238b0e57b9e",
+            "name": "Webhook",
+            "webhookId": "c9db4311-9926-4e7c-b8d7-a152a4de9033"
+        },
+        {
+            "parameters": {
+                "respondWith": "allIncomingItems",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.4,
+            "position": [
+                992,
+                0
+            ],
+            "id": "d4221ac4-f142-488d-ae54-256a51e7b910",
+            "name": "Respond to Webhook"
+        },
+        {
+            "parameters": {
+                "url": "={{ $json.url }}",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.3,
+            "position": [
+                336,
+                0
+            ],
+            "id": "478f442b-21cc-4435-a40b-1243025153ab",
+            "name": "HTTP Request"
+        },
+        {
+            "parameters": {
+                "jsCode": "// Get the input data\nconst inputData = $input.first().json.data;\n\n// Function to remove CSS and JS from HTML\nfunction removeCSSAndJSFromHTML(html) {\n  let cleaned = html;\n  \n  // Remove <style> tags and their content\n  cleaned = cleaned.replace(/<style[^>]*>[\\s\\S]*?<\\/style>/gi, '');\n  \n  // Remove inline style attributes\n  cleaned = cleaned.replace(/style\\s*=\\s*[\"'][^\"']*[\"']/gi, '');\n  \n  // Remove <link> tags for stylesheets\n  cleaned = cleaned.replace(/<link[^>]*rel\\s*=\\s*[\"']stylesheet[\"'][^>]*>/gi, '');\n  \n  // Remove <script> tags and their content (JavaScript)\n  cleaned = cleaned.replace(/<script\\b[^>]*>[\\s\\S]*?<\\/script>/gi, '');\n  \n  // Remove inline event handlers (onclick, onload, etc.)\n  cleaned = cleaned.replace(/\\s+on\\w+\\s*=\\s*[\"'][^\"']*[\"']/gi, '');\n  \n  // Remove noscript tags and their content\n  cleaned = cleaned.replace(/<noscript[^>]*>[\\s\\S]*?<\\/noscript>/gi, '');\n  \n  // Remove JavaScript URLs in href/src (javascript:)\n  cleaned = cleaned.replace(/\\s+(?:href|src)\\s*=\\s*[\"']javascript:[^\"']*[\"']/gi, '');\n  \n  return cleaned;\n}\n\n// Process the input data\nconst processedData = removeCSSAndJSFromHTML(inputData);\n\n// Return the result\nreturn [{\n  json: {\n    data: processedData\n  }\n}];"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                512,
+                0
+            ],
+            "id": "b50cdeb3-aef4-4a64-a413-a8501a33cea6",
+            "name": "Code in JavaScript1"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "71f39a9e-ec84-4d15-b74c-faaa3e767471",
+                            "name": "url",
+                            "value": "={{ $json.body.websiteUrl }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "009b9ce0-088b-4113-a176-968c7786cb0c",
+                            "name": "companyName",
+                            "value": "={{ $json.body.companyName }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "2ad76807-6146-4aaa-a3db-63d5522efe3c",
+                            "name": "companyDescription",
+                            "value": "={{ $json.body.companyDescription }}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                160,
+                0
+            ],
+            "id": "c900fcb4-7c3e-41e3-bd90-a7f2902b42d7",
+            "name": "Edit Fields"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert website copywriter specializing in AI calling and AI call-handling platforms.\n\nYou will receive three inputs:\n\n1. **Competitor fetched HTML content:**\n   `{{ $json.data }}`\n\n2. **Our company name:**\n   `{{ $('Edit Fields').item.json.companyName }}`\n\n3. **Our company description:**\n   `{{ $('Edit Fields').item.json.companyDescription }}`\n\n---\n\n### **Your Task**\n\nRewrite the competitor’s website content into **original, high-quality website copy** for our AI calling / AI call-handling platform.\n\nThe rewritten content must:\n\n* Be **section-by-section**, in the **exact same order** as the competitor\n* Preserve the **same number of sections and subsections**\n* Be **roughly the same length per section**\n* Be clearer, more human, and more compelling than the original\n\n---\n\n### **Critical Rules (Must Follow Exactly)**\n\n#### **Structure & Formatting**\n\n* Convert the provided **HTML content into clean Markdown**\n* Use:\n\n  * `##` for main section headings (H2)\n  * `###` for sub-section headings (H3)\n* **Do not reuse or slightly modify competitor headings** — fully rephrase every heading\n* Preserve the competitor’s **overall structure and hierarchy**\n* Return **only Markdown**, no HTML\n\n#### **Writing Style**\n\n* Keep each bullet point or short description to **1–2 lines max** (≈1.5 lines)\n* Maintain **consistent length across similar points**\n* Tone should be:\n\n  * Clear\n  * Conversational\n  * Professional\n  * Non-salesy\n* Avoid fluff, buzzwords, and marketing hype\n* Do **not** copy phrases or sentence structures from the competitor\n\n#### **Brand Usage**\n\n* Mention **our company name exactly 4–6 times total** across the entire output\n* Mentions must feel natural and evenly distributed\n* Do **not** overuse the brand name\n\n---\n\n### **Output Rules**\n\n* Output **only the rewritten website copy**\n* No explanations, notes, summaries, or meta text\n* No references to the competitor\n* No references to the instructions\n* Markdown only\n\n---\n",
+                "needsFallback": true,
+                "batching": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.chainLlm",
+            "typeVersion": 1.7,
+            "position": [
+                688,
+                0
+            ],
+            "id": "06e62b43-9cc1-41fd-9dcd-83cb2f955497",
+            "name": "Basic LLM Chain"
+        },
+        {
+            "parameters": {
+                "options": {
+                    "temperature": 0.7
+                }
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                656,
+                176
+            ],
+            "id": "218455c0-ac4e-4146-8efa-bbd3f2e96518",
+            "name": "Google Gemini Chat Model",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "MzMAELLX7ocbTJNT",
+                    "name": "Google Gemini(PaLM) Api account 31"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "model": "anthropic/claude-sonnet-4.5",
+                "options": {
+                    "temperature": 0.4
+                }
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+            "typeVersion": 1,
+            "position": [
+                768,
+                176
+            ],
+            "id": "1c1a7c49-6a3a-4b8b-8414-f376e0e61bcd",
+            "name": "OpenRouter Chat Model",
+            "credentials": {
+                "openRouterApi": {
+                    "id": "Q7VWeDG2LQcdO3eU",
+                    "name": "Kedeyo"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "content": "",
+                "height": 448,
+                "width": 1312
+            },
+            "type": "n8n-nodes-base.stickyNote",
+            "position": [
+                -80,
+                -80
+            ],
+            "typeVersion": 1,
+            "id": "11561be5-0e7c-4211-a659-0a251001d309",
+            "name": "Sticky Note"
+        }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Edit Fields",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "HTTP Request": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript1": {
+            "main": [
+                [
+                    {
+                        "node": "Basic LLM Chain",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP Request",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Basic LLM Chain": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Basic LLM Chain",
+                        "type": "ai_languageModel",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "OpenRouter Chat Model": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Basic LLM Chain",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "pinData": {},
+    "meta": {
+        "instanceId": "5b533a58b55c9cfffb3ca6a1fd154d9ee56f64098154b77dce684a20e62b0a1a"
+    }
+}

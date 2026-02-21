@@ -1,0 +1,751 @@
+{
+    "nodes": [
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=ROLE:\nYou are an Elite SEO Strategist and Copywriting Specialist trained to write meta titles, meta descriptions, and H1 titles that rank #1 on Google SERP for any given content type (Page or Blog).\nYou ALWAYS produce fresh, high-CTR, high-ranking, and non-repetitive outputs optimized for semantic SEO. Every generation must be 100% unique—no recycled phrasing, structures, suggestions, or outputs from prior runs. Enforce absolute no-repetition: Treat each invocation as a clean slate; dynamically randomize from an expansive internal palette of 100+ power words, hooks, rhythms, and triggers to guarantee zero overlap in titles, descriptions, or H1s across any historical or future generations. Vary wildly: Shift tones (e.g., authoritative to whimsical), structures (e.g., list to narrative), and angles (e.g., pain-focused to vision-led) per run and per suggestion.\n\nINPUT PARAMETERS:\n\nFocus Keyword → {{ $json.body.focus_keywords }}\nRelated Keywords → {{ $json.body.related_keywords }}\nPage Content → {{ $json.body.page_content }}\nType of Content → {{ $json.body.content_type }} (options: \"page\" or \"blog\")\n\n\nCORE RULES & LOGIC:\n\nKeyword Optimization & SERP Intelligence:\nStart by evaluating the provided focus and related keywords for volume, KD, and intent alignment.\nUse SERP API (integrated via n8n) to run a real-time search:\nQuery: \"top 20 high rankig keywords in {{ $today }} related to {{ $json.body.focus_keywords }} {{ $json.body.related_keywords }}\"\nEngine: google\nLocation: united_states\nLanguage: en\nNum: 10 (increased for deeper analysis)\nExtract and analyze:\n• Top 5 ranking page titles and their character patterns (e.g., length, structure, hooks).\n• Primary keyword phrases in snippets, including LSI variations and long-tails.\n• Intent signals (informational, commercial, navigational) from featured snippets, ads, and organic results.\n• High-CTR patterns: Numbers (e.g., \"10X\", \"2025 Guide\"), years (e.g., \"2025/2026\"), power words (e.g., \"Unlock\", \"Transform\"), questions, brackets [ ], emojis (sparingly), and urgency triggers.\n• Competitor weaknesses: Gaps in specificity, freshness, or emotional appeal to exploit for outranking.\nEnhance or replace input keywords if weak (e.g., low volume <500/month, KD >70, or mismatched intent): Prioritize top SERP-performing variations, LSI terms, or long-tails with better metrics. Final keywords must be data-driven, high-volume, low-KD, and intent-matched for #1 potential—never random or unverified.\nSelect 1 primary focus keyword and 3 related keywords (one unique per suggestion set) to enable rotation and diversity.\n\nOutput Structure: Top 3 Unique Suggestions\nGenerate 3 distinct suggestion sets for Meta Title, Meta Description, and H1 Title. Each set must be fully independent: No overlapping phrasing, keywords (beyond the core focus), structures, hooks, tones, or rhythms. Use SERP data to differentiate wildly (e.g., Set 1: Data/number-heavy; Set 2: Story/question-driven; Set 3: Vision/future-proof).\nEnsure all 3 sets incorporate the final enhanced focus keyword + 1 unique related keyword (strict rotation: Set 1 uses Related KW1, Set 2 uses KW2, Set 3 uses KW3).\nAbsolute Freshness Lock: Before finalizing, self-audit against all prior generations (simulate via internal variance engine); if any phrase echoes (even subtly), regenerate with 3x randomization (e.g., swap synonyms, invert structure, inject new metaphors from page content).\n\nMeta Title (EXACT 60 Characters per Suggestion):\nLength: 60 characters only (spaces included). Enforce strict count—no deviations.\nPer suggestion: Include focus keyword + 1 unique related keyword (rotated strictly).\nStructure variations across suggestions (never repeat patterns across runs):\nSuggestion 1: [Dynamic Power Word] + [Focus KW] + [Quantified Benefit] + [Related KW]\nSuggestion 2: [Intriguing Question] + [Related KW] + [Focus KW] + [Time-Sensitive Trigger]\nSuggestion 3: [Trend/Year Hook] + [Focus KW with Twist] + [Related KW] + [Bold Promise]\n\nLeverage SERP patterns: Mirror high-CTR elements but innovate with untapped angles (e.g., if SERP uses \"Tips\", pivot to \"Hacks\" or \"Secrets\" dynamically).\nUse emotional hooks, numbers, 2025/2026, or brackets [] tailored to intent, randomized per run.\nBANNED WORDS: services, provider, solutions, company, best, top, expert, leading, ultimate, premium, cheap, free.\nNO COMMAS between keyword phrases. Flow with varied connectors like \"via\", \"through\", \"beyond\", or seamless blends.\nEach must feel urgent, clickable, and human—engineered to surge CTR by 25%+ via hyper-specific, run-unique flair.\n\nMeta Description (EXACT 160 Characters per Suggestion):\nLength: 160 characters only. Strict count—no buffer.\nPer suggestion: Expand meta title with wholly unique benefit stacking, social proof (e.g., \"Empower 5K+ innovators\"), or transformation arcs pulled fresh from page content and SERP gaps.\nInclude focus + 1 unique related keyword naturally (rotated).\nVary micro-CTAs wildly across suggestions and runs: Set 1: \"Ignite\"; Set 2: \"Revolutionize Today\"; Set 3: \"Forge Ahead\".\nEnd with diverse emotional payoffs: Rotate per run (e.g., \"Seize the Surge\", \"Claim Your Leap\", \"Ignite Endless Wins\").\nDO NOT repeat meta title phrasing or any prior outputs. Be expansive: Infuse run-specific LSI terms for semantic depth, front-load for mobile.\nFreshness Boost: Draw 1 unique insight from page content per description to personalize beyond SERP norms.\n\nH1 / Hero Title (Content-Type Specific, per Suggestion):\nGenerate 3 unique H1s, each with focus keyword + 1 unique related keyword (rotated).\nIf content_type = \"blog\":\n→ Informative, curiosity-driven, rhythmic or rhyming with alliteration/flow—vary per run (e.g., Set 1: Punchy alliteration; Set 2: Playful rhyme; Set 3: Echoing questions).\n→ Example base (never reuse): \"Decoding Digital Drift: Strategies That Spark Sustainable Shifts\"\nIf content_type = \"page\":\n→ Conversion-focused, authoritative, benefit-first with urgency/proof—vary per run (e.g., Set 1: Proof-infused; Set 2: Urgency-charged; Set 3: Visionary blueprint).\n→ Example base (never reuse): \"Ignite Growth Waves: AI Strategies Fueling 2026 Breakthroughs\"\nNever generic. Infuse insightful, bold, memorable elements: Ultra-short bursts, poetic cadence, or SERP-exploiting counters—randomized fresh each time.\nUse power rhythm: Parallel structure or cadence tuned to content type, with run-to-run pivots for unbreakable novelty.\n\nFreshness & Uniqueness Engine (Hyper-Enhanced):\n100% original per invocation: Mandate triple randomization—power words from rotating banks (e.g., Run 1: Ignite/Forge; Run 2: Surge/Amplify), triggers (e.g., questions to imperatives), and infusions from page content (e.g., extract 3 new phrases per run).\nCross-suggestion & Cross-run Diversity: Set 2 must oppose Set 1 in every metric (tone, length, hook); future runs auto-pivot 180° (e.g., from numerical to narrative).\nTone/depth: Echo page content's voice but amplify with exclusive, run-fresh twists (e.g., weave in timely 2026 forecasts if undated).\nIronclad No-Repeat Rule: Embed logic to flag/block any echo of past outputs; if detected, auto-regenerate with escalated variance.\n\nFinal Validation (Self-Check per Suggestion & Run):\nMeta Title = 60 chars exactly\nMeta Description = 160 chars exactly\nFocus KW in all fields per set\n1 unique rotated related KW per set (no cross-set or cross-run overlap)\nNo banned words\nNo commas between keyword phrases\nH1 matches content_type with radical rhythmic variation\nEach set outperforms SERP top 5 in CTR potential (e.g., fresher, bolder hooks)\nGlobal: Data-driven keywords, zero duplication (audited), hyper-semantic density\n\n\n\nOUTPUT FORMAT (MUST FOLLOW EXACTLY):\nSuggestion Set 1:\n<meta_title>\n60-Character Meta Title Here Exactly\n</meta_title>\n<meta_description>\n160-Character Meta Description Here Exactly\n</meta_description>\n<h1_title>\nRhythmic and Intent-Aligned H1 Title Based on Content Type\n</h1_title>\nSuggestion Set 2:\n<meta_title>\n60-Character Meta Title Here Exactly (Wildly Unique Variation)\n</meta_title>\n<meta_description>\n160-Character Meta Description Here Exactly (Radically Fresh Expansion)\n</meta_description>\n<h1_title>\nRhythmic and Intent-Aligned H1 Title Based on Content Type (Novel Twist)\n</h1_title>\nSuggestion Set 3:\n<meta_title>\n60-Character Meta Title Here Exactly (Contrasting Hook)\n</meta_title>\n<meta_description>\n160-Character Meta Description Here Exactly (Divergent CTA & Proof)\n</meta_description>\n<h1_title>\nRhythmic and Intent-Aligned H1 Title Based on Content Type (Pivotal Reinvention)\n</h1_title>\n<keywords_used>\nFinal Focus Keyword: [Enhanced Primary KW Used Across All]\nRelated Keywords: [Related KW 1 Used in Set 1], [Related KW 2 Used in Set 2], [Related KW 3 Used in Set 3]\n</keywords_used>\nSERP Insights Summary: [Brief 2-3 bullet notes on key enhancements from SERP data, e.g., \"Swapped 'generic KW' for 'high-volume long-tail' slashing KD by 50%; Infused 2026 trends to eclipse stale SERP entries.\"]\nGOAL:\nDeliver #1-ranking, direct-injection-ready meta tags and H1s across 3 elite, non-repeating options that dominate current top 5 SERP results in CTR (target 25-35% uplift), intent precision, and conversion velocity. Harness n8n SERP API for real-time, metric-proven keyword evolution—ensuring only battle-tested terms that conquer searches, with unbreakable freshness to fuel endless A/B innovation.\nEvery output must be CMS-ready (Webflow, WordPress, etc.) and ironclad unique across all time.\nNOW: Query SERP API via n8n, refine keywords with metrics, generate 3 hyper-fresh, divergent suggestion sets (no echoes ever), and validate for unchallenged SERP supremacy.",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "typeVersion": 2.2,
+            "position": [
+                416,
+                0
+            ],
+            "id": "97b712da-1346-46c0-b525-ac6da107ec3e",
+            "name": "AI Agent1"
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+            "typeVersion": 1,
+            "position": [
+                176,
+                192
+            ],
+            "id": "4d8c8e40-3f0c-403b-b6f0-a14343a39370",
+            "name": "OpenRouter Chat Model3",
+            "credentials": {
+                "openRouterApi": {
+                    "id": "Q7VWeDG2LQcdO3eU",
+                    "name": "Kedeyo"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+            "typeVersion": 1,
+            "position": [
+                608,
+                192
+            ],
+            "id": "c622c03f-11e9-449f-95db-a7e9c1a93267",
+            "name": "SerpAPI1",
+            "credentials": {
+                "serpApi": {
+                    "id": "dxdcjVs4iA8G5mjP",
+                    "name": "SerpApi account 4"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "meta_maker",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2.1,
+            "position": [
+                80,
+                0
+            ],
+            "id": "e2740116-9ec0-4d5a-ab68-dfc74ceb6f36",
+            "name": "Webhook",
+            "webhookId": "3cf9bb41-dca5-419a-9ee7-957698dc173b",
+            "disabled": true
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                352,
+                192
+            ],
+            "id": "6825e0ed-4fa7-4bc8-be15-75d3b9f7c03a",
+            "name": "Google Gemini Chat Model2",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "KYoGPvTyGMmv9elG",
+                    "name": "Aman API "
+                }
+            }
+        },
+        {
+            "parameters": {
+                "respondWith": "text",
+                "responseBody": "={{ $json.html }}",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.4,
+            "position": [
+                2720,
+                592
+            ],
+            "id": "507b2f2d-3450-4449-8114-dda2f5905b62",
+            "name": "Respond to Webhook"
+        },
+        {
+            "parameters": {
+                "sessionIdType": "customKey",
+                "sessionKey": "={{ $json.headers['x-forwarded-server'] }}",
+                "contextWindowLength": 20
+            },
+            "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+            "typeVersion": 1.3,
+            "position": [
+                496,
+                192
+            ],
+            "id": "b001d042-3851-4f6f-a847-4e1677f5b7ea",
+            "name": "Simple Memory"
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "n8n-nodes-base.dateTimeTool",
+            "typeVersion": 2,
+            "position": [
+                736,
+                192
+            ],
+            "id": "2e6f8702-0622-4a58-ba93-33c893f0bb7f",
+            "name": "Date & Time"
+        },
+        {
+            "parameters": {
+                "url": "https://serpapi.com/search.json",
+                "sendQuery": true,
+                "queryParameters": {
+                    "parameters": [
+                        {
+                            "name": "engine",
+                            "value": "google"
+                        },
+                        {
+                            "name": "q",
+                            "value": "={{$json.body.focus_keywords}} {{$json.body.related_keywords}}"
+                        },
+                        {
+                            "name": "location",
+                            "value": "United States"
+                        },
+                        {
+                            "name": "hl",
+                            "value": "en"
+                        },
+                        {
+                            "name": "num",
+                            "value": "20"
+                        },
+                        {
+                            "name": "api_key",
+                            "value": "930be0f1e09309d46b29917c7bb357ed5fb39bd27f4fea5b989b0aa64802c7ba"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                272,
+                496
+            ],
+            "id": "aa2ae88c-369f-44c6-a351-3c564957dff5",
+            "name": "HTTP Request"
+        },
+        {
+            "parameters": {
+                "url": "https://serpapi.com/search.json",
+                "sendQuery": true,
+                "queryParameters": {
+                    "parameters": [
+                        {
+                            "name": "engine",
+                            "value": "google_autocomplete"
+                        },
+                        {
+                            "name": "q",
+                            "value": "={{$json.body.focus_keywords}}"
+                        },
+                        {
+                            "name": "location",
+                            "value": "United States"
+                        },
+                        {
+                            "name": "hl",
+                            "value": "en"
+                        },
+                        {
+                            "name": "api_key",
+                            "value": "930be0f1e09309d46b29917c7bb357ed5fb39bd27f4fea5b989b0aa64802c7ba"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                272,
+                672
+            ],
+            "id": "320ebc57-b483-46f5-95f5-5b395280a149",
+            "name": "HTTP Request1"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "c0e8b9de-5593-4f75-bcf2-cc44e0832951",
+                            "name": "organic_results",
+                            "value": "={{ $json.organic_results }}",
+                            "type": "array"
+                        },
+                        {
+                            "id": "5dbac1a5-9d34-4053-afd2-08048002b4dd",
+                            "name": "related_searches",
+                            "value": "={{ $json.related_searches }}",
+                            "type": "array"
+                        },
+                        {
+                            "id": "32406409-2525-4e9c-9c57-f7b10fc83b17",
+                            "name": "related_questions",
+                            "value": "={{ $json.related_questions }}",
+                            "type": "array"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                496,
+                496
+            ],
+            "id": "ab0e3082-909b-430a-9695-2c5a7beebfca",
+            "name": "Edit Fields"
+        },
+        {
+            "parameters": {
+                "aggregate": "aggregateAllItemData",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.aggregate",
+            "typeVersion": 1,
+            "position": [
+                896,
+                592
+            ],
+            "id": "e3a555a9-1e6f-42fa-a65e-a96b2c3a5907",
+            "name": "Aggregate"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "89331dc2-e826-42ec-8b4f-f904864c9c40",
+                            "name": "autocomplete_suggestions",
+                            "value": "={{ $json.suggestions }}",
+                            "type": "array"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                496,
+                672
+            ],
+            "id": "c494445c-4ded-4afb-8cf3-dbc53248c14f",
+            "name": "Edit Fields1"
+        },
+        {
+            "parameters": {
+                "jsCode": "// Robustly read SERP Core, Autocomplete, and Trends from Aggregate->data[]\nconst input = $json;\nconst data = Array.isArray(input.data) ? input.data : [input];\n\n// helpers\nconst findInData = (pred) => data.find(pred) || {};\nconst addToBag = (bag, k, s=0) => {\n  if (!k) return;\n  const key = String(k).toLowerCase().trim().replace(/\\s+/g,' ');\n  if (!key || key.length < 2) return;\n  bag.set(key, (bag.get(key) || 0) + s);\n};\n\n// pick the right objects from the aggregated array\nconst core = findInData(o => o.organic_results || o.related_searches || o.related_questions);\nconst auto = findInData(o => o.autocomplete_suggestions || o.suggestions);\nconst trends = findInData(o => o.related_topics);\n\n// build a keyword bag\nconst bag = new Map();\n\n// Related searches (+2)\n(core.related_searches || []).forEach(r => addToBag(bag, r.query, 2));\n\n// People Also Ask (+1)\n(core.related_questions || []).forEach(q => addToBag(bag, q.question, 1));\n\n// Autocomplete (+2) — handle both shapes\n(auto.autocomplete_suggestions || auto.suggestions || []).forEach(s => {\n  const val = s.value || s.suggestion || s;\n  addToBag(bag, val, 2);\n});\n\n// N-grams (1–4) from top 20 titles/snippets (+1/occ up to +3)\nconst texts = [];\n(core.organic_results || []).slice(0,20).forEach(r => {\n  if (r.title) texts.push(r.title);\n  if (r.snippet) texts.push(r.snippet);\n});\nconst text = texts.join(' ').toLowerCase();\nconst tokens = text.replace(/[^a-z0-9\\s]/g,' ').split(/\\s+/).filter(Boolean);\n[1,2,3,4].forEach(n => {\n  for (let i=0;i<=tokens.length-n;i++){\n    const g = tokens.slice(i,i+n).join(' ');\n    if (g.length>=3 && g.length<=40) addToBag(bag, g, 1);\n  }\n});\n\n// Optional Trends (+1)\n(trends.related_topics || []).forEach(t => addToBag(bag, t.title || t.topic_title || t.name, 1));\n\n// Basic blacklist\nconst blacklist = ['facebook','youtube','reddit','wikipedia','login','near me','review','pricing','price','compare','vs'];\nfor (const k of Array.from(bag.keys())) {\n  if (blacklist.some(b => k.includes(b))) bag.delete(k);\n}\n\n// Rank & keep top 20\nconst ranked = Array.from(bag.entries())\n  .map(([keyword,score]) => ({keyword, score}))\n  .sort((a,b)=>b.score-a.score)\n  .slice(0,20);\n\n// Intent probe from titles/snippets\nconst joined = texts.join(' ').toLowerCase();\nconst info = /what|why|how|guide|explained|definition|learn/.test(joined);\nconst comm = /buy|pricing|quote|plan|trial|demo|setup|deploy|integration/.test(joined);\nconst intent = info && comm ? 'mixed' : (info ? 'informational' : (comm ? 'commercial' : 'mixed'));\n\n// Emit\nreturn [{\n  json: {\n    top20_keywords: ranked.map(r=>r.keyword),\n    serp_sources: {\n      top_titles: (core.organic_results || []).slice(0,3).map(r=>r.title || '').filter(Boolean),\n      intent\n    }\n  }\n}];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1168,
+                592
+            ],
+            "id": "ccfbb56e-44ed-414b-81f1-8f64f3e31809",
+            "name": "Code in JavaScript"
+        },
+        {
+            "parameters": {},
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 3.2,
+            "position": [
+                720,
+                592
+            ],
+            "id": "723b8296-6d28-4b0d-9125-f8d123e6d78c",
+            "name": "Merge"
+        },
+        {
+            "parameters": {
+                "jsCode": "// Inputs expected (from previous node or Set node):\n// focus_kw (string, optional)\n// related_kws_raw (string of comma/pipe separated related keywords, optional)\n// page_content (string, optional)\n// top20_keywords (array from your SERP node, optional)\n\n// --- Helpers ---\nconst toArray = (v) => {\n  if (!v) return [];\n  if (Array.isArray(v)) return v.filter(Boolean);\n  return String(v)\n    .split(/[,|;\\n]/g)\n    .map(s => s.trim())\n    .filter(Boolean);\n};\n\nconst titleCase = (s) => {\n  if (!s) return \"\";\n  const small = new Set([\"a\",\"an\",\"and\",\"the\",\"for\",\"with\",\"to\",\"of\",\"in\",\"on\",\"at\",\"by\",\"or\"]);\n  return s\n    .toLowerCase()\n    .split(/\\s+/)\n    .map((w,i) => (i>0 && small.has(w) ? w : w.charAt(0).toUpperCase() + w.slice(1)))\n    .join(\" \");\n};\n\nconst uniq = (arr) => Array.from(new Set(arr.map(s => s.toLowerCase().trim())));\n\nconst fitExact = (s, target, filler = \" — Guide\") => {\n  let out = (s || \"\").trim();\n\n  // If too long, trim to last space within limit; if none, hard cut.\n  if (out.length > target) {\n    let cut = out.slice(0, target);\n    const lastSpace = cut.lastIndexOf(\" \");\n    if (lastSpace > 35) cut = cut.slice(0, lastSpace);\n    out = cut.replace(/[ ,:;.\\-–—]+$/,\"\").trim();\n  }\n\n  // If still too long, hard cut to target\n  if (out.length > target) out = out.slice(0, target);\n\n  // If short, pad with filler (cut the last filler to hit exact)\n  while (out.length < target) {\n    const need = target - out.length;\n    if (need >= filler.length) {\n      out += filler;\n    } else {\n      out += filler.slice(0, need);\n    }\n  }\n  return out;\n};\n\nconst fitExactDesc = (s, target) => fitExact(s, target, \" Learn more.\");\n\n// --- Gather inputs safely ---\nconst focus_kw = $json.focus_kw || $json.focuskey_words || $json[\"focuskey words\"] || \"\";\nconst related_kws_raw = $json.related_kws_raw || $json[\"Related_keywords \"] || $json[\"Related keywords\"] || \"\";\nconst page_content = $json.page_content || $json[\"Your_Page_Content \"] || $json[\"Your Page Content\"] || \"\";\n\nconst top20 = Array.isArray($json.top20_keywords) ? $json.top20_keywords : [];\nconst relatedList = uniq(toArray(related_kws_raw));\n\n// Choose focus keyword\nconst focus = (focus_kw || top20[0] || \"\").toLowerCase().trim();\n\n// Choose up to two related keywords (prefer user-provided; else from top20 minus focus)\nconst fromTop = top20.filter(k => k && k.toLowerCase() !== focus.toLowerCase());\nlet rel = uniq([...relatedList, ...fromTop]).filter(k => k !== focus).slice(0,2);\nconst rel1 = rel[0] || fromTop[0] || \"\";\nconst rel2 = rel[1] || fromTop[1] || \"\";\n\n// --- Build candidates ---\nconst capF = titleCase(focus);\nconst capR1 = titleCase(rel1);\nconst capR2 = titleCase(rel2);\n\nconst candidates = [\n  `${capF} — ${capR1}${capR2 ? \" & \" + capR2 : \"\"}`,\n  `${capF}: ${capR1}${capR2 ? \" and \" + capR2 : \"\"}`,\n  `${capF} with ${capR1}${capR2 ? \" & \" + capR2 : \"\"}`,\n  `${capF} | ${capR1}${capR2 ? \" + \" + capR2 : \"\"}`,\n].map(s => s.replace(/\\s+/g, \" \").trim());\n\n// Pick the longest candidate <= 60; else first\nconst TARGET_TITLE = 60;\nlet chosen = candidates\n  .filter(s => s.length <= TARGET_TITLE)\n  .sort((a,b) => b.length - a.length)[0] || candidates[0];\n\n// Enforce exactly 60 chars\nconst meta_title = fitExact(chosen, TARGET_TITLE, \" — Guide\");\n\n// --- Meta description (160) ---\n// Make sure it contains focus + 1-2 related, natural language.\nconst baseDescParts = [\n  `Discover ${focus}`,\n  rel1 ? `with ${rel1}` : \"\",\n  rel2 ? `and ${rel2}` : \"\",\n  `. Learn how to improve quality, reduce costs, and scale with confidence.`,\n];\nlet meta_description_raw = baseDescParts.join(\" \").replace(/\\s+/g,\" \").replace(/ \\./g,\".\").trim();\n\n// Include a tiny hook from page content if available\nif (page_content) {\n  const teaser = String(page_content).trim().replace(/\\s+/g,\" \").slice(0, 90).replace(/[.;,:\\-–—]+$/,\"\");\n  if (teaser && !meta_description_raw.toLowerCase().includes(teaser.toLowerCase())) {\n    meta_description_raw += ` ${teaser}.`;\n  }\n}\nconst TARGET_DESC = 160;\nconst meta_description = fitExactDesc(meta_description_raw, TARGET_DESC);\n\n// --- H1 (informative with a little rhythm) ---\nconst h1_title = `${titleCase(focus)} with ${capR1}${capR2 ? \" & \" + capR2 : \"\"}: Smart, Secure & Scalable`;\n\n// --- Page content title (alternate) ---\nconst page_title = `The ${titleCase(focus)} Playbook: ${capR1}${capR2 ? \" + \" + capR2 : \"\"} Essentials`;\n\n// --- Output + counts for debugging ---\nreturn [{\n  json: {\n    focus_keyword_used: focus,\n    related_keywords_used: [rel1, rel2].filter(Boolean),\n    top20_keywords: top20,\n\n    meta_title,\n    meta_title_length: meta_title.length,\n\n    meta_description,\n    meta_description_length: meta_description.length,\n\n    h1_title,\n    page_title\n  }\n}];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1376,
+                592
+            ],
+            "id": "6d5c0551-2b1d-487d-840a-100b23563f24",
+            "name": "Code in JavaScript1"
+        },
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "meta_maker",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2.1,
+            "position": [
+                48,
+                560
+            ],
+            "id": "42ff8313-85df-401b-b0b7-2e477bd99cbb",
+            "name": "Webhook2",
+            "webhookId": "3cf9bb41-dca5-419a-9ee7-957698dc173b"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "170e1bba-ae0f-4235-86f1-fdc310b0a05f",
+                            "name": "focus_keyword_serp",
+                            "value": "={{ $json.focus_keyword_used }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "9a07dbc5-505b-471c-992a-90cfdcbd8243",
+                            "name": "related_keywords_serp",
+                            "value": "={{ $json.related_keywords_used }}",
+                            "type": "array"
+                        },
+                        {
+                            "id": "62ad4c0e-0df0-4785-82e8-93a0a8c48a17",
+                            "name": "top20_keywords_serp",
+                            "value": "={{ $json.top20_keywords }}",
+                            "type": "array"
+                        },
+                        {
+                            "id": "a85a5b3e-3a74-4f7b-80c8-7ac30950c663",
+                            "name": "meta_title_serp",
+                            "value": "={{ $json.meta_title }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "90192d47-007b-47e7-9a55-4c65ae3efaa5",
+                            "name": "meta_description_serp",
+                            "value": "={{ $json.meta_description }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "0af9b0a4-41a3-4160-b4d6-a7867aabbf8f",
+                            "name": "h1_title_serp",
+                            "value": "={{ $json.h1_title }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "66180691-f153-4582-bc1e-07ec88167254",
+                            "name": "page_title_serp",
+                            "value": "={{ $json.page_title }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "90fe5b9e-0323-445b-a3f1-704633aee02c",
+                            "name": "body.focus_keywords_user",
+                            "value": "={{ $('Webhook2').item.json.body.focus_keywords }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "888abe8f-e3fc-4f16-a90c-fb20059d771c",
+                            "name": "body.related_keywords_user",
+                            "value": "={{ $('Webhook2').item.json.body.related_keywords }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "7a779dca-74ee-4d83-90ca-618833caa11b",
+                            "name": "body.page_content_user",
+                            "value": "={{ $('Webhook2').item.json.body.page_content }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "8f710748-f3f2-4972-8c64-a1001158b1e6",
+                            "name": "body.content_type",
+                            "value": "={{ $('Webhook2').item.json.body.content_type }}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                1584,
+                592
+            ],
+            "id": "13579061-8aad-46b5-9df3-6aa6dd5f04e3",
+            "name": "Edit Fields2"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=ROLE:\nYou are a Content-Locked Rhythm-Ranking SERP Poet. Every line must match page content, flow like poetry, and score 9.8+.\n\nINPUT:\n{{ $json.focus_keyword_serp }} → SERP Focus\n{{ $json.related_keywords_serp }} → SERP Related (array)\n{{ $json.top20_keywords_serp }} → Top 20 KWs (array)\n{{ $json.meta_title_serp }}, {{ $json.meta_description_serp }}, {{ $json.h1_title_serp }}, {{ $json.page_title_serp }} → SERP References\n{{ $json.body.focus_keywords_user }}, {{ $json.body.related_keywords_user }} → USER KWs\n{{ $json.body.page_content_user }} → **PAGE CONTENT (MUST ALIGN)**\n{{ $json.body.content_type }} → \"page\" | \"blog\"\n\nHARD-CODED POOL:\nWholesale VoIP, VoIP Termination, Wholesale VoIP Rates, Wholesale VoIP Routes, CLI Routing, LCR Algorithms, A-Z Routes, Global Reach, Fraud Shield, 7-Step Guide, 60% Savings, 99.9% Uptime\n\nFOCUS KW LOCK:\n- Must be: \"Wholesale VoIP Termination\" | \"Wholesale VoIP Rates\" | \"Wholesale VoIP Routes\"\n- Left-aligned in title, first 80 chars of desc, first 5 words of H1\n\nPAGE-CONTENT FUSION (MANDATORY):\n1. Extract 3 claims from {{ $json.body.page_content_user }}:\n   - Technical (e.g., \"CLI guaranteed\")\n   - Outcome (e.g., \"60% cost cut\")\n   - Asset (e.g., \"7-step fraud guide\")\n2. Inject 1–2 claims into **every set**\n3. Auto-reject if no content match\n\nENFORCED RULES:\n- Title: **EXACT 60 chars**\n- Desc: **EXACT 160 chars**\n- 2–3 KWs per set\n- No commas → use “via”, “with”, “for”\n- Banned: services, provider, solutions, company, best, top, expert, leading, ultimate, premium, cheap, free\n\nRHYTHM & RHYME ENGINE:\n- **Alliteration**: 3+ same-letter words\n- **Rhyme/Near-Rhyme**: Title, Desc, H1\n- **Cadence**: 5–7 syllables per line\n- **Power verbs**: slash, crush, lock, ignite\n- **Benefit stack**: profit + clarity + scale\n\nNUMERIC PROOF (EVERY SET):\n- 7-step, 60%, 99.9%, 200+, zero, 80%, 50%\n\nMICRO-CTA (10 unique):\n1. Ignite  2. Revolutionize Today  3. Forge Ahead  4. Launch Now  5. Scale Fast  6. Dominate  7. Unleash  8. Activate  9. Accelerate  10. Seize Control\n\nFRESHNESS:\n- Jaccard < 0.2\n- 120+ verbs, 80+ hooks, 60+ structures → rotate\n- Self-audit: regenerate if no rhythm or content match\n\nOUTPUT FORMAT:\nSuggestion Set 1:\nMeta Title: [60 chars | content claim + rhythm]\nMeta Description: [160 chars | claim in first 80 + rhyme]\nH1 Title: [rhythmic echo of claim]\n\n... (up to Set 10)\n\nMASTER SELECTION:\nMeta Title (Winner): [60 chars] ← Set X\nMeta Description (Winner): [160 chars] ← Set X\nH1 Title (Winner): [H1] ← Set X\nDetails: Set X | Score: 9.9/10 | Content Claim: [from page_content_user]\n\nSuggestion Set 1:\nMeta Title: Wholesale VoIP Termination via CLI + Fraud Shield\nMeta Description: Shield wholesale VoIP termination with CLI and fraud shield. Stop 80% attacks, lock 99.9% uptime. Ignite your network now.\nH1 Title: CLI + Fraud Shield: Wholesale VoIP Termination\n\nSuggestion Set 3:\nMeta Title: Wholesale VoIP Rates via 7-Step + 80% Fraud Stop\nMeta Description: Slash wholesale VoIP rates with 7-step fraud stop. Secure 80% attack block and 99.9% uptime. Forge Ahead with confidence.\nH1 Title: 7-Step + 80% Stop: Wholesale VoIP Rates\n\nENFORCED RHYTHM:\n- Desc: EXACT 160 chars\n- Alliteration: 3+ same-letter words\n- Title rhythm: [Verb] + [Number] + [Benefit]\n- Auto-reject if desc < 160",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "typeVersion": 2.2,
+            "position": [
+                1792,
+                592
+            ],
+            "id": "833420d8-db5a-4fed-a8cf-85f2356ec60f",
+            "name": "AI Agent"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=Transform {{ $json.output }} (in the “Suggestion Set” format) into HTML only for direct embed.\n\nInstructions:\n\nInput: {{ $json.output }} containing Suggestion Sets, SERP Notes, Keywords, and a MASTER SELECTION block.\n\nOutput: Return only one HTML5 fragment wrapped in <section class=\"ai-block\">…</section> (no <html>, <head>, <body>).\n\nUse MASTER first: Prefer <meta_title_master>, <meta_description_master>, <h1_title_master>; if any is missing, fall back to Set 1.\n\nRender blocks (omit if absent):\n\nHero H1 (master)\n\n“SEO Preview” (master meta title & description)\n\nCards grid for all Suggestion Sets (title, description, H1)\n\n“Keywords Used” (focus, related, sources)\n\n“SERP Insights” (Note 1/2/3…)\n\n“Master Details” (chosen set, lengths, focus/related KWs)\n\nSanitize: strip <script>, event handlers, iframes, trackers.\n\nSemantics: h1/h2/h3, p, ul/ol, blockquote; responsive table only if truly tabular.\n\nAccessibility: logical heading order; external links use target=\"_blank\" rel=\"nofollow noopener\".\n\nStyle: insert a scoped <style> at the top inside .ai-block only; define CSS vars --brand-1:#01b7ff; --brand-2:#006c69; --accent:#fc6a0d; and minimal styles for headings, paragraphs, lists, cards, and a simple responsive grid.\n\nNo extra text: return the final sanitized HTML fragment only.",
+                "batching": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.chainLlm",
+            "typeVersion": 1.7,
+            "position": [
+                2144,
+                592
+            ],
+            "id": "dfc08ceb-b96b-4bc9-bec1-d5de267e0565",
+            "name": "Basic LLM Chain"
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                2144,
+                816
+            ],
+            "id": "647af361-336e-4e0f-a1a0-931af49d3982",
+            "name": "Google Gemini Chat Model1",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "KYoGPvTyGMmv9elG",
+                    "name": "Aman API "
+                }
+            }
+        },
+        {
+            "parameters": {
+                "jsCode": "function markdownToHTML(md) {\n  if (!md) return '';\n\n  // Headings\n  md = md.replace(/^### (.*)$/gim, '<h3>$1</h3>');\n  md = md.replace(/^## (.*)$/gim, '<h2>$1</h2>');\n  md = md.replace(/^# (.*)$/gim, '<h1>$1</h1>');\n\n  // Bold and italic\n  md = md.replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>');\n  md = md.replace(/__(.*?)__/g, '<strong>$1</strong>');\n  md = md.replace(/\\*(.*?)\\*/g, '<em>$1</em>');\n  md = md.replace(/_(.*?)_/g, '<em>$1</em>');\n\n  // Inline code\n  md = md.replace(/`([^`]+)`/g, '<code>$1</code>');\n\n  // Blockquotes\n  md = md.replace(/^\\s*>\\s?(.*)$/gm, '<blockquote>$1</blockquote>');\n\n  // Images\n  md = md.replace(/!\\[(.*?)\\]\\((.*?)\\)/g, '<img src=\"$2\" alt=\"$1\"/>');\n\n  // Links\n  md = md.replace(/\\[(.*?)\\]\\((.*?)\\)/g, '<a href=\"$2\" target=\"_blank\">$1</a>');\n\n  // Lists (combine consecutive list items)\n  md = md.replace(/(?:^\\s*[-*+]\\s+.*(?:\\n|$))+?/gm, match => {\n    const items = match.trim().split(/\\n/).map(line => line.replace(/^\\s*[-*+]\\s+/, ''));\n    return `<ul>${items.map(i => `<li>${i}</li>`).join('')}</ul>`;\n  });\n\n  md = md.replace(/(?:^\\s*\\d+\\.\\s+.*(?:\\n|$))+?/gm, match => {\n    const items = match.trim().split(/\\n/).map(line => line.replace(/^\\s*\\d+\\.\\s+/, ''));\n    return `<ol>${items.map(i => `<li>${i}</li>`).join('')}</ol>`;\n  });\n\n  // Paragraphs (add <p> for plain text blocks)\n  md = md.replace(/^(?!<[h|ul|ol|li|img|blockquote|code|p])(.*)$/gm, '<p>$1</p>');\n\n  // Line breaks\n  md = md.replace(/\\n+/g, '<br/>');\n\n  return md.trim();\n}\n\n// Process all incoming items\nreturn items.map(item => {\n  const markdown = item.json.content || item.json.text || '';\n  item.json.html = markdownToHTML(markdown);\n  return item;\n});\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                2480,
+                592
+            ],
+            "id": "8053f859-a918-46e8-9258-6f7587b687ba",
+            "name": "Code in JavaScript2"
+        },
+        {
+            "parameters": {
+                "model": "x-ai/grok-4-fast",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+            "typeVersion": 1,
+            "position": [
+                1792,
+                784
+            ],
+            "id": "dd8a0ab6-2472-4ff0-bb04-e8ec1bbbce21",
+            "name": "OpenRouter Chat Model",
+            "credentials": {
+                "openRouterApi": {
+                    "id": "Q7VWeDG2LQcdO3eU",
+                    "name": "Kedeyo"
+                }
+            }
+        }
+    ],
+    "connections": {
+        "AI Agent1": {
+            "main": [
+                []
+            ]
+        },
+        "OpenRouter Chat Model3": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "SerpAPI1": {
+            "ai_tool": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "ai_tool",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model2": {
+            "ai_languageModel": [
+                []
+            ]
+        },
+        "Respond to Webhook": {
+            "main": [
+                []
+            ]
+        },
+        "Simple Memory": {
+            "ai_memory": [
+                []
+            ]
+        },
+        "Date & Time": {
+            "ai_tool": [
+                [
+                    {
+                        "node": "AI Agent1",
+                        "type": "ai_tool",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "HTTP Request": {
+            "main": [
+                [
+                    {
+                        "node": "Edit Fields",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "HTTP Request1": {
+            "main": [
+                [
+                    {
+                        "node": "Edit Fields1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields": {
+            "main": [
+                [
+                    {
+                        "node": "Merge",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Aggregate": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields1": {
+            "main": [
+                [
+                    {
+                        "node": "Merge",
+                        "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Merge": {
+            "main": [
+                [
+                    {
+                        "node": "Aggregate",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript1": {
+            "main": [
+                [
+                    {
+                        "node": "Edit Fields2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Webhook2": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP Request",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "HTTP Request1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields2": {
+            "main": [
+                [
+                    {
+                        "node": "AI Agent",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AI Agent": {
+            "main": [
+                [
+                    {
+                        "node": "Basic LLM Chain",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Basic LLM Chain": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model1": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Basic LLM Chain",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript2": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenRouter Chat Model": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "AI Agent",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "pinData": {},
+    "meta": {
+        "templateCredsSetupCompleted": true,
+        "instanceId": "5b533a58b55c9cfffb3ca6a1fd154d9ee56f64098154b77dce684a20e62b0a1a"
+    }
+}

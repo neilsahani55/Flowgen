@@ -1,0 +1,259 @@
+{
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "339628ac-83c0-40de-a829-fb6f27f84d68",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2.1,
+            "position": [
+                -224,
+                0
+            ],
+            "id": "5ac2d772-0f29-48f1-8494-33d550f9d52f",
+            "name": "Webhook",
+            "webhookId": "339628ac-83c0-40de-a829-fb6f27f84d68"
+        },
+        {
+            "parameters": {
+                "respondWith": "allIncomingItems",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.4,
+            "position": [
+                720,
+                0
+            ],
+            "id": "38956ecb-1f4b-406d-9b19-e5ce033eafc7",
+            "name": "Respond to Webhook",
+            "alwaysOutputData": false
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "d707f0ad-68cf-40d8-885a-7b0f99bf62de",
+                            "name": "url",
+                            "value": "={{ $json.body.url }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "193b19c5-d486-4680-bf98-3382a5a53212",
+                            "name": "notes",
+                            "value": "={{ $json.body.notes }}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                -80,
+                0
+            ],
+            "id": "fe68c7eb-8bb2-4470-816e-8026b85d8a08",
+            "name": "Edit Fields"
+        },
+        {
+            "parameters": {
+                "url": "={{ $json.url }}",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.3,
+            "position": [
+                64,
+                0
+            ],
+            "id": "390d0959-2c13-4f8f-b414-969f6f566bc9",
+            "name": "HTTP Request"
+        },
+        {
+            "parameters": {
+                "options": {
+                    "temperature": 0.7
+                }
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                288,
+                208
+            ],
+            "id": "da584ec2-b4d9-4e24-839c-5d27fe1ac0b9",
+            "name": "Google Gemini Chat Model",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "MzMAELLX7ocbTJNT",
+                    "name": "Google Gemini(PaLM) Api account 31"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "jsCode": "const text = $input.first().json.text;\n\n// Match each value block - handles both formats:\n// 1. *   **value1:** (bullet format)\n// 2. ### value1: (header format)\nconst blocks = text.match(/(?:[#*][ ]*\\*{0,2}value\\d+[ ]*[:*]{1,3}|### value\\d+:)[\\s\\S]*?(?=(?:[#*][ ]*\\*{0,2}value\\d+[ ]*[:*]{1,3}|### value\\d+:)|\\n?$)/g);\n\nif (!blocks) {\n  return [{ json: { error: \"No values found\" } }];\n}\n\nconst results = blocks.map((block) => {\n  // Extract value number from the header\n  const valueNumMatch = block.match(/(?:value(\\d+))/);\n  if (!valueNumMatch) {\n    return { json: {} };\n  }\n  \n  const num = valueNumMatch[1];\n  \n  // Extract fields - handle both formats\n  // Look for Error field\n  const errorMatch = block.match(/(?:\\*[ ]+\\*\\*|\\*\\*)?Error:\\*\\*([\\s\\S]*?)(?=(?:\\*[ ]+\\*\\*|\\*\\*)?Location:|###?|\\n?$)/i);\n  \n  // Look for Location field\n  const locationMatch = block.match(/(?:\\*[ ]+\\*\\*|\\*\\*)?Location:\\*\\*([\\s\\S]*?)(?=(?:\\*[ ]+\\*\\*|\\*\\*)?Suggested Fix:|###?|\\n?$)/i);\n  \n  // Look for Suggested Fix field\n  const fixesMatch = block.match(/(?:\\*[ ]+\\*\\*|\\*\\*)?Suggested Fix:\\*\\*([\\s\\S]*)/i);\n  \n  // Dynamic key names\n  const obj = {};\n  obj[`value${num}_error`] = errorMatch ? errorMatch[1].trim().replace(/^[\\n\\s*]+|[\\n\\s*]+$/g, '') : \"\";\n  obj[`value${num}_location`] = locationMatch ? locationMatch[1].trim().replace(/^[\\n\\s*]+|[\\n\\s*]+$/g, '') : \"\";\n  obj[`value${num}_suggested_fixes`] = fixesMatch ? fixesMatch[1].trim().replace(/^[\\n\\s*]+|[\\n\\s*]+$/g, '') : \"\";\n  \n  return { json: obj };\n});\n\nreturn results;"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                576,
+                0
+            ],
+            "id": "a75e2fa4-6b47-431b-b922-f95a460bae0c",
+            "name": "Code in JavaScript"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are a **Professional Content Editor**. Your task is to identify and correct meaningful errors while strictly ignoring technical noise and minor punctuation issues.\n\n**Strict Data Usage:**\n\n1. **Meta Tags:** Use `{{ $json.data }}` **ONLY** to extract and check text within `<title>` and `<meta name=\"description\">`.\n2. **Main Content:** Use `{{ $('Edit Fields').item.json.notes }}` for all **Spelling, Grammar, and Content** checks.\n\n**Strict Filtering Rules (What to IGNORE):**\n\n* **NO \"Silly\" Errors:** Ignore missing/extra full stops (periods) at the end of lines, minor spacing, or oxford comma preferences.\n* **NO Technical Noise:** Ignore HTML tags, attributes (class, id, href), or any strings containing underscores or numbers.\n* **High Threshold:** Only flag actual typos, incorrect verb tenses, subject-verb disagreement, or phrases that are genuinely confusing to a human reader.\n\n---\n\n### 📌 OUTPUT FORMAT\n\n* **value1:**\n* **Error:** [Detailed 1-2 sentence explanation of the specific error and its impact. Specify if it is in Meta Data or Body Content]\n* **Location:** [The specific phrase or sentence where the error was found]\n* **Suggested Fix:**\n1. [Direct correction]\n2. [Improved/Polished version]\n\n\n\n\n* **value2:**\n* **Error:** [Detailed 1-2 sentence explanation of the specific error and its impact. Specify if it is in Meta Data or Body Content]\n* **Location:** [The specific phrase or sentence where the error was found]\n* **Suggested Fix:**\n1. [Direct correction]\n2. [Improved/Polished version]\n\n---\n\n### ✅ Execution Rules:\n\n* **No Introduction/Conclusion:** Start the response immediately with `* **value1:**`.\n* **Concise Depth:** Keep the error description informative but under 40 words.\n* **Clear Suggestions:** Provide exactly two distinct suggestions for every error.\n* **Strict Adherence:** Follow the data source instructions exactly as defined above.\n\n",
+                "needsFallback": true,
+                "batching": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.chainLlm",
+            "typeVersion": 1.7,
+            "position": [
+                320,
+                0
+            ],
+            "id": "be76e35d-95fa-44d9-b807-0c91c71d0db8",
+            "name": "Basic LLM Chain"
+        },
+        {
+            "parameters": {
+                "model": "google/gemini-2.5-flash",
+                "options": {
+                    "temperature": 0.7
+                }
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+            "typeVersion": 1,
+            "position": [
+                384,
+                208
+            ],
+            "id": "a415bf40-257f-44ad-b8a6-c31d1a2b7368",
+            "name": "OpenRouter Chat Model",
+            "credentials": {
+                "openRouterApi": {
+                    "id": "Q7VWeDG2LQcdO3eU",
+                    "name": "Kedeyo"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "jsCode": "// Get the input data\nconst inputData = $input.first().json.data;\n\n// Function to remove CSS and JS from HTML\nfunction removeCSSAndJSFromHTML(html) {\n  let cleaned = html;\n  \n  // Remove <style> tags and their content\n  cleaned = cleaned.replace(/<style[^>]*>[\\s\\S]*?<\\/style>/gi, '');\n  \n  // Remove inline style attributes\n  cleaned = cleaned.replace(/style\\s*=\\s*[\"'][^\"']*[\"']/gi, '');\n  \n  // Remove <link> tags for stylesheets\n  cleaned = cleaned.replace(/<link[^>]*rel\\s*=\\s*[\"']stylesheet[\"'][^>]*>/gi, '');\n  \n  // Remove <script> tags and their content (JavaScript)\n  cleaned = cleaned.replace(/<script\\b[^>]*>[\\s\\S]*?<\\/script>/gi, '');\n  \n  // Remove inline event handlers (onclick, onload, etc.)\n  cleaned = cleaned.replace(/\\s+on\\w+\\s*=\\s*[\"'][^\"']*[\"']/gi, '');\n  \n  // Remove noscript tags and their content\n  cleaned = cleaned.replace(/<noscript[^>]*>[\\s\\S]*?<\\/noscript>/gi, '');\n  \n  // Remove JavaScript URLs in href/src (javascript:)\n  cleaned = cleaned.replace(/\\s+(?:href|src)\\s*=\\s*[\"']javascript:[^\"']*[\"']/gi, '');\n  \n  return cleaned;\n}\n\n// Process the input data\nconst processedData = removeCSSAndJSFromHTML(inputData);\n\n// Return the result\nreturn [{\n  json: {\n    data: processedData\n  }\n}];"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                192,
+                0
+            ],
+            "id": "1e909d24-17ba-474d-98c5-04764105fffe",
+            "name": "Code in JavaScript1"
+        }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Edit Fields",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields": {
+            "main": [
+                [
+                    {
+                        "node": "HTTP Request",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "HTTP Request": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Basic LLM Chain",
+                        "type": "ai_languageModel",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Basic LLM Chain": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OpenRouter Chat Model": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Basic LLM Chain",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript1": {
+            "main": [
+                [
+                    {
+                        "node": "Basic LLM Chain",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "pinData": {},
+    "meta": {
+        "templateCredsSetupCompleted": true,
+        "instanceId": "5b533a58b55c9cfffb3ca6a1fd154d9ee56f64098154b77dce684a20e62b0a1a"
+    }
+}

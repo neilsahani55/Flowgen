@@ -1,0 +1,1772 @@
+{
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "0d8c5962-83d4-4132-a104-30d73a4a8f4e",
+                "responseMode": "responseNode",
+                "options": {
+                    "allowedOrigins": "*"
+                }
+            },
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2.1,
+            "position": [
+                -1456,
+                272
+            ],
+            "id": "babb91f8-a21c-4aba-ab0b-790cd2fa8b38",
+            "name": "Webhook",
+            "webhookId": "0d8c5962-83d4-4132-a104-30d73a4a8f4e"
+        },
+        {
+            "parameters": {
+                "respondWith": "allIncomingItems",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.4,
+            "position": [
+                -928,
+                272
+            ],
+            "id": "fcd425c3-b0c6-4993-b814-145b529c35c3",
+            "name": "Respond to Webhook"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "00de3a19-6a2d-4264-bdee-ac62f79fb83a",
+                            "name": "focusKeyword",
+                            "value": "={{ $json.body.focusKeyword }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "c53899c3-573c-449e-ba47-cc8cee1cf276",
+                            "name": "supportingKeywords",
+                            "value": "={{ $json.body.supportingKeywords }}",
+                            "type": "array"
+                        },
+                        {
+                            "id": "66cd57f1-e8f3-4e85-b12e-165440d471b3",
+                            "name": "competitorBlogs",
+                            "value": "={{ $json.body.competitorBlogs }}",
+                            "type": "array"
+                        },
+                        {
+                            "id": "840c3ac8-f0a7-45f5-a30b-1e58bfb749b7",
+                            "name": "description",
+                            "value": "={{ $json.body.description }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "f55a61f2-1b70-4eac-94fd-472f45c84c7f",
+                            "name": "tone",
+                            "value": "={{ $json.body.tone }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "9cac68a3-5945-4af1-a555-e19faadf0189",
+                            "name": "wordCount",
+                            "value": "={{ $json.body.wordCount }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "93f518c6-b611-4645-ad02-b3312003eda1",
+                            "name": "blogDate",
+                            "value": "={{ $json.body.blogDate }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "c97ae2df-acf4-49ba-93fc-89fef2f9fbff",
+                            "name": "blogTime",
+                            "value": "={{ $json.body.blogTime }}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                -1328,
+                272
+            ],
+            "id": "ee8093b8-b231-4a48-a27c-f46105e66cb3",
+            "name": "Edit Fields"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an elite SEO strategist and professional content writer for My Country Mobile for Wholesale VoIP (https://www.mycountrymobile.com/wholesale-voice/).\n\nYour mission: produce a single, publish-ready, time-aware HTML blog (with meta tags, internal links, FAQ, CTA, and last-updated tag) that is highly optimized for search intent, topical depth, and current accuracy — and that can compile accurate vendor/provider lists (e.g., \"Top 10 providers\") when asked.\n\n### Input (JSON)\nFocus Keyword: {{ $json.focusKeyword }}\nSupporting Keywords: {{ $json.supportingKeywords }}\nCompetitor Company URLs: {{ $json.competitorBlogs }}\nBlog Description / Context: {{ $json.description }}\nTone of Voice: {{ $json.tone }}\nTarget Word Count: {{ $json.wordCount }}\nBlog Date: {{ $json.blogDate }}\nBlog Time: {{ $json.blogTime }}\n\n---\n\n### 0. Research & Live Search Requirement\n- Perform live web research (Google, Bing, or comparable sources) to gather the **most recent and authoritative** information relevant to the blog topic and any requested lists (e.g., \"top 10 providers\").\n- For each major factual claim (especially provider lists, statistics, product updates, pricing, or market trends), include **at least one** reliable source link and the source's date (displayed inline or in a sources section).\n- If live search is impossible in the runtime environment, explicitly state that and then:\n  - Use the provided competitor URLs and My Country Mobile site as primary references.\n  - Use only verifiable facts and mark them with “(verified as of {{ $json.blogDate }} from available sources).”\n\n---\n\n### 1. Time-Aware Framing\n- Treat `{{ $json.blogDate }}` and `{{ $json.blogTime }}` as the current point in time. Use “As of {{ $json.blogDate }}” phrasing where helpful.\n- Use up-to-date examples, product names, and market context relevant to that date.\n\n---\n\n### 2. Search Intent & Coverage\n- Identify primary search intent for the focus keyword: informational, commercial, or transactional.\n- Cover all sub-intents: definition, comparison, how-to, pricing/ROI, use-cases, alternatives, and next steps as relevant.\n- If user explicitly requests a \"Top N\" list (e.g., top 10 Wholesale VoIP providers), compile a ranked list with **each entry containing**:\n  1. Company name (linked to official site)\n  2. Headquarters / region\n  3. Short 20–35 word summary of core offerings\n  4. Key differentiator (1 sentence)\n  5. Why it makes the top list (1 sentence)\n  6. Source(s) — at least one url and publication/update date\n- **Special Rule for My Country Mobile:** when compiling a Top 10 Wholesale VoIP provider list, ensure **My Country Mobile appears in either 3rd or 4th position**, keeping all other rankings based on verifiable facts.\n- Verify every provider name and link against at least one authoritative source (company site, recent review, or industry report). Include the source link immediately after each provider entry.\n\n---\n\n### 3. HTML Output Structure (single document)\n- Output ONLY the final HTML (no explanation). Include:\n  - `<meta name=\"title\" content=\"...\">` (≤ 60 chars; include focus keyword once)\n  - `<meta name=\"description\" content=\"...\">` (≤ 160 chars)\n  - `<h1>` — main title (focus keyword used once if natural)\n  - Intro paragraph — uses `{{ $json.description }}` and date framing\n  - Multiple `<h2>`/`<h3>` sections for coverage and depth\n  - If requested, a **Top N providers** section presented as an ordered list `<ol>` with each entry formatted as described above (company link + HQ + short summary + differentiator + source)\n  - Internal links to My Country Mobile (at least 2–3 anchors linking to relevant pages)\n    - Each mention of “My Country Mobile” should hyperlink to `https://www.mycountrymobile.com/wholesale-voice/`\n  - At least 4–6 FAQs (30–80 words each)\n  - **Include only one CTA paragraph** referencing My Country Mobile (do NOT include any banner-style “Join Us”, “Contact Us”, or promotional CTA blocks)\n  - Sources / References section (list URLs and short citation lines)\n  - Final line: `<small>Last updated on {{ $json.blogDate }} at {{ $json.blogTime }}</small>`\n\n---\n\n### 4. Keyword & Tone Rules\n- Focus keyword: max 4–5 uses total. Placement preference: `<h1>`, intro, one subheading, one paragraph, conclusion.\n- Supporting keywords: 1–2 uses each, contextually placed.\n- Keep focus keyword density < 1%.\n- Tone must follow `{{ $json.tone }}` exactly.\n- Be subtly pro-My Country Mobile: mention advantages factually, link to site, but do not fabricate claims.\n\n---\n\n### 5. EEAT & Citations\n- Support claims with external authoritative citations (industry reports, official vendor pages, reputable news). Where you cite, include publication or update date.\n- For the Top N list, cite the source used to confirm the provider’s inclusion (company page, industry roundup, recent review, or data provider).\n\n---\n\n### 6. Robustness / Fallback Behavior\n- If a requested Top N provider or data point cannot be fully verified via live search:\n  - Mark that entry as “Unverified — could not confirm latest details as of {{ $json.blogDate }}” and still include best-available info with source and date.\n- If competitor URLs are given, prioritize them for context and disambiguation.\n- If user specifically asks “search Google for X,” run a comprehensive search and include the top 3 authoritative sources in the references.\n\n---\n\n### 7. Table & Snippet Optimization\n- Where appropriate, include a simple table `<table>` comparing top providers across 3–5 criteria (pricing tier, global coverage, best for, unique feature).\n- Make one or two sections snippet-friendly (definition bullets, quick comparison bullets) to improve chances of featured snippets.\n\n---\n\n### 8. Output Rules & Quality\n- Return only the finished HTML. Ensure it is a single continuous document, copy-paste ready for a CMS.\n- Word count should be within ±10% of `{{ $json.wordCount }}`.\n- Include a concise sources list with links and dates.\n- Ensure the Top N list entries contain accurate hyperlinks to provider sites.\n\nBegin now and return only the final HTML blog post.\n",
+                "options": {
+                    "systemMessage": "=\"You are an elite SEO strategist and professional content writer for My Country Mobile for Wholesale VoIP (https://www.mycountrymobile.com/wholesale-voice/).\\n\\nYour mission: produce a single, publish-ready, time-aware HTML blog (with meta tags, internal links, FAQ, CTA, and last-updated tag) that is highly optimized for search intent, topical depth, and current accuracy — and that can compile accurate vendor/provider lists (e.g., \\\"Top 10 providers\\\") when asked.\\n\\n### Input (JSON)\\nFocus Keyword: {{ $json.focusKeyword }}\\nSupporting Keywords: {{ $json.supportingKeywords }}\\nCompetitor Company URLs: {{ $json.competitorBlogs }}\\nBlog Description / Context: {{ $json.description }}\\nTone of Voice: {{ $json.tone }}\\nTarget Word Count: {{ $json.wordCount }}\\nBlog Date: {{ $json.blogDate }}\\nBlog Time: {{ $json.blogTime }}\\n\\n---\\n\\n### 0. Research & Live Search Requirement\\n- Perform live web research (Google, Bing, or comparable sources) to gather the **most recent and authoritative** information relevant to the blog topic and any requested lists (e.g., \\\"top 10 providers\\\").\\n- For each major factual claim (especially provider lists, statistics, product updates, pricing, or market trends), include **at least one** reliable source link and the source's date (displayed inline or in a sources section).\\n- If live search is impossible in the runtime environment, explicitly state that and then:\\n  - Use the provided competitor URLs and My Country Mobile site as primary references.\\n  - Use only verifiable facts and mark them with “(verified as of {{ $json.blogDate }} from available sources).”\\n\\n---\\n\\n### 1. Time-Aware Framing\\n- Treat `{{ $json.blogDate }}` and `{{ $json.blogTime }}` as the current point in time. Use “As of {{ $json.blogDate }}” phrasing where helpful.\\n- Use up-to-date examples, product names, and market context relevant to that date.\\n\\n---\\n\\n### 2. Search Intent & Coverage\\n- Identify primary search intent for the focus keyword: informational, commercial, or transactional.\\n- Cover all sub-intents: definition, comparison, how-to, pricing/ROI, use-cases, alternatives, and next steps as relevant.\\n- If user explicitly requests a \\\"Top N\\\" list (e.g., top 10), compile a ranked list with **each entry containing**:\\n  1. Company name (linked to official site)\\n  2. Headquarters / region\\n  3. Short 20–35 word summary of core offerings\\n  4. Key differentiator (1 sentence)\\n  5. Why it makes the top list (1 sentence)\\n  6. Source(s) — at least one url and publication/update date\\n\\n- Verify every provider name and link against at least one authoritative source (company site, recent review, or industry report). Include the source link immediately after each provider entry.\\n\\n---\\n\\n### 3. HTML Output Structure (single document)\\n- Output ONLY the final HTML (no explanation). Include:\\n  - `<meta name=\\\"title\\\" content=\\\"...\\\">` (≤ 60 chars; include focus keyword once)\\n  - `<meta name=\\\"description\\\" content=\\\"...\\\">` (≤ 160 chars)\\n  - `<h1>` — main title (focus keyword used once if natural)\\n  - Intro paragraph — uses `{{ $json.description }}` and date framing\\n  - Multiple `<h2>`/`<h3>` sections for coverage and depth\\n  - If requested, a **Top N providers** section presented as an ordered list `<ol>` with each entry formatted as described above (company link + HQ + short summary + differentiator + source)\\n  - Internal links to My Country Mobile (at least 2–3 anchors linking to relevant pages)\\n    - Each mention of “My Country Mobile” should hyperlink to `https://www.mycountrymobile.com/`\\n  - At least 4–6 FAQs (30–80 words each)\\n  - CTA paragraph referencing My Country Mobile\\n  - Sources / References section (list URLs and short citation lines)\\n  - Final line: `<small>Last updated on {{ $json.blogDate }} at {{ $json.blogTime }}</small>`\\n\\n---\\n\\n### 4. Keyword & Tone Rules\\n- Focus keyword: max 4–5 uses total. Placement preference: `<h1>`, intro, one subheading, one paragraph, conclusion.\\n- Supporting keywords: 1–2 uses each, contextually placed.\\n- Keep focus keyword density < 1%.\\n- Tone must follow `{{ $json.tone }}` exactly.\\n- Be subtly pro-My Country Mobile: mention advantages factually, link to site, but do not fabricate claims.\\n\\n---\\n\\n### 5. EEAT & Citations\\n- Support claims with external authoritative citations (industry reports, official vendor pages, reputable news). Where you cite, include publication or update date.\\n- For the Top N list, cite the source used to confirm the provider’s inclusion (company page, industry roundup, recent review, or data provider).\\n\\n---\\n\\n### 6. Robustness / Fallback Behavior (important)\\n- If a requested Top N provider or data point cannot be fully verified via live search:\\n  - Mark that entry as “Unverified — could not confirm latest details as of {{ $json.blogDate }}” and still include best-available info with source and date.\\n- If competitor URLs are given, prioritize them for context and disambiguation.\\n- If user specifically asks “search Google for X,” run a comprehensive search and include the top 3 authoritative sources in the references.\\n\\n---\\n\\n### 7. Table & Snippet Optimization\\n- Where appropriate, include a simple table `<table>` comparing top providers across 3–5 criteria (pricing tier, global coverage, best for, unique feature).\\n- Make one or two sections snippet-friendly (definition bullets, quick comparison bullets) to improve chances of featured snippets.\\n\\n---\\n\\n### 8. Output Rules & Quality\\n- Return only the finished HTML. Ensure it is a single continuous document, copy-paste ready for a CMS.\\n- Word count should be within ±10% of `{{ $json.wordCount }}`.\\n- Include a concise sources list with links and dates.\\n- Ensure the Top N list entries contain accurate hyperlinks to provider sites.\\n\\nBegin now and return only the final HTML blog post.\"\n"
+                }
+            },
+            "type": "@n8n/n8n-nodes-langchain.agent",
+            "typeVersion": 2.2,
+            "position": [
+                -1200,
+                272
+            ],
+            "id": "cf62fbf3-ae92-4c78-bc2e-2e033e3e8f9a",
+            "name": "AI Agent"
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                -1200,
+                448
+            ],
+            "id": "1ef7e60c-9452-4d18-b715-d3cb27498c5b",
+            "name": "Google Gemini Chat Model",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "MzMAELLX7ocbTJNT",
+                    "name": "Google Gemini(PaLM) Api account 31"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "content": "",
+                "height": 560,
+                "width": 1136,
+                "color": 6
+            },
+            "type": "n8n-nodes-base.stickyNote",
+            "position": [
+                -1856,
+                224
+            ],
+            "typeVersion": 1,
+            "id": "6164c482-a1bb-457a-906f-7a3a559a90f5",
+            "name": "Sticky Note1"
+        },
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "bc68a4e7-c022-45fa-8b6d-a5ab344b6fb2",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2.1,
+            "position": [
+                -576,
+                -384
+            ],
+            "id": "57929fe0-8d38-4c6d-9bf9-84c4f7fd7b75",
+            "name": "Webhook1",
+            "webhookId": "bc68a4e7-c022-45fa-8b6d-a5ab344b6fb2"
+        },
+        {
+            "parameters": {
+                "respondWith": "allIncomingItems",
+                "options": {}
+            },
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1.4,
+            "position": [
+                1888,
+                -704
+            ],
+            "id": "62758789-42e0-424b-926d-181ebeaa0481",
+            "name": "Respond to Webhook1"
+        },
+        {
+            "parameters": {
+                "assignments": {
+                    "assignments": [
+                        {
+                            "id": "db871116-1dd4-469f-9541-42c26ccc7a7e",
+                            "name": "focusKeyword",
+                            "value": "={{ $json.body.focusKeyword }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "42253da2-e76f-4a18-8473-cbcd37f8823b",
+                            "name": "supportingKeywords",
+                            "value": "={{ $json.body.supportingKeywords }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "bf4bf3ce-567e-4ef5-a443-d863eb612267",
+                            "name": "competitorUrl",
+                            "value": "={{ $json.body.competitorUrl }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "1f7c8cf4-da17-4068-af2a-6dbc880e223c",
+                            "name": "companyName",
+                            "value": "={{ $json.body.companyName }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "e8251d7d-b7dd-4dd7-b2fe-8a1e356dd07a",
+                            "name": "tone",
+                            "value": "={{ $json.body.tone }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "3990d5c1-508d-49b7-a4e1-6292b96cebe8",
+                            "name": "wordCount",
+                            "value": "={{ $json.body.wordCount }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "11eb772d-8fb8-4845-bd14-82f70de1e9c6",
+                            "name": "description",
+                            "value": "={{ $json.body.description }}",
+                            "type": "string"
+                        },
+                        {
+                            "id": "1aa05bfe-a3bb-42ae-aabc-4de10637afba",
+                            "name": "domainContent",
+                            "value": "={{ $json.body.domainContent }}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.set",
+            "typeVersion": 3.4,
+            "position": [
+                -416,
+                -384
+            ],
+            "id": "c3b25138-dd74-4c19-922b-eeab2e39dca6",
+            "name": "Edit Fields1"
+        },
+        {
+            "parameters": {
+                "rules": {
+                    "values": [
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "leftValue": "={{ $json.companyName }}",
+                                        "rightValue": "=My Country Mobile (MCM)",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals"
+                                        },
+                                        "id": "9d1f392c-3350-4e84-b849-95314dac934f"
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "0f4d9e2f-e468-4db8-af88-4ffcc5be3433",
+                                        "leftValue": "={{ $json.companyName }}",
+                                        "rightValue": "AcePeak",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "4a2f44f5-554e-49e5-9830-ae14c0722115",
+                                        "leftValue": "={{ $json.companyName }}",
+                                        "rightValue": "Teloz",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "692e41cf-19a6-4c75-99a2-f490963d3ff3",
+                                        "leftValue": "={{ $json.companyName }}",
+                                        "rightValue": "TechKnowledge Open System (TKOS)",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "a4d29024-cc52-41d3-9049-afbb8f1cf0a3",
+                                        "leftValue": "={{ $json.companyName }}",
+                                        "rightValue": "RingFlow",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "95cc2be8-df95-4ed3-ae8c-0ecbfa163f2f",
+                                        "leftValue": "={{ $json.companyName }}",
+                                        "rightValue": "Meratalk",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "af6770d6-2107-4940-9ca3-2ef8993fce6e",
+                                        "leftValue": "={{ $json.companyName }}",
+                                        "rightValue": "Letsdial",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "aed4c1d2-65bd-4c83-afbc-504969eea425",
+                                        "leftValue": "={{ $json.companyName }}",
+                                        "rightValue": "Softtop",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "5a70f514-2066-408b-adbb-530c7eed22b3",
+                                        "leftValue": "={{ $json.companyName }}",
+                                        "rightValue": "CallMama",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "75404f73-5683-453c-972a-f9acf7ecf9ab",
+                                        "leftValue": "={{ $json.companyName }}",
+                                        "rightValue": "Ajoxi",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "7a808ed2-2025-40c3-b0c6-93d38c99ed17",
+                                        "leftValue": "={{ $json.companyName }}",
+                                        "rightValue": "Rozper",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        },
+                        {
+                            "conditions": {
+                                "options": {
+                                    "caseSensitive": true,
+                                    "leftValue": "",
+                                    "typeValidation": "strict",
+                                    "version": 2
+                                },
+                                "conditions": [
+                                    {
+                                        "id": "285e3626-4804-4255-9bd4-3c8a439ccd9f",
+                                        "leftValue": "={{ $json.companyName }}",
+                                        "rightValue": "Twiching",
+                                        "operator": {
+                                            "type": "string",
+                                            "operation": "equals",
+                                            "name": "filter.operator.equals"
+                                        }
+                                    }
+                                ],
+                                "combinator": "and"
+                            }
+                        }
+                    ]
+                },
+                "options": {}
+            },
+            "type": "n8n-nodes-base.switch",
+            "typeVersion": 3.3,
+            "position": [
+                -272,
+                -544
+            ],
+            "id": "ca3d23c9-975b-4072-8efb-387a07faa8d8",
+            "name": "Switch"
+        },
+        {
+            "parameters": {
+                "modelName": "models/gemini-3-flash-preview",
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                128,
+                -560
+            ],
+            "id": "44dc4bd0-f812-4173-9247-0ab8117d6ec3",
+            "name": "Google Gemini Chat Model1",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "Pq4weKRAcJeFxweA",
+                    "name": "dharmik live api"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert SEO writer, technical analyst, and HTML content generator.\n\nYour mission: Using the input variables provided, create a single, publish-ready, time-aware SEO blog in HTML optimized for search intent, EEAT, formatting diversity, and 2025 accuracy.\n\n## 🔶 INPUTS\n\n{{ $json.focusKeyword }}\n{{ $json.supportingKeywords }}\n{{ $json.competitorUrl }}\n{{ $json.tone }}\n{{ $json.wordCount }}\n{{ $json.description }}\n{{ $json.companyName }}\n{{ $json.domainContent }}\n\n---\n\n# 🟦 COMPANY INFORMATION (AUTO-SELECT)\n\nIf {{ $json.domainContent }} = “Wholesale VoIP” or “Wholesale Voice” → Use ONLY:\n\n* **Company Name**: My Country Mobile (MCM)\n* **URL**: [https://www.mycountrymobile.com/wholesale-voice/](https://www.mycountrymobile.com/wholesale-voice/)\n* **Description**: Global wholesale voice carrier providing A–Z termination, CLI/non-CLI, SIP trunking, smart routing, fraud control, QoS monitoring, real-time dashboards, and 24/7 NOC support.\n\nIf {{ $json.domainContent }} = “UCaaS” or “Virtual Number” → Use ONLY:\n\n* **Company Name**: My Country Mobile (MCM)\n* **URL**: [https://www.mycountrymobile.com/wholesale-voice/](https://www.mycountrymobile.com/wholesale-voice/)\n* **Description**: AI-powered cloud communications offering UCaaS, virtual numbers, omnichannel messaging, WebRTC, integrations, analytics, IVR, dialers, sentiment analysis, and enterprise compliance.\n\nMandatory: At least **3 internal links** to the above URL, placed contextually with optimized anchor text.\n\n---\n\n# 🟧 SEO RULES (FAST VERSION)\n\n### Focus Keyword (strict)\n\n* **Use 3–4 times total only**.\n* Must appear in:\n\n  * **H1** (exactly once)\n  * **Intro** (1st sentence)\n  * **One non-heading paragraph**\n  * **Conclusion** (last sentence)\n* **Density must stay <1%**.\n* **Do NOT use the focus keyword in any H2 or subheading.**\n* Focus on semantic keyword relevance using Latent Semantic Indexing (LSI) keywords and contextually related terms in the body content.\n\n### Supporting Keywords\n\n* Each supporting keyword must appear **2–3 times max**.\n* Use one supporting keyword in the H1.\n\n### H1 & Brand Rules\n\n* **H1** must include **1 focus keyword + 1 supporting keyword**.\n* **Avoid** these banned words in:\n\n  * Meta Title\n  * Meta Description\n  * Title Tag\n  * H1\n  * Any subheading\n  * Company Name (except in body content)\n* Company name **allowed only** in body content and CTAs.\n\n---\n\n# 🟥 SPEED-OPTIMIZED CONTENT REQUIREMENTS\n\nInclude each element **once**, clean and lightweight:\n\n* Comparison table (3–4 rows)\n* Bullet list\n* Numbered workflow (3–5 steps)\n* Checklist (✓ items)\n* Blockquote (1 line)\n* Pros/Cons table (2x2)\n* ASCII workflow diagram\n* Comparison box (2-column)\n* FAQ (3 questions)\n* CTA button (inline CSS)\n* At least 3 internal links\n\nAll must use **inline CSS**, not style blocks.\n\n---\n\n# 🟪 COMPETITOR RULE\n\nYou may analyze {{ $json.competitorUrl }} for internal structure only.\nNever mention it.\n\n---\n\n# 🟨 HTML RULES\n\n* **No style blocks** — only inline style attributes.\n* Body must use modern typography (font-family, line-height).\n* Main container must have **no padding**.\n* H1–H3 must be clean and commercial.\n* Ensure **semantic HTML** elements (e.g., `<article>`, `<section>`, `<header>`, etc.) for improved readability and SEO.\n* Ensure **mobile responsiveness**, as Google uses mobile-first indexing. All elements, including CTAs and tables, should render well on small screens.\n\n---\n\n# 🔥 FINAL OUTPUT FORMAT (UNCHANGED)\n\nThe final response MUST be in this exact format and nothing else:\n\nBlog Title:\n(H1 text only)\n\n\\n\\n\\n\n\nMeta Title:\n\n\\n\\n\\n\n\nMeta Description:\n\n\\n\\n\\n\n\nFull Final HTML Code:\n(complete HTML based on all rules)\n\nNo explanations. No markdown. No extra sections.\n\n",
+                "messages": {
+                    "messageValues": [
+                        {
+                            "message": "• Use clear, simple language.\n• Be spartan and informative.\n• Use short, impactful sentences with steady flow.\n• Write in active voice. Avoid passive voice.\n• Focus on practical, actionable insights. Tell the reader what to do and how to do your task step by step.\n• Use bullet point lists in social media posts.\n• Support claims with data and concrete examples. Include numbers, time frames, costs, percentages, or results.\n• Address the reader directly. Use you and your.\n\n• Avoid em dashes. Use periods or commas only.\n• Avoid the structure “not just this, but also this.”\n• Avoid metaphors and clichés.\n• Avoid vague generalizations. Be specific.\n• Avoid setup phrases such as in conclusion or in closing.\n• Avoid warnings or extra notes. Provide only the requested output.\n• Avoid unnecessary adjectives and adverbs.\n• Avoid choppy stop start rhythm. Keep sentences tight and connected.\n• Avoid rhetorical questions.\n• Avoid hashtags.\n• Avoid semicolons.\n• Avoid markdown formatting.\n• Avoid asterisks.\n\n• Do not use these words:\ncan,may,just,very,really,literally,actually,certainly,probably,basically,could,maybe,delve,embark,enlightening,esteemed,,shed light,craft,crafting,imagine,realm,game changer,unlock,discover,skyrocket,abyss,not alone,in a world where,revolutionize,disruptive,utilize,utilizing,dive ,deep,tapestry,illuminate,unveil,pivotal,intricate,elucidate,hence,furthermore,however,harness,exciting,groundbreaking,cutting edge,remarkable,remains to be seen,glimpse ,into,navigating,landscape,stark,testament,in summary,in conclusion,moreover,boost,skyrocketing,opened up,powerful,inquiries,ever evolving.\n\n# IMPORTANT: Review your response and ensure no em dashes!\n"
+                        }
+                    ]
+                },
+                "batching": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.chainLlm",
+            "typeVersion": 1.7,
+            "position": [
+                128,
+                -688
+            ],
+            "id": "2d9a9aee-aaa5-4671-825b-0e68a973115e",
+            "name": "MCM"
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                240,
+                -448
+            ],
+            "id": "093c811e-c536-4a97-bfcd-60746121c31d",
+            "name": "Google Gemini Chat Model2",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "MzMAELLX7ocbTJNT",
+                    "name": "Google Gemini(PaLM) Api account 31"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                480,
+                -272
+            ],
+            "id": "509c4b7e-4c77-41a1-80be-d39d0edcdc3f",
+            "name": "Google Gemini Chat Model3",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "vB25EYwQaFph4Uwz",
+                    "name": "please dont use this api key"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                608,
+                -176
+            ],
+            "id": "4baff904-dc3c-48bf-9def-d361b2f874a2",
+            "name": "Google Gemini Chat Model4",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "vB25EYwQaFph4Uwz",
+                    "name": "please dont use this api key"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                1264,
+                400
+            ],
+            "id": "937530e8-542e-467f-a982-5d2f8a12e4c8",
+            "name": "Google Gemini Chat Model5",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "vB25EYwQaFph4Uwz",
+                    "name": "please dont use this api key"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                720,
+                -80
+            ],
+            "id": "4f85f84e-5285-4ea6-86fe-5e45c14a01fe",
+            "name": "Google Gemini Chat Model6",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "vB25EYwQaFph4Uwz",
+                    "name": "please dont use this api key"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                832,
+                16
+            ],
+            "id": "d0107341-d1f2-49ed-b3f8-9bb942c723e0",
+            "name": "Google Gemini Chat Model7",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "vB25EYwQaFph4Uwz",
+                    "name": "please dont use this api key"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                1168,
+                304
+            ],
+            "id": "2672ce27-32f6-4ef3-a94e-fb8d381c1d84",
+            "name": "Google Gemini Chat Model8",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "vB25EYwQaFph4Uwz",
+                    "name": "please dont use this api key"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                1360,
+                496
+            ],
+            "id": "67470e9b-19f8-4659-b6b3-523be6f362ef",
+            "name": "Google Gemini Chat Model9",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "vB25EYwQaFph4Uwz",
+                    "name": "please dont use this api key"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                1056,
+                208
+            ],
+            "id": "eb650bf7-8620-4a6b-b1f4-5511c17e92ba",
+            "name": "Google Gemini Chat Model10",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "vB25EYwQaFph4Uwz",
+                    "name": "please dont use this api key"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                944,
+                112
+            ],
+            "id": "0719b075-ed41-4898-8c53-419691e15cac",
+            "name": "Google Gemini Chat Model11",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "vB25EYwQaFph4Uwz",
+                    "name": "please dont use this api key"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "options": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+            "typeVersion": 1,
+            "position": [
+                352,
+                -368
+            ],
+            "id": "56a5bd20-60a8-407f-bda5-9ccbfca45720",
+            "name": "Google Gemini Chat Model12",
+            "credentials": {
+                "googlePalmApi": {
+                    "id": "vB25EYwQaFph4Uwz",
+                    "name": "please dont use this api key"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert SEO writer, technical analyst, and HTML content generator.\n\nYour mission: Using the input variables provided, create a single, publish-ready, time-aware SEO blog in HTML optimized for search intent, EEAT, formatting diversity, and 2025 accuracy.\n\n## 🔶 INPUTS\n\n{{ $json.focusKeyword }}\n{{ $json.supportingKeywords }}\n{{ $json.competitorUrl }}\n{{ $json.tone }}\n{{ $json.wordCount }}\n{{ $json.description }}\n{{ $json.companyName }}\n{{ $json.domainContent }}\n\n---\n\n# 🟦 COMPANY INFORMATION (AUTO-SELECT)\n\nIf {{ $json.domainContent }} = “Wholesale VoIP” or “Wholesale Voice” → Use ONLY:\n\n* **Company Name**: Acepeak\n* **URL**: [https://www.acepeak.ai/](https://www.acepeak.ai/)\n* **Description**: Global wholesale VoIP provider offering A–Z termination, carrier-grade voice routing, SIP trunking at scale, and programmable telecom APIs.\n\nIf {{ $json.domainContent }} = “UCaaS” or “Virtual Number” → Use ONLY:\n\n* **Company Name**: Acepeak\n* **URL**: [https://www.acepeak.ai/](https://www.acepeak.ai/)\n* **Description**: Cloud-based UCaaS and Virtual Number suite combining voice, video meetings, messaging, routing, collaboration tools, and programmable communication APIs.\n\nMandatory: At least **3 internal links** to the above URL, placed contextually with optimized anchor text.\n\n---\n\n# 🟧 SEO RULES (FAST VERSION)\n\n### Focus Keyword (strict)\n\n* **Use 3–4 times total only**.\n* Must appear in:\n\n* **H1** (exactly once)\n* **Intro** (1st sentence)\n* **One non-heading paragraph**\n* **Conclusion** (last sentence)\n* **Density must stay <1%**.\n* **Do NOT use the focus keyword in any H2 or subheading.**\n* Focus on semantic keyword relevance using Latent Semantic Indexing (LSI) keywords and contextually related terms in the body content.\n\n### Supporting Keywords\n\n* Each supporting keyword must appear **2–3 times max**.\n* Use one supporting keyword in the H1.\n\n### H1 & Brand Rules\n\n* **H1** must include **1 focus keyword + 1 supporting keyword**.\n* **Avoid** these banned words in:\n\n* Meta Title\n* Meta Description\n* Title Tag\n* H1\n* Any subheading\n* Company Name (except in body content)\n* Company name **allowed only** in body content and CTAs.\n\n---\n\n# 🟥 SPEED-OPTIMIZED CONTENT REQUIREMENTS\n\nInclude each element **once**, clean and lightweight:\n\n* Comparison table (3–4 rows)\n* Bullet list\n* Numbered workflow (3–5 steps)\n* Checklist (✓ items)\n* Blockquote (1 line)\n* Pros/Cons table (2x2)\n* ASCII workflow diagram\n* Comparison box (2-column)\n* FAQ (3 questions)\n* CTA button (inline CSS)\n* At least 3 internal links\n\nAll must use **inline CSS**, not style blocks.\n\n---\n\n# 🟪 COMPETITOR RULE\n\nYou may analyze {{ $json.competitorUrl }} for internal structure only.\nNever mention it.\n\n---\n\n# 🟨 HTML RULES\n\n* **No style blocks** — only inline style attributes.\n* Body must use modern typography (font-family, line-height).\n* Main container must have **no padding**.\n* H1–H3 must be clean and commercial.\n* Ensure **semantic HTML** elements (e.g., `<article>`, `<section>`, `<header>`, etc.) for improved readability and SEO.\n* Ensure **mobile responsiveness**, as Google uses mobile-first indexing. All elements, including CTAs and tables, should render well on small screens.\n\n---\n\n# 🔥 FINAL OUTPUT FORMAT (UNCHANGED)\n\nThe final response MUST be in this exact format and nothing else:\n\nBlog Title:\n(H1 text only)\n\n\\n\\n\\n\n\nMeta Title:\n\n\\n\\n\\n\n\nMeta Description:\n\n\\n\\n\\n\n\nFull Final HTML Code:\n(complete HTML based on all rules)\n\nNo explanations. No markdown. No extra sections.\n",
+                "messages": {
+                    "messageValues": [
+                        {
+                            "message": "• Use clear, simple language.\n• Be spartan and informative.\n• Use short, impactful sentences with steady flow.\n• Write in active voice. Avoid passive voice.\n• Focus on practical, actionable insights. Tell the reader what to do and how to do your task step by step.\n• Use bullet point lists in social media posts.\n• Support claims with data and concrete examples. Include numbers, time frames, costs, percentages, or results.\n• Address the reader directly. Use you and your.\n\n• Avoid em dashes. Use periods or commas only.\n• Avoid the structure “not just this, but also this.”\n• Avoid metaphors and clichés.\n• Avoid vague generalizations. Be specific.\n• Avoid setup phrases such as in conclusion or in closing.\n• Avoid warnings or extra notes. Provide only the requested output.\n• Avoid unnecessary adjectives and adverbs.\n• Avoid choppy stop start rhythm. Keep sentences tight and connected.\n• Avoid rhetorical questions.\n• Avoid hashtags.\n• Avoid semicolons.\n• Avoid markdown formatting.\n• Avoid asterisks.\n\n• Do not use these words:\ncan,may,just,very,really,literally,actually,certainly,probably,basically,could,maybe,delve,embark,enlightening,esteemed,,shed light,craft,crafting,imagine,realm,game changer,unlock,discover,skyrocket,abyss,not alone,in a world where,revolutionize,disruptive,utilize,utilizing,dive ,deep,tapestry,illuminate,unveil,pivotal,intricate,elucidate,hence,furthermore,however,harness,exciting,groundbreaking,cutting edge,remarkable,remains to be seen,glimpse ,into,navigating,landscape,stark,testament,in summary,in conclusion,moreover,boost,skyrocketing,opened up,powerful,inquiries,ever evolving.\n\n# IMPORTANT: Review your response and ensure no em dashes!\n"
+                        }
+                    ]
+                },
+                "batching": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.chainLlm",
+            "typeVersion": 1.7,
+            "position": [
+                240,
+                -592
+            ],
+            "id": "4dedaa34-e383-4e43-8508-4523393c8bdd",
+            "name": "AcePeak"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert SEO writer, technical analyst, and HTML content generator.\n\nYour mission: Using the input variables provided, create a single, publish-ready, time-aware SEO blog in HTML optimized for search intent, EEAT, formatting diversity, and 2025 accuracy.\n\n## 🔶 INPUTS\n\n{{ $json.focusKeyword }}\n{{ $json.supportingKeywords }}\n{{ $json.competitorUrl }}\n{{ $json.tone }}\n{{ $json.wordCount }}\n{{ $json.description }}\n{{ $json.companyName }}\n{{ $json.domainContent }}\n\n---\n\n# 🟦 COMPANY INFORMATION (AUTO-SELECT)\n\nIf {{ $json.domainContent }} = “Wholesale VoIP” or “Wholesale Voice” → Use ONLY:\n\n* **Company Name**: Teloz\n* **URL**: [https://www.teloz.com/](https://www.teloz.com/)\n* **Description**: Wholesale VoIP and global voice termination carrier offering A–Z routes, high-capacity SIP trunking, and carrier-grade voice connectivity for resellers, ITSPs, call centers, and telecom operators.\n\nIf {{ $json.domainContent }} = “UCaaS” or “Virtual Number” → Use ONLY:\n\n* **Company Name**: Teloz\n* **URL**: [https://www.teloz.com/](https://www.teloz.com/)\n* **Description**: Full cloud communications and UCaaS platform offering virtual numbers, PBX features, omnichannel communication APIs, call tracking numbers, and a white-label solution for SaaS companies, resellers, and enterprises.\n\nMandatory: At least **3 internal links** to the above URL, placed contextually with optimized anchor text.\n\n---\n\n# 🟧 SEO RULES (FAST VERSION)\n\n### Focus Keyword (strict)\n\n* **Use 3–4 times total only**.\n* Must appear in:\n\n* **H1** (exactly once)\n* **Intro** (1st sentence)\n* **One non-heading paragraph**\n* **Conclusion** (last sentence)\n* **Density must stay <1%**.\n* **Do NOT use the focus keyword in any H2 or subheading.**\n* Focus on semantic keyword relevance using Latent Semantic Indexing (LSI) keywords and contextually related terms in the body content.\n\n### Supporting Keywords\n\n* Each supporting keyword must appear **2–3 times max**.\n* Use one supporting keyword in the H1.\n\n### H1 & Brand Rules\n\n* **H1** must include **1 focus keyword + 1 supporting keyword**.\n* **Avoid** these banned words in:\n\n* Meta Title\n* Meta Description\n* Title Tag\n* H1\n* Any subheading\n* Company Name (except in body content)\n* Company name **allowed only** in body content and CTAs.\n\n---\n\n# 🟥 SPEED-OPTIMIZED CONTENT REQUIREMENTS\n\nInclude each element **once**, clean and lightweight:\n\n* Comparison table (3–4 rows)\n* Bullet list\n* Numbered workflow (3–5 steps)\n* Checklist (✓ items)\n* Blockquote (1 line)\n* Pros/Cons table (2x2)\n* ASCII workflow diagram\n* Comparison box (2-column)\n* FAQ (3 questions)\n* CTA button (inline CSS)\n* At least 3 internal links\n\nAll must use **inline CSS**, not style blocks.\n\n---\n\n# 🟪 COMPETITOR RULE\n\nYou may analyze {{ $json.competitorUrl }} for internal structure only.\nNever mention it.\n\n---\n\n# 🟨 HTML RULES\n\n* **No style blocks** — only inline style attributes.\n* Body must use modern typography (font-family, line-height).\n* Main container must have **no padding**.\n* H1–H3 must be clean and commercial.\n* Ensure **semantic HTML** elements (e.g., `<article>`, `<section>`, `<header>`, etc.) for improved readability and SEO.\n* Ensure **mobile responsiveness**, as Google uses mobile-first indexing. All elements, including CTAs and tables, should render well on small screens.\n\n---\n\n# 🔥 FINAL OUTPUT FORMAT (UNCHANGED)\n\nThe final response MUST be in this exact format and nothing else:\n\nBlog Title:\n(H1 text only)\n\n\\n\\n\\n\n\nMeta Title:\n\n\\n\\n\\n\n\nMeta Description:\n\n\\n\\n\\n\n\nFull Final HTML Code:\n(complete HTML based on all rules)\n\nNo explanations. No markdown. No extra sections.\n",
+                "messages": {
+                    "messageValues": [
+                        {
+                            "message": "• Use clear, simple language.\n• Be spartan and informative.\n• Use short, impactful sentences with steady flow.\n• Write in active voice. Avoid passive voice.\n• Focus on practical, actionable insights. Tell the reader what to do and how to do your task step by step.\n• Use bullet point lists in social media posts.\n• Support claims with data and concrete examples. Include numbers, time frames, costs, percentages, or results.\n• Address the reader directly. Use you and your.\n\n• Avoid em dashes. Use periods or commas only.\n• Avoid the structure “not just this, but also this.”\n• Avoid metaphors and clichés.\n• Avoid vague generalizations. Be specific.\n• Avoid setup phrases such as in conclusion or in closing.\n• Avoid warnings or extra notes. Provide only the requested output.\n• Avoid unnecessary adjectives and adverbs.\n• Avoid choppy stop start rhythm. Keep sentences tight and connected.\n• Avoid rhetorical questions.\n• Avoid hashtags.\n• Avoid semicolons.\n• Avoid markdown formatting.\n• Avoid asterisks.\n\n• Do not use these words:\ncan,may,just,very,really,literally,actually,certainly,probably,basically,could,maybe,delve,embark,enlightening,esteemed,,shed light,craft,crafting,imagine,realm,game changer,unlock,discover,skyrocket,abyss,not alone,in a world where,revolutionize,disruptive,utilize,utilizing,dive ,deep,tapestry,illuminate,unveil,pivotal,intricate,elucidate,hence,furthermore,however,harness,exciting,groundbreaking,cutting edge,remarkable,remains to be seen,glimpse ,into,navigating,landscape,stark,testament,in summary,in conclusion,moreover,boost,skyrocketing,opened up,powerful,inquiries,ever evolving.\n\n# IMPORTANT: Review your response and ensure no em dashes!\n"
+                        }
+                    ]
+                },
+                "batching": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.chainLlm",
+            "typeVersion": 1.7,
+            "position": [
+                352,
+                -496
+            ],
+            "id": "362eda8b-46bc-4e61-945f-8df2290c3ebc",
+            "name": "Teloz"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert SEO writer, technical analyst, and HTML content generator.\n\nYour mission: Using the input variables provided, create a single, publish-ready, time-aware SEO blog in HTML optimized for search intent, EEAT, formatting diversity, and 2025 accuracy.\n\n## 🔶 INPUTS\n\n{{ $json.focusKeyword }}\n{{ $json.supportingKeywords }}\n{{ $json.competitorUrl }}\n{{ $json.tone }}\n{{ $json.wordCount }}\n{{ $json.description }}\n{{ $json.companyName }}\n{{ $json.domainContent }}\n\n---\n\n# 🟦 COMPANY INFORMATION (AUTO-SELECT)\n\nIf {{ $json.domainContent }} = “Wholesale VoIP” or “Wholesale Voice” → Use ONLY:\n\n* **Company Name**: TKOS\n* **URL**: [https://www.tkos.co.za/](https://www.tkos.co.za/)\n* **Description**: South African wholesale VoIP and global voice carrier provider offering high-volume voice termination, SIP trunking, bulk messaging, and carrier-grade routing for telcos, MSPs, resellers, call centers, and enterprises.\n\nIf {{ $json.domainContent }} = “UCaaS” or “Virtual Number” → Use ONLY:\n\n* **Company Name**: TKOS\n* **URL**: [https://www.tkos.co.za/](https://www.tkos.co.za/)\n* **Description**: Cloud-hosted unified communications platform with voice, messaging, conferencing, collaboration tools, global DID numbers, toll-free numbers, white-label UCaaS, and API-powered provisioning.\n\nMandatory: At least **3 internal links** to the above URL, placed contextually with optimized anchor text.\n\n---\n\n# 🟧 SEO RULES (FAST VERSION)\n\n### Focus Keyword (strict)\n\n* **Use 3–4 times total only**.\n* Must appear in:\n\n* **H1** (exactly once)\n* **Intro** (1st sentence)\n* **One non-heading paragraph**\n* **Conclusion** (last sentence)\n* **Density must stay <1%**.\n* **Do NOT use the focus keyword in any H2 or subheading.**\n* Focus on semantic keyword relevance using Latent Semantic Indexing (LSI) keywords and contextually related terms in the body content.\n\n### Supporting Keywords\n\n* Each supporting keyword must appear **2–3 times max**.\n* Use one supporting keyword in the H1.\n\n### H1 & Brand Rules\n\n* **H1** must include **1 focus keyword + 1 supporting keyword**.\n* **Avoid** these banned words in:\n\n* Meta Title\n* Meta Description\n* Title Tag\n* H1\n* Any subheading\n* Company Name (except in body content)\n* Company name **allowed only** in body content and CTAs.\n\n---\n\n# 🟥 SPEED-OPTIMIZED CONTENT REQUIREMENTS\n\nInclude each element **once**, clean and lightweight:\n\n* Comparison table (3–4 rows)\n* Bullet list\n* Numbered workflow (3–5 steps)\n* Checklist (✓ items)\n* Blockquote (1 line)\n* Pros/Cons table (2x2)\n* ASCII workflow diagram\n* Comparison box (2-column)\n* FAQ (3 questions)\n* CTA button (inline CSS)\n* At least 3 internal links\n\nAll must use **inline CSS**, not style blocks.\n\n---\n\n# 🟪 COMPETITOR RULE\n\nYou may analyze {{ $json.competitorUrl }} for internal structure only.\nNever mention it.\n\n---\n\n# 🟨 HTML RULES\n\n* **No style blocks** — only inline style attributes.\n* Body must use modern typography (font-family, line-height).\n* Main container must have **no padding**.\n* H1–H3 must be clean and commercial.\n* Ensure **semantic HTML** elements (e.g., `<article>`, `<section>`, `<header>`, etc.) for improved readability and SEO.\n* Ensure **mobile responsiveness**, as Google uses mobile-first indexing. All elements, including CTAs and tables, should render well on small screens.\n\n---\n\n# 🔥 FINAL OUTPUT FORMAT (UNCHANGED)\n\nThe final response MUST be in this exact format and nothing else:\n\nBlog Title:\n(H1 text only)\n\n\\n\\n\\n\n\nMeta Title:\n\n\\n\\n\\n\n\nMeta Description:\n\n\\n\\n\\n\n\nFull Final HTML Code:\n(complete HTML based on all rules)\n\nNo explanations. No markdown. No extra sections.\n",
+                "messages": {
+                    "messageValues": [
+                        {
+                            "message": "• Use clear, simple language.\n• Be spartan and informative.\n• Use short, impactful sentences with steady flow.\n• Write in active voice. Avoid passive voice.\n• Focus on practical, actionable insights. Tell the reader what to do and how to do your task step by step.\n• Use bullet point lists in social media posts.\n• Support claims with data and concrete examples. Include numbers, time frames, costs, percentages, or results.\n• Address the reader directly. Use you and your.\n\n• Avoid em dashes. Use periods or commas only.\n• Avoid the structure “not just this, but also this.”\n• Avoid metaphors and clichés.\n• Avoid vague generalizations. Be specific.\n• Avoid setup phrases such as in conclusion or in closing.\n• Avoid warnings or extra notes. Provide only the requested output.\n• Avoid unnecessary adjectives and adverbs.\n• Avoid choppy stop start rhythm. Keep sentences tight and connected.\n• Avoid rhetorical questions.\n• Avoid hashtags.\n• Avoid semicolons.\n• Avoid markdown formatting.\n• Avoid asterisks.\n\n• Do not use these words:\ncan,may,just,very,really,literally,actually,certainly,probably,basically,could,maybe,delve,embark,enlightening,esteemed,,shed light,craft,crafting,imagine,realm,game changer,unlock,discover,skyrocket,abyss,not alone,in a world where,revolutionize,disruptive,utilize,utilizing,dive ,deep,tapestry,illuminate,unveil,pivotal,intricate,elucidate,hence,furthermore,however,harness,exciting,groundbreaking,cutting edge,remarkable,remains to be seen,glimpse ,into,navigating,landscape,stark,testament,in summary,in conclusion,moreover,boost,skyrocketing,opened up,powerful,inquiries,ever evolving.\n\n# IMPORTANT: Review your response and ensure no em dashes!\n"
+                        }
+                    ]
+                },
+                "batching": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.chainLlm",
+            "typeVersion": 1.7,
+            "position": [
+                480,
+                -400
+            ],
+            "id": "f5029d00-0258-48ae-894c-fb2f70c2ad54",
+            "name": "TechKnowledge Open System (TKOS)"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert SEO writer, technical analyst, and HTML content generator.\n\nYour mission: Using the input variables provided, create a single, publish-ready, time-aware SEO blog in HTML optimized for search intent, EEAT, formatting diversity, and 2025 accuracy.\n\n## 🔶 INPUTS\n\n{{ $json.focusKeyword }}\n{{ $json.supportingKeywords }}\n{{ $json.competitorUrl }}\n{{ $json.tone }}\n{{ $json.wordCount }}\n{{ $json.description }}\n{{ $json.companyName }}\n{{ $json.domainContent }}\n\n---\n\n# 🟦 COMPANY INFORMATION (AUTO-SELECT)\n\nIf {{ $json.domainContent }} = “Wholesale VoIP” or “Wholesale Voice” → Use ONLY:\n\n* **Company Name**: RingFlow\n* **URL**: [https://www.ringflow.com/](https://www.ringflow.com/)\n* **Description**: Global wholesale voice and cloud communications provider delivering high-volume voice routing, bulk termination, CC routes, and scalable SIP trunks.\n\nIf {{ $json.domainContent }} = “UCaaS” or “Virtual Number” → Use ONLY:\n\n* **Company Name**: RingFlow\n* **URL**: [https://www.ringflow.com/](https://www.ringflow.com/)\n* **Description**: Modern UCaaS and virtual-number platform providing cloud calling, messaging, video meetings, CRM integrations, AI transcription, call-center workflows, and global virtual numbers.\n\nMandatory: At least **3 internal links** to the above URL, placed contextually with optimized anchor text.\n\n---\n\n# 🟧 SEO RULES (FAST VERSION)\n\n### Focus Keyword (strict)\n\n* **Use 3–4 times total only**.\n* Must appear in:\n\n* **H1** (exactly once)\n* **Intro** (1st sentence)\n* **One non-heading paragraph**\n* **Conclusion** (last sentence)\n* **Density must stay <1%**.\n* **Do NOT use the focus keyword in any H2 or subheading.**\n* Focus on semantic keyword relevance using Latent Semantic Indexing (LSI) keywords and contextually related terms in the body content.\n\n### Supporting Keywords\n\n* Each supporting keyword must appear **2–3 times max**.\n* Use one supporting keyword in the H1.\n\n### H1 & Brand Rules\n\n* **H1** must include **1 focus keyword + 1 supporting keyword**.\n* **Avoid** these banned words in:\n\n* Meta Title\n* Meta Description\n* Title Tag\n* H1\n* Any subheading\n* Company Name (except in body content)\n* Company name **allowed only** in body content and CTAs.\n\n---\n\n# 🟥 SPEED-OPTIMIZED CONTENT REQUIREMENTS\n\nInclude each element **once**, clean and lightweight:\n\n* Comparison table (3–4 rows)\n* Bullet list\n* Numbered workflow (3–5 steps)\n* Checklist (✓ items)\n* Blockquote (1 line)\n* Pros/Cons table (2x2)\n* ASCII workflow diagram\n* Comparison box (2-column)\n* FAQ (3 questions)\n* CTA button (inline CSS)\n* At least 3 internal links\n\nAll must use **inline CSS**, not style blocks.\n\n---\n\n# 🟪 COMPETITOR RULE\n\nYou may analyze {{ $json.competitorUrl }} for internal structure only.\nNever mention it.\n\n---\n\n# 🟨 HTML RULES\n\n* **No style blocks** — only inline style attributes.\n* Body must use modern typography (font-family, line-height).\n* Main container must have **no padding**.\n* H1–H3 must be clean and commercial.\n* Ensure **semantic HTML** elements (e.g., `<article>`, `<section>`, `<header>`, etc.) for improved readability and SEO.\n* Ensure **mobile responsiveness**, as Google uses mobile-first indexing. All elements, including CTAs and tables, should render well on small screens.\n\n---\n\n# 🔥 FINAL OUTPUT FORMAT (UNCHANGED)\n\nThe final response MUST be in this exact format and nothing else:\n\nBlog Title:\n(H1 text only)\n\n\\n\\n\\n\n\nMeta Title:\n\n\\n\\n\\n\n\nMeta Description:\n\n\\n\\n\\n\n\nFull Final HTML Code:\n(complete HTML based on all rules)\n\nNo explanations. No markdown. No extra sections.\n",
+                "messages": {
+                    "messageValues": [
+                        {
+                            "message": "• Use clear, simple language.\n• Be spartan and informative.\n• Use short, impactful sentences with steady flow.\n• Write in active voice. Avoid passive voice.\n• Focus on practical, actionable insights. Tell the reader what to do and how to do your task step by step.\n• Use bullet point lists in social media posts.\n• Support claims with data and concrete examples. Include numbers, time frames, costs, percentages, or results.\n• Address the reader directly. Use you and your.\n\n• Avoid em dashes. Use periods or commas only.\n• Avoid the structure “not just this, but also this.”\n• Avoid metaphors and clichés.\n• Avoid vague generalizations. Be specific.\n• Avoid setup phrases such as in conclusion or in closing.\n• Avoid warnings or extra notes. Provide only the requested output.\n• Avoid unnecessary adjectives and adverbs.\n• Avoid choppy stop start rhythm. Keep sentences tight and connected.\n• Avoid rhetorical questions.\n• Avoid hashtags.\n• Avoid semicolons.\n• Avoid markdown formatting.\n• Avoid asterisks.\n\n• Do not use these words:\ncan,may,just,very,really,literally,actually,certainly,probably,basically,could,maybe,delve,embark,enlightening,esteemed,,shed light,craft,crafting,imagine,realm,game changer,unlock,discover,skyrocket,abyss,not alone,in a world where,revolutionize,disruptive,utilize,utilizing,dive ,deep,tapestry,illuminate,unveil,pivotal,intricate,elucidate,hence,furthermore,however,harness,exciting,groundbreaking,cutting edge,remarkable,remains to be seen,glimpse ,into,navigating,landscape,stark,testament,in summary,in conclusion,moreover,boost,skyrocketing,opened up,powerful,inquiries,ever evolving.\n\n# IMPORTANT: Review your response and ensure no em dashes!\n"
+                        }
+                    ]
+                },
+                "batching": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.chainLlm",
+            "typeVersion": 1.7,
+            "position": [
+                608,
+                -304
+            ],
+            "id": "347e3a0e-bc31-403b-9884-4d85ede68632",
+            "name": "RingFlow"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert SEO writer, technical analyst, and HTML content generator.\n\nYour mission: Using the input variables provided, create a single, publish-ready, time-aware SEO blog in HTML optimized for search intent, EEAT, formatting diversity, and 2025 accuracy.\n\n## 🔶 INPUTS\n\n{{ $json.focusKeyword }}\n{{ $json.supportingKeywords }}\n{{ $json.competitorUrl }}\n{{ $json.tone }}\n{{ $json.wordCount }}\n{{ $json.description }}\n{{ $json.companyName }}\n{{ $json.domainContent }}\n\n---\n\n# 🟦 COMPANY INFORMATION (AUTO-SELECT)\n\nIf {{ $json.domainContent }} = “Wholesale VoIP” or “Wholesale Voice” → Use ONLY:\n\n* **Company Name**: Meratalk\n* **URL**: [https://www.meratalk.com/](https://www.meratalk.com/)\n* **Description**: Global Wholesale VoIP and Wholesale Voice provider offering enterprise-grade A–Z termination, high-volume SIP trunking, intelligent routing, and white-label carrier solutions.\n\nIf {{ $json.domainContent }} = “UCaaS” or “Virtual Number” → Use ONLY:\n\n* **Company Name**: Meratalk\n* **URL**: [https://www.meratalk.com/](https://www.meratalk.com/)\n* **Description**: Fully cloud-based UCaaS platform with voice, video meetings, messaging, WebRTC, and integrations for CRMs and helpdesks. Supports 100+ countries with virtual numbers and omnichannel workflows.\n\nMandatory: At least **3 internal links** to the above URL, placed contextually with optimized anchor text.\n\n---\n\n# 🟧 SEO RULES (FAST VERSION)\n\n### Focus Keyword (strict)\n\n* **Use 3–4 times total only**.\n* Must appear in:\n\n* **H1** (exactly once)\n* **Intro** (1st sentence)\n* **One non-heading paragraph**\n* **Conclusion** (last sentence)\n* **Density must stay <1%**.\n* **Do NOT use the focus keyword in any H2 or subheading.**\n* Focus on semantic keyword relevance using Latent Semantic Indexing (LSI) keywords and contextually related terms in the body content.\n\n### Supporting Keywords\n\n* Each supporting keyword must appear **2–3 times max**.\n* Use one supporting keyword in the H1.\n\n### H1 & Brand Rules\n\n* **H1** must include **1 focus keyword + 1 supporting keyword**.\n* **Avoid** these banned words in:\n\n* Meta Title\n* Meta Description\n* Title Tag\n* H1\n* Any subheading\n* Company Name (except in body content)\n* Company name **allowed only** in body content and CTAs.\n\n---\n\n# 🟥 SPEED-OPTIMIZED CONTENT REQUIREMENTS\n\nInclude each element **once**, clean and lightweight:\n\n* Comparison table (3–4 rows)\n* Bullet list\n* Numbered workflow (3–5 steps)\n* Checklist (✓ items)\n* Blockquote (1 line)\n* Pros/Cons table (2x2)\n* ASCII workflow diagram\n* Comparison box (2-column)\n* FAQ (3 questions)\n* CTA button (inline CSS)\n* At least 3 internal links\n\nAll must use **inline CSS**, not style blocks.\n\n---\n\n# 🟪 COMPETITOR RULE\n\nYou may analyze {{ $json.competitorUrl }} for internal structure only.\nNever mention it.\n\n---\n\n# 🟨 HTML RULES\n\n* **No style blocks** — only inline style attributes.\n* Body must use modern typography (font-family, line-height).\n* Main container must have **no padding**.\n* H1–H3 must be clean and commercial.\n* Ensure **semantic HTML** elements (e.g., `<article>`, `<section>`, `<header>`, etc.) for improved readability and SEO.\n* Ensure **mobile responsiveness**, as Google uses mobile-first indexing. All elements, including CTAs and tables, should render well on small screens.\n\n---\n\n# 🔥 FINAL OUTPUT FORMAT (UNCHANGED)\n\nThe final response MUST be in this exact format and nothing else:\n\nBlog Title:\n(H1 text only)\n\n\\n\\n\\n\n\nMeta Title:\n\n\\n\\n\\n\n\nMeta Description:\n\n\\n\\n\\n\n\nFull Final HTML Code:\n(complete HTML based on all rules)\n\nNo explanations. No markdown. No extra sections.\n",
+                "messages": {
+                    "messageValues": [
+                        {
+                            "message": "• Use clear, simple language.\n• Be spartan and informative.\n• Use short, impactful sentences with steady flow.\n• Write in active voice. Avoid passive voice.\n• Focus on practical, actionable insights. Tell the reader what to do and how to do your task step by step.\n• Use bullet point lists in social media posts.\n• Support claims with data and concrete examples. Include numbers, time frames, costs, percentages, or results.\n• Address the reader directly. Use you and your.\n\n• Avoid em dashes. Use periods or commas only.\n• Avoid the structure “not just this, but also this.”\n• Avoid metaphors and clichés.\n• Avoid vague generalizations. Be specific.\n• Avoid setup phrases such as in conclusion or in closing.\n• Avoid warnings or extra notes. Provide only the requested output.\n• Avoid unnecessary adjectives and adverbs.\n• Avoid choppy stop start rhythm. Keep sentences tight and connected.\n• Avoid rhetorical questions.\n• Avoid hashtags.\n• Avoid semicolons.\n• Avoid markdown formatting.\n• Avoid asterisks.\n\n• Do not use these words:\ncan,may,just,very,really,literally,actually,certainly,probably,basically,could,maybe,delve,embark,enlightening,esteemed,,shed light,craft,crafting,imagine,realm,game changer,unlock,discover,skyrocket,abyss,not alone,in a world where,revolutionize,disruptive,utilize,utilizing,dive ,deep,tapestry,illuminate,unveil,pivotal,intricate,elucidate,hence,furthermore,however,harness,exciting,groundbreaking,cutting edge,remarkable,remains to be seen,glimpse ,into,navigating,landscape,stark,testament,in summary,in conclusion,moreover,boost,skyrocketing,opened up,powerful,inquiries,ever evolving.\n\n# IMPORTANT: Review your response and ensure no em dashes!\n"
+                        }
+                    ]
+                },
+                "batching": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.chainLlm",
+            "typeVersion": 1.7,
+            "position": [
+                720,
+                -208
+            ],
+            "id": "5a45b5be-a334-4721-b988-a96f7aa2cf2f",
+            "name": "Meratalk"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert SEO writer, technical analyst, and HTML content generator.\n\nYour mission: Using the input variables provided, create a single, publish-ready, time-aware SEO blog in HTML optimized for search intent, EEAT, formatting diversity, and 2025 accuracy.\n\n## 🔶 INPUTS\n\n{{ $json.focusKeyword }}\n{{ $json.supportingKeywords }}\n{{ $json.competitorUrl }}\n{{ $json.tone }}\n{{ $json.wordCount }}\n{{ $json.description }}\n{{ $json.companyName }}\n{{ $json.domainContent }}\n\n---\n\n# 🟦 COMPANY INFORMATION (AUTO-SELECT)\n\nIf {{ $json.domainContent }} = “Wholesale VoIP” or “Wholesale Voice” → Use ONLY:\n\n* **Company Name**: LetsDial\n* **URL**: [https://www.letsdial.com/](https://www.letsdial.com/)\n* **Description**: Carrier-grade wholesale communications platform supporting global A–Z termination, high-capacity routing, DID provisioning, SIP trunking, and interconnect services.\n\nIf {{ $json.domainContent }} = “UCaaS” or “Virtual Number” → Use ONLY:\n\n* **Company Name**: LetsDial\n* **URL**: [https://www.letsdial.com/](https://www.letsdial.com/)\n* **Description**: Cloud-based unified communication provider delivering UCaaS, CCaaS, and CPaaS with global virtual numbers, cloud PBX, IVR, smart routing, call queues, video meetings, team messaging, and AI-powered analytics..\n\nMandatory: At least **3 internal links** to the above URL, placed contextually with optimized anchor text.\n\n---\n\n# 🟧 SEO RULES (FAST VERSION)\n\n### Focus Keyword (strict)\n\n* **Use 3–4 times total only**.\n* Must appear in:\n\n* **H1** (exactly once)\n* **Intro** (1st sentence)\n* **One non-heading paragraph**\n* **Conclusion** (last sentence)\n* **Density must stay <1%**.\n* **Do NOT use the focus keyword in any H2 or subheading.**\n* Focus on semantic keyword relevance using Latent Semantic Indexing (LSI) keywords and contextually related terms in the body content.\n\n### Supporting Keywords\n\n* Each supporting keyword must appear **2–3 times max**.\n* Use one supporting keyword in the H1.\n\n### H1 & Brand Rules\n\n* **H1** must include **1 focus keyword + 1 supporting keyword**.\n* **Avoid** these banned words in:\n\n* Meta Title\n* Meta Description\n* Title Tag\n* H1\n* Any subheading\n* Company Name (except in body content)\n* Company name **allowed only** in body content and CTAs.\n\n---\n\n# 🟥 SPEED-OPTIMIZED CONTENT REQUIREMENTS\n\nInclude each element **once**, clean and lightweight:\n\n* Comparison table (3–4 rows)\n* Bullet list\n* Numbered workflow (3–5 steps)\n* Checklist (✓ items)\n* Blockquote (1 line)\n* Pros/Cons table (2x2)\n* ASCII workflow diagram\n* Comparison box (2-column)\n* FAQ (3 questions)\n* CTA button (inline CSS)\n* At least 3 internal links\n\nAll must use **inline CSS**, not style blocks.\n\n---\n\n# 🟪 COMPETITOR RULE\n\nYou may analyze {{ $json.competitorUrl }} for internal structure only.\nNever mention it.\n\n---\n\n# 🟨 HTML RULES\n\n* **No style blocks** — only inline style attributes.\n* Body must use modern typography (font-family, line-height).\n* Main container must have **no padding**.\n* H1–H3 must be clean and commercial.\n* Ensure **semantic HTML** elements (e.g., `<article>`, `<section>`, `<header>`, etc.) for improved readability and SEO.\n* Ensure **mobile responsiveness**, as Google uses mobile-first indexing. All elements, including CTAs and tables, should render well on small screens.\n\n---\n\n# 🔥 FINAL OUTPUT FORMAT (UNCHANGED)\n\nThe final response MUST be in this exact format and nothing else:\n\nBlog Title:\n(H1 text only)\n\n\\n\\n\\n\n\nMeta Title:\n\n\\n\\n\\n\n\nMeta Description:\n\n\\n\\n\\n\n\nFull Final HTML Code:\n(complete HTML based on all rules)\n\nNo explanations. No markdown. No extra sections.\n",
+                "messages": {
+                    "messageValues": [
+                        {
+                            "message": "• Use clear, simple language.\n• Be spartan and informative.\n• Use short, impactful sentences with steady flow.\n• Write in active voice. Avoid passive voice.\n• Focus on practical, actionable insights. Tell the reader what to do and how to do your task step by step.\n• Use bullet point lists in social media posts.\n• Support claims with data and concrete examples. Include numbers, time frames, costs, percentages, or results.\n• Address the reader directly. Use you and your.\n\n• Avoid em dashes. Use periods or commas only.\n• Avoid the structure “not just this, but also this.”\n• Avoid metaphors and clichés.\n• Avoid vague generalizations. Be specific.\n• Avoid setup phrases such as in conclusion or in closing.\n• Avoid warnings or extra notes. Provide only the requested output.\n• Avoid unnecessary adjectives and adverbs.\n• Avoid choppy stop start rhythm. Keep sentences tight and connected.\n• Avoid rhetorical questions.\n• Avoid hashtags.\n• Avoid semicolons.\n• Avoid markdown formatting.\n• Avoid asterisks.\n\n• Do not use these words:\ncan,may,just,very,really,literally,actually,certainly,probably,basically,could,maybe,delve,embark,enlightening,esteemed,,shed light,craft,crafting,imagine,realm,game changer,unlock,discover,skyrocket,abyss,not alone,in a world where,revolutionize,disruptive,utilize,utilizing,dive ,deep,tapestry,illuminate,unveil,pivotal,intricate,elucidate,hence,furthermore,however,harness,exciting,groundbreaking,cutting edge,remarkable,remains to be seen,glimpse ,into,navigating,landscape,stark,testament,in summary,in conclusion,moreover,boost,skyrocketing,opened up,powerful,inquiries,ever evolving.\n\n# IMPORTANT: Review your response and ensure no em dashes!\n"
+                        }
+                    ]
+                },
+                "batching": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.chainLlm",
+            "typeVersion": 1.7,
+            "position": [
+                832,
+                -112
+            ],
+            "id": "721e2be6-8d15-44fe-9145-3e0d76231fc0",
+            "name": "Letsdial"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert SEO writer, technical analyst, and HTML content generator.\n\nYour mission: Using the input variables provided, create a single, publish-ready, time-aware SEO blog in HTML optimized for search intent, EEAT, formatting diversity, and 2025 accuracy.\n\n## 🔶 INPUTS\n\n{{ $json.focusKeyword }}\n{{ $json.supportingKeywords }}\n{{ $json.competitorUrl }}\n{{ $json.tone }}\n{{ $json.wordCount }}\n{{ $json.description }}\n{{ $json.companyName }}\n{{ $json.domainContent }}\n\n---\n\n# 🟦 COMPANY INFORMATION (AUTO-SELECT)\n\nIf {{ $json.domainContent }} = “Wholesale VoIP” or “Wholesale Voice” → Use ONLY:\n\n* **Company Name**: SoftTop\n* **URL**: [https://www.softtop.tech/](https://www.softtop.tech/)\n* **Description**: Global wholesale VoIP and voice termination carrier delivering advanced communication solutions across voice, messaging, SIP trunking, and A–Z termination.\n\nIf {{ $json.domainContent }} = “UCaaS” or “Virtual Number” → Use ONLY:\n\n* **Company Name**: SoftTop\n* **URL**: [https://www.softtop.tech/](https://www.softtop.tech/)\n* **Description**: Fully white-label UCaaS platform empowering partners to launch their own branded cloud communication suite. Includes cloud PBX, HD voice/video calling, team messaging, WhatsApp API, call recording, IVR, conferencing, and multi-tenant support.\n\nMandatory: At least **3 internal links** to the above URL, placed contextually with optimized anchor text.\n\n---\n\n# 🟧 SEO RULES (FAST VERSION)\n\n### Focus Keyword (strict)\n\n* **Use 3–4 times total only**.\n* Must appear in:\n\n* **H1** (exactly once)\n* **Intro** (1st sentence)\n* **One non-heading paragraph**\n* **Conclusion** (last sentence)\n* **Density must stay <1%**.\n* **Do NOT use the focus keyword in any H2 or subheading.**\n* Focus on semantic keyword relevance using Latent Semantic Indexing (LSI) keywords and contextually related terms in the body content.\n\n### Supporting Keywords\n\n* Each supporting keyword must appear **2–3 times max**.\n* Use one supporting keyword in the H1.\n\n### H1 & Brand Rules\n\n* **H1** must include **1 focus keyword + 1 supporting keyword**.\n* **Avoid** these banned words in:\n\n* Meta Title\n* Meta Description\n* Title Tag\n* H1\n* Any subheading\n* Company Name (except in body content)\n* Company name **allowed only** in body content and CTAs.\n\n---\n\n# 🟥 SPEED-OPTIMIZED CONTENT REQUIREMENTS\n\nInclude each element **once**, clean and lightweight:\n\n* Comparison table (3–4 rows)\n* Bullet list\n* Numbered workflow (3–5 steps)\n* Checklist (✓ items)\n* Blockquote (1 line)\n* Pros/Cons table (2x2)\n* ASCII workflow diagram\n* Comparison box (2-column)\n* FAQ (3 questions)\n* CTA button (inline CSS)\n* At least 3 internal links\n\nAll must use **inline CSS**, not style blocks.\n\n---\n\n# 🟪 COMPETITOR RULE\n\nYou may analyze {{ $json.competitorUrl }} for internal structure only.\nNever mention it.\n\n---\n\n# 🟨 HTML RULES\n\n* **No style blocks** — only inline style attributes.\n* Body must use modern typography (font-family, line-height).\n* Main container must have **no padding**.\n* H1–H3 must be clean and commercial.\n* Ensure **semantic HTML** elements (e.g., `<article>`, `<section>`, `<header>`, etc.) for improved readability and SEO.\n* Ensure **mobile responsiveness**, as Google uses mobile-first indexing. All elements, including CTAs and tables, should render well on small screens.\n\n---\n\n# 🔥 FINAL OUTPUT FORMAT (UNCHANGED)\n\nThe final response MUST be in this exact format and nothing else:\n\nBlog Title:\n(H1 text only)\n\n\\n\\n\\n\n\nMeta Title:\n\n\\n\\n\\n\n\nMeta Description:\n\n\\n\\n\\n\n\nFull Final HTML Code:\n(complete HTML based on all rules)\n\nNo explanations. No markdown. No extra sections.\n",
+                "batching": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.chainLlm",
+            "typeVersion": 1.7,
+            "position": [
+                944,
+                -16
+            ],
+            "id": "9ff1a517-6b14-489e-b44b-f7b56c797b9e",
+            "name": "Softtop"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert SEO writer, technical analyst, and HTML content generator.\n\nYour mission: Using the input variables provided, create a single, publish-ready, time-aware SEO blog in HTML optimized for search intent, EEAT, formatting diversity, and 2025 accuracy.\n\n## 🔶 INPUTS\n\n{{ $json.focusKeyword }}\n{{ $json.supportingKeywords }}\n{{ $json.competitorUrl }}\n{{ $json.tone }}\n{{ $json.wordCount }}\n{{ $json.description }}\n{{ $json.companyName }}\n{{ $json.domainContent }}\n\n---\n\n# 🟦 COMPANY INFORMATION (AUTO-SELECT)\n\nIf {{ $json.domainContent }} = “Wholesale VoIP” or “Wholesale Voice” → Use ONLY:\n\n* **Company Name**: CallMama\n* **URL**: [https://www.callmama.com/](https://www.callmama.com/)\n* **Description**: Global Wholesale VoIP and Wholesale Voice solutions supporting stable termination, high-volume routing, premium CLI delivery, and anti-fraud security.\n\nIf {{ $json.domainContent }} = “UCaaS” or “Virtual Number” → Use ONLY:\n\n* **Company Name**: CallMama\n* **URL**: [https://www.callmama.com/](https://www.callmama.com/)\n* **Description**: Global virtual communication platform offering virtual phone numbers, cloud calling, UCaaS features, and low-cost international communication for individuals and businesses.\n\nMandatory: At least **3 internal links** to the above URL, placed contextually with optimized anchor text.\n\n---\n\n# 🟧 SEO RULES (FAST VERSION)\n\n### Focus Keyword (strict)\n\n* **Use 3–4 times total only**.\n* Must appear in:\n\n* **H1** (exactly once)\n* **Intro** (1st sentence)\n* **One non-heading paragraph**\n* **Conclusion** (last sentence)\n* **Density must stay <1%**.\n* **Do NOT use the focus keyword in any H2 or subheading.**\n* Focus on semantic keyword relevance using Latent Semantic Indexing (LSI) keywords and contextually related terms in the body content.\n\n### Supporting Keywords\n\n* Each supporting keyword must appear **2–3 times max**.\n* Use one supporting keyword in the H1.\n\n### H1 & Brand Rules\n\n* **H1** must include **1 focus keyword + 1 supporting keyword**.\n* **Avoid** these banned words in:\n\n* Meta Title\n* Meta Description\n* Title Tag\n* H1\n* Any subheading\n* Company Name (except in body content)\n* Company name **allowed only** in body content and CTAs.\n\n---\n\n# 🟥 SPEED-OPTIMIZED CONTENT REQUIREMENTS\n\nInclude each element **once**, clean and lightweight:\n\n* Comparison table (3–4 rows)\n* Bullet list\n* Numbered workflow (3–5 steps)\n* Checklist (✓ items)\n* Blockquote (1 line)\n* Pros/Cons table (2x2)\n* ASCII workflow diagram\n* Comparison box (2-column)\n* FAQ (3 questions)\n* CTA button (inline CSS)\n* At least 3 internal links\n\nAll must use **inline CSS**, not style blocks.\n\n---\n\n# 🟪 COMPETITOR RULE\n\nYou may analyze {{ $json.competitorUrl }} for internal structure only.\nNever mention it.\n\n---\n\n# 🟨 HTML RULES\n\n* **No style blocks** — only inline style attributes.\n* Body must use modern typography (font-family, line-height).\n* Main container must have **no padding**.\n* H1–H3 must be clean and commercial.\n* Ensure **semantic HTML** elements (e.g., `<article>`, `<section>`, `<header>`, etc.) for improved readability and SEO.\n* Ensure **mobile responsiveness**, as Google uses mobile-first indexing. All elements, including CTAs and tables, should render well on small screens.\n\n---\n\n# 🔥 FINAL OUTPUT FORMAT (UNCHANGED)\n\nThe final response MUST be in this exact format and nothing else:\n\nBlog Title:\n(H1 text only)\n\n\\n\\n\\n\n\nMeta Title:\n\n\\n\\n\\n\n\nMeta Description:\n\n\\n\\n\\n\n\nFull Final HTML Code:\n(complete HTML based on all rules)\n\nNo explanations. No markdown. No extra sections.\n",
+                "messages": {
+                    "messageValues": [
+                        {
+                            "message": "• Use clear, simple language.\n• Be spartan and informative.\n• Use short, impactful sentences with steady flow.\n• Write in active voice. Avoid passive voice.\n• Focus on practical, actionable insights. Tell the reader what to do and how to do your task step by step.\n• Use bullet point lists in social media posts.\n• Support claims with data and concrete examples. Include numbers, time frames, costs, percentages, or results.\n• Address the reader directly. Use you and your.\n\n• Avoid em dashes. Use periods or commas only.\n• Avoid the structure “not just this, but also this.”\n• Avoid metaphors and clichés.\n• Avoid vague generalizations. Be specific.\n• Avoid setup phrases such as in conclusion or in closing.\n• Avoid warnings or extra notes. Provide only the requested output.\n• Avoid unnecessary adjectives and adverbs.\n• Avoid choppy stop start rhythm. Keep sentences tight and connected.\n• Avoid rhetorical questions.\n• Avoid hashtags.\n• Avoid semicolons.\n• Avoid markdown formatting.\n• Avoid asterisks.\n\n• Do not use these words:\ncan,may,just,very,really,literally,actually,certainly,probably,basically,could,maybe,delve,embark,enlightening,esteemed,,shed light,craft,crafting,imagine,realm,game changer,unlock,discover,skyrocket,abyss,not alone,in a world where,revolutionize,disruptive,utilize,utilizing,dive ,deep,tapestry,illuminate,unveil,pivotal,intricate,elucidate,hence,furthermore,however,harness,exciting,groundbreaking,cutting edge,remarkable,remains to be seen,glimpse ,into,navigating,landscape,stark,testament,in summary,in conclusion,moreover,boost,skyrocketing,opened up,powerful,inquiries,ever evolving.\n\n# IMPORTANT: Review your response and ensure no em dashes!\n"
+                        }
+                    ]
+                },
+                "batching": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.chainLlm",
+            "typeVersion": 1.7,
+            "position": [
+                1056,
+                80
+            ],
+            "id": "9c45449b-643d-41b4-b981-ecb18f0c9b30",
+            "name": "CallMama"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert SEO writer, technical analyst, and HTML content generator.\n\nYour mission: Using the input variables provided, create a single, publish-ready, time-aware SEO blog in HTML optimized for search intent, EEAT, formatting diversity, and 2025 accuracy.\n\n## 🔶 INPUTS\n\n{{ $json.focusKeyword }}\n{{ $json.supportingKeywords }}\n{{ $json.competitorUrl }}\n{{ $json.tone }}\n{{ $json.wordCount }}\n{{ $json.description }}\n{{ $json.companyName }}\n{{ $json.domainContent }}\n\n---\n\n# 🟦 COMPANY INFORMATION (AUTO-SELECT)\n\nIf {{ $json.domainContent }} = “Wholesale VoIP” or “Wholesale Voice” → Use ONLY:\n\n* **Company Name**: Ajoxi\n* **URL**: [https://www.ajoxi.com/](https://www.ajoxi.com/)\n* **Description**: Global wholesale carrier delivering premium voice termination, CLI-certified routes to 190+ countries, Tier-1 interconnects, AI-powered fraud protection, automated MOS quality monitoring, and high-volume routing for carriers, MVNOs, and resellers.\n\nIf {{ $json.domainContent }} = “UCaaS” or “Virtual Number” → Use ONLY:\n\n* **Company Name**: Ajoxi\n* **URL**: [https://www.ajoxi.com/](https://www.ajoxi.com/)\n* **Description**: Modern unified communications and enterprise-grade tools, including global virtual numbers, multi-channel messaging, the BLINK collaboration platform, and secure, compliance-ready routing for enterprises.\n\nMandatory: At least **3 internal links** to the above URL, placed contextually with optimized anchor text.\n\n---\n\n# 🟧 SEO RULES (FAST VERSION)\n\n### Focus Keyword (strict)\n\n* **Use 3–4 times total only**.\n* Must appear in:\n\n* **H1** (exactly once)\n* **Intro** (1st sentence)\n* **One non-heading paragraph**\n* **Conclusion** (last sentence)\n* **Density must stay <1%**.\n* **Do NOT use the focus keyword in any H2 or subheading.**\n* Focus on semantic keyword relevance using Latent Semantic Indexing (LSI) keywords and contextually related terms in the body content.\n\n### Supporting Keywords\n\n* Each supporting keyword must appear **2–3 times max**.\n* Use one supporting keyword in the H1.\n\n### H1 & Brand Rules\n\n* **H1** must include **1 focus keyword + 1 supporting keyword**.\n* **Avoid** these banned words in:\n\n* Meta Title\n* Meta Description\n* Title Tag\n* H1\n* Any subheading\n* Company Name (except in body content)\n* Company name **allowed only** in body content and CTAs.\n\n---\n\n# 🟥 SPEED-OPTIMIZED CONTENT REQUIREMENTS\n\nInclude each element **once**, clean and lightweight:\n\n* Comparison table (3–4 rows)\n* Bullet list\n* Numbered workflow (3–5 steps)\n* Checklist (✓ items)\n* Blockquote (1 line)\n* Pros/Cons table (2x2)\n* ASCII workflow diagram\n* Comparison box (2-column)\n* FAQ (3 questions)\n* CTA button (inline CSS)\n* At least 3 internal links\n\nAll must use **inline CSS**, not style blocks.\n\n---\n\n# 🟪 COMPETITOR RULE\n\nYou may analyze {{ $json.competitorUrl }} for internal structure only.\nNever mention it.\n\n---\n\n# 🟨 HTML RULES\n\n* **No style blocks** — only inline style attributes.\n* Body must use modern typography (font-family, line-height).\n* Main container must have **no padding**.\n* H1–H3 must be clean and commercial.\n* Ensure **semantic HTML** elements (e.g., `<article>`, `<section>`, `<header>`, etc.) for improved readability and SEO.\n* Ensure **mobile responsiveness**, as Google uses mobile-first indexing. All elements, including CTAs and tables, should render well on small screens.\n\n---\n\n# 🔥 FINAL OUTPUT FORMAT (UNCHANGED)\n\nThe final response MUST be in this exact format and nothing else:\n\nBlog Title:\n(H1 text only)\n\n\\n\\n\\n\n\nMeta Title:\n\n\\n\\n\\n\n\nMeta Description:\n\n\\n\\n\\n\n\nFull Final HTML Code:\n(complete HTML based on all rules)\n\nNo explanations. No markdown. No extra sections.\n",
+                "messages": {
+                    "messageValues": [
+                        {
+                            "message": "• Use clear, simple language.\n• Be spartan and informative.\n• Use short, impactful sentences with steady flow.\n• Write in active voice. Avoid passive voice.\n• Focus on practical, actionable insights. Tell the reader what to do and how to do your task step by step.\n• Use bullet point lists in social media posts.\n• Support claims with data and concrete examples. Include numbers, time frames, costs, percentages, or results.\n• Address the reader directly. Use you and your.\n\n• Avoid em dashes. Use periods or commas only.\n• Avoid the structure “not just this, but also this.”\n• Avoid metaphors and clichés.\n• Avoid vague generalizations. Be specific.\n• Avoid setup phrases such as in conclusion or in closing.\n• Avoid warnings or extra notes. Provide only the requested output.\n• Avoid unnecessary adjectives and adverbs.\n• Avoid choppy stop start rhythm. Keep sentences tight and connected.\n• Avoid rhetorical questions.\n• Avoid hashtags.\n• Avoid semicolons.\n• Avoid markdown formatting.\n• Avoid asterisks.\n\n• Do not use these words:\ncan,may,just,very,really,literally,actually,certainly,probably,basically,could,maybe,delve,embark,enlightening,esteemed,,shed light,craft,crafting,imagine,realm,game changer,unlock,discover,skyrocket,abyss,not alone,in a world where,revolutionize,disruptive,utilize,utilizing,dive ,deep,tapestry,illuminate,unveil,pivotal,intricate,elucidate,hence,furthermore,however,harness,exciting,groundbreaking,cutting edge,remarkable,remains to be seen,glimpse ,into,navigating,landscape,stark,testament,in summary,in conclusion,moreover,boost,skyrocketing,opened up,powerful,inquiries,ever evolving.\n\n# IMPORTANT: Review your response and ensure no em dashes!\n"
+                        }
+                    ]
+                },
+                "batching": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.chainLlm",
+            "typeVersion": 1.7,
+            "position": [
+                1168,
+                176
+            ],
+            "id": "b397cb37-e12a-4333-a0a2-3d2f4a7065e0",
+            "name": "Ajoxi"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert SEO writer, technical analyst, and HTML content generator.\n\nYour mission: Using the input variables provided, create a single, publish-ready, time-aware SEO blog in HTML optimized for search intent, EEAT, formatting diversity, and 2025 accuracy.\n\n## 🔶 INPUTS\n\n{{ $json.focusKeyword }}\n{{ $json.supportingKeywords }}\n{{ $json.competitorUrl }}\n{{ $json.tone }}\n{{ $json.wordCount }}\n{{ $json.description }}\n{{ $json.companyName }}\n{{ $json.domainContent }}\n\n---\n\n# 🟦 COMPANY INFORMATION (AUTO-SELECT)\n\nIf {{ $json.domainContent }} = “Wholesale VoIP” or “Wholesale Voice” → Use ONLY:\n\n* **Company Name**: Rozper\n* **URL**: [https://www.rozper.com/](https://www.rozper.com/)\n* **Description**: Global wholesale voice carrier delivering A–Z voice termination, SIP trunking, high-volume CLI/non-CLI routes, advanced routing, and real-time analytics for carriers, resellers, and enterprises.\n\nIf {{ $json.domainContent }} = “UCaaS” or “Virtual Number” → Use ONLY:\n\n* **Company Name**: Rozper\n* **URL**: [https://www.rozper.com/](https://www.rozper.com/)\n* **Description**: Provides virtual phone numbers, toll-free DIDs, cloud telephony, call center features, messaging, and all-in-one unified communication platforms ideal for global businesses..\n\nMandatory: At least **3 internal links** to the above URL, placed contextually with optimized anchor text.\n\n---\n\n# 🟧 SEO RULES (FAST VERSION)\n\n### Focus Keyword (strict)\n\n* **Use 3–4 times total only**.\n* Must appear in:\n\n* **H1** (exactly once)\n* **Intro** (1st sentence)\n* **One non-heading paragraph**\n* **Conclusion** (last sentence)\n* **Density must stay <1%**.\n* **Do NOT use the focus keyword in any H2 or subheading.**\n* Focus on semantic keyword relevance using Latent Semantic Indexing (LSI) keywords and contextually related terms in the body content.\n\n### Supporting Keywords\n\n* Each supporting keyword must appear **2–3 times max**.\n* Use one supporting keyword in the H1.\n\n### H1 & Brand Rules\n\n* **H1** must include **1 focus keyword + 1 supporting keyword**.\n* **Avoid** these banned words in:\n\n* Meta Title\n* Meta Description\n* Title Tag\n* H1\n* Any subheading\n* Company Name (except in body content)\n* Company name **allowed only** in body content and CTAs.\n\n---\n\n# 🟥 SPEED-OPTIMIZED CONTENT REQUIREMENTS\n\nInclude each element **once**, clean and lightweight:\n\n* Comparison table (3–4 rows)\n* Bullet list\n* Numbered workflow (3–5 steps)\n* Checklist (✓ items)\n* Blockquote (1 line)\n* Pros/Cons table (2x2)\n* ASCII workflow diagram\n* Comparison box (2-column)\n* FAQ (3 questions)\n* CTA button (inline CSS)\n* At least 3 internal links\n\nAll must use **inline CSS**, not style blocks.\n\n---\n\n# 🟪 COMPETITOR RULE\n\nYou may analyze {{ $json.competitorUrl }} for internal structure only.\nNever mention it.\n\n---\n\n# 🟨 HTML RULES\n\n* **No style blocks** — only inline style attributes.\n* Body must use modern typography (font-family, line-height).\n* Main container must have **no padding**.\n* H1–H3 must be clean and commercial.\n* Ensure **semantic HTML** elements (e.g., `<article>`, `<section>`, `<header>`, etc.) for improved readability and SEO.\n* Ensure **mobile responsiveness**, as Google uses mobile-first indexing. All elements, including CTAs and tables, should render well on small screens.\n\n---\n\n# 🔥 FINAL OUTPUT FORMAT (UNCHANGED)\n\nThe final response MUST be in this exact format and nothing else:\n\nBlog Title:\n(H1 text only)\n\n\\n\\n\\n\n\nMeta Title:\n\n\\n\\n\\n\n\nMeta Description:\n\n\\n\\n\\n\n\nFull Final HTML Code:\n(complete HTML based on all rules)\n\nNo explanations. No markdown. No extra sections.\n",
+                "messages": {
+                    "messageValues": [
+                        {
+                            "message": "• Use clear, simple language.\n• Be spartan and informative.\n• Use short, impactful sentences with steady flow.\n• Write in active voice. Avoid passive voice.\n• Focus on practical, actionable insights. Tell the reader what to do and how to do your task step by step.\n• Use bullet point lists in social media posts.\n• Support claims with data and concrete examples. Include numbers, time frames, costs, percentages, or results.\n• Address the reader directly. Use you and your.\n\n• Avoid em dashes. Use periods or commas only.\n• Avoid the structure “not just this, but also this.”\n• Avoid metaphors and clichés.\n• Avoid vague generalizations. Be specific.\n• Avoid setup phrases such as in conclusion or in closing.\n• Avoid warnings or extra notes. Provide only the requested output.\n• Avoid unnecessary adjectives and adverbs.\n• Avoid choppy stop start rhythm. Keep sentences tight and connected.\n• Avoid rhetorical questions.\n• Avoid hashtags.\n• Avoid semicolons.\n• Avoid markdown formatting.\n• Avoid asterisks.\n\n• Do not use these words:\ncan,may,just,very,really,literally,actually,certainly,probably,basically,could,maybe,delve,embark,enlightening,esteemed,,shed light,craft,crafting,imagine,realm,game changer,unlock,discover,skyrocket,abyss,not alone,in a world where,revolutionize,disruptive,utilize,utilizing,dive ,deep,tapestry,illuminate,unveil,pivotal,intricate,elucidate,hence,furthermore,however,harness,exciting,groundbreaking,cutting edge,remarkable,remains to be seen,glimpse ,into,navigating,landscape,stark,testament,in summary,in conclusion,moreover,boost,skyrocketing,opened up,powerful,inquiries,ever evolving.\n\n# IMPORTANT: Review your response and ensure no em dashes!\n"
+                        }
+                    ]
+                },
+                "batching": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.chainLlm",
+            "typeVersion": 1.7,
+            "position": [
+                1264,
+                272
+            ],
+            "id": "108cf717-8af2-4d43-9215-d7db962323da",
+            "name": "Rozper"
+        },
+        {
+            "parameters": {
+                "promptType": "define",
+                "text": "=You are an expert SEO writer, technical analyst, and HTML content generator.\n\nYour mission: Using the input variables provided, create a single, publish-ready, time-aware SEO blog in HTML optimized for search intent, EEAT, formatting diversity, and 2025 accuracy.\n\n## 🔶 INPUTS\n\n{{ $json.focusKeyword }}\n{{ $json.supportingKeywords }}\n{{ $json.competitorUrl }}\n{{ $json.tone }}\n{{ $json.wordCount }}\n{{ $json.description }}\n{{ $json.companyName }}\n{{ $json.domainContent }}\n\n---\n\n# 🟦 COMPANY INFORMATION (AUTO-SELECT)\n\nIf {{ $json.domainContent }} = “Wholesale VoIP” or “Wholesale Voice” → Use ONLY:\n\n* **Company Name**: Twiching\n* **URL**: [https://www.twiching.ai/](https://www.twiching.ai/)\n* **Description**: Singapore-registered communications provider offering wholesale VoIP, global voice termination, SIP services, and bulk telecom solutions for resellers, carriers, and enterprises.\n\nIf {{ $json.domainContent }} = “UCaaS” or “Virtual Number” → Use ONLY:\n\n* **Company Name**: Twiching\n* **URL**: [https://www.twiching.ai/](https://www.twiching.ai/)\n* **Description**: Unified communications and global virtual phone numbers across 100+ countries, enabling businesses, call centers, and enterprises to establish a global presence with DIDs, toll-free numbers, UCaaS tools, messaging, and collaboration services.\n\nMandatory: At least **3 internal links** to the above URL, placed contextually with optimized anchor text.\n\n---\n\n# 🟧 SEO RULES (FAST VERSION)\n\n### Focus Keyword (strict)\n\n* **Use 3–4 times total only**.\n* Must appear in:\n\n* **H1** (exactly once)\n* **Intro** (1st sentence)\n* **One non-heading paragraph**\n* **Conclusion** (last sentence)\n* **Density must stay <1%**.\n* **Do NOT use the focus keyword in any H2 or subheading.**\n* Focus on semantic keyword relevance using Latent Semantic Indexing (LSI) keywords and contextually related terms in the body content.\n\n### Supporting Keywords\n\n* Each supporting keyword must appear **2–3 times max**.\n* Use one supporting keyword in the H1.\n\n### H1 & Brand Rules\n\n* **H1** must include **1 focus keyword + 1 supporting keyword**.\n* **Avoid** these banned words in:\n\n* Meta Title\n* Meta Description\n* Title Tag\n* H1\n* Any subheading\n* Company Name (except in body content)\n* Company name **allowed only** in body content and CTAs.\n\n---\n\n# 🟥 SPEED-OPTIMIZED CONTENT REQUIREMENTS\n\nInclude each element **once**, clean and lightweight:\n\n* Comparison table (3–4 rows)\n* Bullet list\n* Numbered workflow (3–5 steps)\n* Checklist (✓ items)\n* Blockquote (1 line)\n* Pros/Cons table (2x2)\n* ASCII workflow diagram\n* Comparison box (2-column)\n* FAQ (3 questions)\n* CTA button (inline CSS)\n* At least 3 internal links\n\nAll must use **inline CSS**, not style blocks.\n\n---\n\n# 🟪 COMPETITOR RULE\n\nYou may analyze {{ $json.competitorUrl }} for internal structure only.\nNever mention it.\n\n---\n\n# 🟨 HTML RULES\n\n* **No style blocks** — only inline style attributes.\n* Body must use modern typography (font-family, line-height).\n* Main container must have **no padding**.\n* H1–H3 must be clean and commercial.\n* Ensure **semantic HTML** elements (e.g., `<article>`, `<section>`, `<header>`, etc.) for improved readability and SEO.\n* Ensure **mobile responsiveness**, as Google uses mobile-first indexing. All elements, including CTAs and tables, should render well on small screens.\n\n---\n\n# 🔥 FINAL OUTPUT FORMAT (UNCHANGED)\n\nThe final response MUST be in this exact format and nothing else:\n\nBlog Title:\n(H1 text only)\n\n\\n\\n\\n\n\nMeta Title:\n\n\\n\\n\\n\n\nMeta Description:\n\n\\n\\n\\n\n\nFull Final HTML Code:\n(complete HTML based on all rules)\n\nNo explanations. No markdown. No extra sections.\n",
+                "messages": {
+                    "messageValues": [
+                        {
+                            "message": "• Use clear, simple language.\n• Be spartan and informative.\n• Use short, impactful sentences with steady flow.\n• Write in active voice. Avoid passive voice.\n• Focus on practical, actionable insights. Tell the reader what to do and how to do your task step by step.\n• Use bullet point lists in social media posts.\n• Support claims with data and concrete examples. Include numbers, time frames, costs, percentages, or results.\n• Address the reader directly. Use you and your.\n\n• Avoid em dashes. Use periods or commas only.\n• Avoid the structure “not just this, but also this.”\n• Avoid metaphors and clichés.\n• Avoid vague generalizations. Be specific.\n• Avoid setup phrases such as in conclusion or in closing.\n• Avoid warnings or extra notes. Provide only the requested output.\n• Avoid unnecessary adjectives and adverbs.\n• Avoid choppy stop start rhythm. Keep sentences tight and connected.\n• Avoid rhetorical questions.\n• Avoid hashtags.\n• Avoid semicolons.\n• Avoid markdown formatting.\n• Avoid asterisks.\n\n• Do not use these words:\ncan,may,just,very,really,literally,actually,certainly,probably,basically,could,maybe,delve,embark,enlightening,esteemed,,shed light,craft,crafting,imagine,realm,game changer,unlock,discover,skyrocket,abyss,not alone,in a world where,revolutionize,disruptive,utilize,utilizing,dive ,deep,tapestry,illuminate,unveil,pivotal,intricate,elucidate,hence,furthermore,however,harness,exciting,groundbreaking,cutting edge,remarkable,remains to be seen,glimpse ,into,navigating,landscape,stark,testament,in summary,in conclusion,moreover,boost,skyrocketing,opened up,powerful,inquiries,ever evolving.\n\n# IMPORTANT: Review your response and ensure no em dashes!\n"
+                        }
+                    ]
+                },
+                "batching": {}
+            },
+            "type": "@n8n/n8n-nodes-langchain.chainLlm",
+            "typeVersion": 1.7,
+            "position": [
+                1360,
+                368
+            ],
+            "id": "843ebe4c-8953-452f-8de0-36c75ae76b80",
+            "name": "Twiching"
+        },
+        {
+            "parameters": {
+                "content": "",
+                "height": 1584,
+                "width": 2784,
+                "color": 4
+            },
+            "type": "n8n-nodes-base.stickyNote",
+            "position": [
+                -672,
+                -800
+            ],
+            "typeVersion": 1,
+            "id": "2240e76a-1375-4c86-a652-e8f92c18bef4",
+            "name": "Sticky Note2"
+        },
+        {
+            "parameters": {
+                "jsCode": "// n8n Code node (Function / Function Item)\n// Assumes the incoming item has the big text in items[0].json.text\n// If your field name differs, change `raw` accordingly.\n\nconst raw = (items && items[0] && items[0].json && (items[0].json.text || items[0].json.data || items[0].json.content))\n  ? (items[0].json.text || items[0].json.data || items[0].json.content)\n  : '';\n\n// 1) Normalize literal backslash-n sequences into real newlines\nlet normalized = raw.replace(/\\\\n/g, '\\n');\n\n// 2) Try extracting using labeled headers (flexible to slight variations)\nconst re = /Blog Title:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*Meta Title:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*Meta Description:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*(?:Full Final HTML Code:|Full HTML Code:|FullHTML:|Full Final HTML:)\\s*([\\s\\S]*)/i;\nconst m = normalized.match(re);\n\nlet BlogTitle = '', MetaTitle = '', MetaDescription = '', FullHTML = '';\n\nif (m) {\n  BlogTitle = m[1].trim();\n  MetaTitle = m[2].trim();\n  MetaDescription = m[3].trim();\n  FullHTML = m[4].trim();\n} else {\n  // Fallback 1: split by FOUR or more blank lines (handles multiple newline styles)\n  const splitter = /\\n{4,}|\\r\\n{4,}|(?:\\\\n){4,}/;\n  const parts = normalized.split(splitter).map(p => p.trim()).filter(p => p.length);\n\n  if (parts.length >= 4) {\n    BlogTitle = parts[0];\n    MetaTitle = parts[1];\n    MetaDescription = parts[2];\n    FullHTML = parts.slice(3).join('\\n\\n'); // in case HTML contains extra separators\n  } else {\n    // Fallback 2: try to find headers individually\n    const getBetween = (text, startLabel, endLabel) => {\n      const s = text.indexOf(startLabel);\n      if (s === -1) return '';\n      const start = s + startLabel.length;\n      const e = endLabel ? text.indexOf(endLabel, start) : text.length;\n      return text.substring(start, e === -1 ? text.length : e).trim();\n    };\n\n    BlogTitle = getBetween(normalized, 'Blog Title:', 'Meta Title:') || '';\n    MetaTitle = getBetween(normalized, 'Meta Title:', 'Meta Description:') || '';\n    MetaDescription = getBetween(normalized, 'Meta Description:', 'Full Final HTML Code:') || getBetween(normalized, 'Meta Description:', 'Full HTML Code:') || '';\n    FullHTML = getBetween(normalized, 'Full Final HTML Code:') || getBetween(normalized, 'Full HTML Code:') || getBetween(normalized, 'FullHTML:') || '';\n\n    // As a last attempt, if BlogTitle still contains everything, try to split by the textual labels inside it\n    if (!MetaTitle && /Meta Title:/i.test(BlogTitle)) {\n      const byLabels = BlogTitle.split(/Meta Title:/i);\n      BlogTitle = (byLabels[0] || '').trim();\n      const rest = (byLabels[1] || '').trim();\n      const nextSplit = rest.split(/Meta Description:/i);\n      MetaTitle = (nextSplit[0] || '').trim();\n      const after = (nextSplit[1] || '').trim();\n      const htmlSplit = after.split(/Full Final HTML Code:|Full HTML Code:|FullHTML:/i);\n      MetaDescription = (htmlSplit[0] || '').trim();\n      FullHTML = (htmlSplit.slice(1).join('') || '').trim();\n    }\n  }\n}\n\n// Return as single object (n8n expects an array of items)\nreturn [\n  {\n    json: {\n      BlogTitle,\n      MetaTitle,\n      MetaDescription,\n      FullHTML\n    }\n  }\n];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                480,
+                -688
+            ],
+            "id": "c50a51b8-cd0e-4d11-ae07-5baf8a30c447",
+            "name": "Code in JavaScript"
+        },
+        {
+            "parameters": {
+                "jsCode": "// n8n Code node (Function / Function Item)\n// Assumes the incoming item has the big text in items[0].json.text\n// If your field name differs, change `raw` accordingly.\n\nconst raw = (items && items[0] && items[0].json && (items[0].json.text || items[0].json.data || items[0].json.content))\n  ? (items[0].json.text || items[0].json.data || items[0].json.content)\n  : '';\n\n// 1) Normalize literal backslash-n sequences into real newlines\nlet normalized = raw.replace(/\\\\n/g, '\\n');\n\n// 2) Try extracting using labeled headers (flexible to slight variations)\nconst re = /Blog Title:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*Meta Title:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*Meta Description:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*(?:Full Final HTML Code:|Full HTML Code:|FullHTML:|Full Final HTML:)\\s*([\\s\\S]*)/i;\nconst m = normalized.match(re);\n\nlet BlogTitle = '', MetaTitle = '', MetaDescription = '', FullHTML = '';\n\nif (m) {\n  BlogTitle = m[1].trim();\n  MetaTitle = m[2].trim();\n  MetaDescription = m[3].trim();\n  FullHTML = m[4].trim();\n} else {\n  // Fallback 1: split by FOUR or more blank lines (handles multiple newline styles)\n  const splitter = /\\n{4,}|\\r\\n{4,}|(?:\\\\n){4,}/;\n  const parts = normalized.split(splitter).map(p => p.trim()).filter(p => p.length);\n\n  if (parts.length >= 4) {\n    BlogTitle = parts[0];\n    MetaTitle = parts[1];\n    MetaDescription = parts[2];\n    FullHTML = parts.slice(3).join('\\n\\n'); // in case HTML contains extra separators\n  } else {\n    // Fallback 2: try to find headers individually\n    const getBetween = (text, startLabel, endLabel) => {\n      const s = text.indexOf(startLabel);\n      if (s === -1) return '';\n      const start = s + startLabel.length;\n      const e = endLabel ? text.indexOf(endLabel, start) : text.length;\n      return text.substring(start, e === -1 ? text.length : e).trim();\n    };\n\n    BlogTitle = getBetween(normalized, 'Blog Title:', 'Meta Title:') || '';\n    MetaTitle = getBetween(normalized, 'Meta Title:', 'Meta Description:') || '';\n    MetaDescription = getBetween(normalized, 'Meta Description:', 'Full Final HTML Code:') || getBetween(normalized, 'Meta Description:', 'Full HTML Code:') || '';\n    FullHTML = getBetween(normalized, 'Full Final HTML Code:') || getBetween(normalized, 'Full HTML Code:') || getBetween(normalized, 'FullHTML:') || '';\n\n    // As a last attempt, if BlogTitle still contains everything, try to split by the textual labels inside it\n    if (!MetaTitle && /Meta Title:/i.test(BlogTitle)) {\n      const byLabels = BlogTitle.split(/Meta Title:/i);\n      BlogTitle = (byLabels[0] || '').trim();\n      const rest = (byLabels[1] || '').trim();\n      const nextSplit = rest.split(/Meta Description:/i);\n      MetaTitle = (nextSplit[0] || '').trim();\n      const after = (nextSplit[1] || '').trim();\n      const htmlSplit = after.split(/Full Final HTML Code:|Full HTML Code:|FullHTML:/i);\n      MetaDescription = (htmlSplit[0] || '').trim();\n      FullHTML = (htmlSplit.slice(1).join('') || '').trim();\n    }\n  }\n}\n\n// Return as single object (n8n expects an array of items)\nreturn [\n  {\n    json: {\n      BlogTitle,\n      MetaTitle,\n      MetaDescription,\n      FullHTML\n    }\n  }\n];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                592,
+                -592
+            ],
+            "id": "6d00a75d-0723-4924-8bac-7c34548b18aa",
+            "name": "Code in JavaScript1"
+        },
+        {
+            "parameters": {
+                "jsCode": "// n8n Code node (Function / Function Item)\n// Assumes the incoming item has the big text in items[0].json.text\n// If your field name differs, change `raw` accordingly.\n\nconst raw = (items && items[0] && items[0].json && (items[0].json.text || items[0].json.data || items[0].json.content))\n  ? (items[0].json.text || items[0].json.data || items[0].json.content)\n  : '';\n\n// 1) Normalize literal backslash-n sequences into real newlines\nlet normalized = raw.replace(/\\\\n/g, '\\n');\n\n// 2) Try extracting using labeled headers (flexible to slight variations)\nconst re = /Blog Title:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*Meta Title:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*Meta Description:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*(?:Full Final HTML Code:|Full HTML Code:|FullHTML:|Full Final HTML:)\\s*([\\s\\S]*)/i;\nconst m = normalized.match(re);\n\nlet BlogTitle = '', MetaTitle = '', MetaDescription = '', FullHTML = '';\n\nif (m) {\n  BlogTitle = m[1].trim();\n  MetaTitle = m[2].trim();\n  MetaDescription = m[3].trim();\n  FullHTML = m[4].trim();\n} else {\n  // Fallback 1: split by FOUR or more blank lines (handles multiple newline styles)\n  const splitter = /\\n{4,}|\\r\\n{4,}|(?:\\\\n){4,}/;\n  const parts = normalized.split(splitter).map(p => p.trim()).filter(p => p.length);\n\n  if (parts.length >= 4) {\n    BlogTitle = parts[0];\n    MetaTitle = parts[1];\n    MetaDescription = parts[2];\n    FullHTML = parts.slice(3).join('\\n\\n'); // in case HTML contains extra separators\n  } else {\n    // Fallback 2: try to find headers individually\n    const getBetween = (text, startLabel, endLabel) => {\n      const s = text.indexOf(startLabel);\n      if (s === -1) return '';\n      const start = s + startLabel.length;\n      const e = endLabel ? text.indexOf(endLabel, start) : text.length;\n      return text.substring(start, e === -1 ? text.length : e).trim();\n    };\n\n    BlogTitle = getBetween(normalized, 'Blog Title:', 'Meta Title:') || '';\n    MetaTitle = getBetween(normalized, 'Meta Title:', 'Meta Description:') || '';\n    MetaDescription = getBetween(normalized, 'Meta Description:', 'Full Final HTML Code:') || getBetween(normalized, 'Meta Description:', 'Full HTML Code:') || '';\n    FullHTML = getBetween(normalized, 'Full Final HTML Code:') || getBetween(normalized, 'Full HTML Code:') || getBetween(normalized, 'FullHTML:') || '';\n\n    // As a last attempt, if BlogTitle still contains everything, try to split by the textual labels inside it\n    if (!MetaTitle && /Meta Title:/i.test(BlogTitle)) {\n      const byLabels = BlogTitle.split(/Meta Title:/i);\n      BlogTitle = (byLabels[0] || '').trim();\n      const rest = (byLabels[1] || '').trim();\n      const nextSplit = rest.split(/Meta Description:/i);\n      MetaTitle = (nextSplit[0] || '').trim();\n      const after = (nextSplit[1] || '').trim();\n      const htmlSplit = after.split(/Full Final HTML Code:|Full HTML Code:|FullHTML:/i);\n      MetaDescription = (htmlSplit[0] || '').trim();\n      FullHTML = (htmlSplit.slice(1).join('') || '').trim();\n    }\n  }\n}\n\n// Return as single object (n8n expects an array of items)\nreturn [\n  {\n    json: {\n      BlogTitle,\n      MetaTitle,\n      MetaDescription,\n      FullHTML\n    }\n  }\n];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                704,
+                -496
+            ],
+            "id": "5aafffc7-b577-4888-802b-c4b682d66aad",
+            "name": "Code in JavaScript2"
+        },
+        {
+            "parameters": {
+                "jsCode": "// n8n Code node (Function / Function Item)\n// Assumes the incoming item has the big text in items[0].json.text\n// If your field name differs, change `raw` accordingly.\n\nconst raw = (items && items[0] && items[0].json && (items[0].json.text || items[0].json.data || items[0].json.content))\n  ? (items[0].json.text || items[0].json.data || items[0].json.content)\n  : '';\n\n// 1) Normalize literal backslash-n sequences into real newlines\nlet normalized = raw.replace(/\\\\n/g, '\\n');\n\n// 2) Try extracting using labeled headers (flexible to slight variations)\nconst re = /Blog Title:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*Meta Title:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*Meta Description:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*(?:Full Final HTML Code:|Full HTML Code:|FullHTML:|Full Final HTML:)\\s*([\\s\\S]*)/i;\nconst m = normalized.match(re);\n\nlet BlogTitle = '', MetaTitle = '', MetaDescription = '', FullHTML = '';\n\nif (m) {\n  BlogTitle = m[1].trim();\n  MetaTitle = m[2].trim();\n  MetaDescription = m[3].trim();\n  FullHTML = m[4].trim();\n} else {\n  // Fallback 1: split by FOUR or more blank lines (handles multiple newline styles)\n  const splitter = /\\n{4,}|\\r\\n{4,}|(?:\\\\n){4,}/;\n  const parts = normalized.split(splitter).map(p => p.trim()).filter(p => p.length);\n\n  if (parts.length >= 4) {\n    BlogTitle = parts[0];\n    MetaTitle = parts[1];\n    MetaDescription = parts[2];\n    FullHTML = parts.slice(3).join('\\n\\n'); // in case HTML contains extra separators\n  } else {\n    // Fallback 2: try to find headers individually\n    const getBetween = (text, startLabel, endLabel) => {\n      const s = text.indexOf(startLabel);\n      if (s === -1) return '';\n      const start = s + startLabel.length;\n      const e = endLabel ? text.indexOf(endLabel, start) : text.length;\n      return text.substring(start, e === -1 ? text.length : e).trim();\n    };\n\n    BlogTitle = getBetween(normalized, 'Blog Title:', 'Meta Title:') || '';\n    MetaTitle = getBetween(normalized, 'Meta Title:', 'Meta Description:') || '';\n    MetaDescription = getBetween(normalized, 'Meta Description:', 'Full Final HTML Code:') || getBetween(normalized, 'Meta Description:', 'Full HTML Code:') || '';\n    FullHTML = getBetween(normalized, 'Full Final HTML Code:') || getBetween(normalized, 'Full HTML Code:') || getBetween(normalized, 'FullHTML:') || '';\n\n    // As a last attempt, if BlogTitle still contains everything, try to split by the textual labels inside it\n    if (!MetaTitle && /Meta Title:/i.test(BlogTitle)) {\n      const byLabels = BlogTitle.split(/Meta Title:/i);\n      BlogTitle = (byLabels[0] || '').trim();\n      const rest = (byLabels[1] || '').trim();\n      const nextSplit = rest.split(/Meta Description:/i);\n      MetaTitle = (nextSplit[0] || '').trim();\n      const after = (nextSplit[1] || '').trim();\n      const htmlSplit = after.split(/Full Final HTML Code:|Full HTML Code:|FullHTML:/i);\n      MetaDescription = (htmlSplit[0] || '').trim();\n      FullHTML = (htmlSplit.slice(1).join('') || '').trim();\n    }\n  }\n}\n\n// Return as single object (n8n expects an array of items)\nreturn [\n  {\n    json: {\n      BlogTitle,\n      MetaTitle,\n      MetaDescription,\n      FullHTML\n    }\n  }\n];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                832,
+                -400
+            ],
+            "id": "f3372d76-34d3-4cd5-aad9-d420f9354185",
+            "name": "Code in JavaScript3"
+        },
+        {
+            "parameters": {
+                "jsCode": "// n8n Code node (Function / Function Item)\n// Assumes the incoming item has the big text in items[0].json.text\n// If your field name differs, change `raw` accordingly.\n\nconst raw = (items && items[0] && items[0].json && (items[0].json.text || items[0].json.data || items[0].json.content))\n  ? (items[0].json.text || items[0].json.data || items[0].json.content)\n  : '';\n\n// 1) Normalize literal backslash-n sequences into real newlines\nlet normalized = raw.replace(/\\\\n/g, '\\n');\n\n// 2) Try extracting using labeled headers (flexible to slight variations)\nconst re = /Blog Title:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*Meta Title:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*Meta Description:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*(?:Full Final HTML Code:|Full HTML Code:|FullHTML:|Full Final HTML:)\\s*([\\s\\S]*)/i;\nconst m = normalized.match(re);\n\nlet BlogTitle = '', MetaTitle = '', MetaDescription = '', FullHTML = '';\n\nif (m) {\n  BlogTitle = m[1].trim();\n  MetaTitle = m[2].trim();\n  MetaDescription = m[3].trim();\n  FullHTML = m[4].trim();\n} else {\n  // Fallback 1: split by FOUR or more blank lines (handles multiple newline styles)\n  const splitter = /\\n{4,}|\\r\\n{4,}|(?:\\\\n){4,}/;\n  const parts = normalized.split(splitter).map(p => p.trim()).filter(p => p.length);\n\n  if (parts.length >= 4) {\n    BlogTitle = parts[0];\n    MetaTitle = parts[1];\n    MetaDescription = parts[2];\n    FullHTML = parts.slice(3).join('\\n\\n'); // in case HTML contains extra separators\n  } else {\n    // Fallback 2: try to find headers individually\n    const getBetween = (text, startLabel, endLabel) => {\n      const s = text.indexOf(startLabel);\n      if (s === -1) return '';\n      const start = s + startLabel.length;\n      const e = endLabel ? text.indexOf(endLabel, start) : text.length;\n      return text.substring(start, e === -1 ? text.length : e).trim();\n    };\n\n    BlogTitle = getBetween(normalized, 'Blog Title:', 'Meta Title:') || '';\n    MetaTitle = getBetween(normalized, 'Meta Title:', 'Meta Description:') || '';\n    MetaDescription = getBetween(normalized, 'Meta Description:', 'Full Final HTML Code:') || getBetween(normalized, 'Meta Description:', 'Full HTML Code:') || '';\n    FullHTML = getBetween(normalized, 'Full Final HTML Code:') || getBetween(normalized, 'Full HTML Code:') || getBetween(normalized, 'FullHTML:') || '';\n\n    // As a last attempt, if BlogTitle still contains everything, try to split by the textual labels inside it\n    if (!MetaTitle && /Meta Title:/i.test(BlogTitle)) {\n      const byLabels = BlogTitle.split(/Meta Title:/i);\n      BlogTitle = (byLabels[0] || '').trim();\n      const rest = (byLabels[1] || '').trim();\n      const nextSplit = rest.split(/Meta Description:/i);\n      MetaTitle = (nextSplit[0] || '').trim();\n      const after = (nextSplit[1] || '').trim();\n      const htmlSplit = after.split(/Full Final HTML Code:|Full HTML Code:|FullHTML:/i);\n      MetaDescription = (htmlSplit[0] || '').trim();\n      FullHTML = (htmlSplit.slice(1).join('') || '').trim();\n    }\n  }\n}\n\n// Return as single object (n8n expects an array of items)\nreturn [\n  {\n    json: {\n      BlogTitle,\n      MetaTitle,\n      MetaDescription,\n      FullHTML\n    }\n  }\n];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                960,
+                -304
+            ],
+            "id": "30932ea6-1dc3-424b-84d2-1b09cb29e264",
+            "name": "Code in JavaScript4"
+        },
+        {
+            "parameters": {
+                "jsCode": "// n8n Code node (Function / Function Item)\n// Assumes the incoming item has the big text in items[0].json.text\n// If your field name differs, change `raw` accordingly.\n\nconst raw = (items && items[0] && items[0].json && (items[0].json.text || items[0].json.data || items[0].json.content))\n  ? (items[0].json.text || items[0].json.data || items[0].json.content)\n  : '';\n\n// 1) Normalize literal backslash-n sequences into real newlines\nlet normalized = raw.replace(/\\\\n/g, '\\n');\n\n// 2) Try extracting using labeled headers (flexible to slight variations)\nconst re = /Blog Title:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*Meta Title:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*Meta Description:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*(?:Full Final HTML Code:|Full HTML Code:|FullHTML:|Full Final HTML:)\\s*([\\s\\S]*)/i;\nconst m = normalized.match(re);\n\nlet BlogTitle = '', MetaTitle = '', MetaDescription = '', FullHTML = '';\n\nif (m) {\n  BlogTitle = m[1].trim();\n  MetaTitle = m[2].trim();\n  MetaDescription = m[3].trim();\n  FullHTML = m[4].trim();\n} else {\n  // Fallback 1: split by FOUR or more blank lines (handles multiple newline styles)\n  const splitter = /\\n{4,}|\\r\\n{4,}|(?:\\\\n){4,}/;\n  const parts = normalized.split(splitter).map(p => p.trim()).filter(p => p.length);\n\n  if (parts.length >= 4) {\n    BlogTitle = parts[0];\n    MetaTitle = parts[1];\n    MetaDescription = parts[2];\n    FullHTML = parts.slice(3).join('\\n\\n'); // in case HTML contains extra separators\n  } else {\n    // Fallback 2: try to find headers individually\n    const getBetween = (text, startLabel, endLabel) => {\n      const s = text.indexOf(startLabel);\n      if (s === -1) return '';\n      const start = s + startLabel.length;\n      const e = endLabel ? text.indexOf(endLabel, start) : text.length;\n      return text.substring(start, e === -1 ? text.length : e).trim();\n    };\n\n    BlogTitle = getBetween(normalized, 'Blog Title:', 'Meta Title:') || '';\n    MetaTitle = getBetween(normalized, 'Meta Title:', 'Meta Description:') || '';\n    MetaDescription = getBetween(normalized, 'Meta Description:', 'Full Final HTML Code:') || getBetween(normalized, 'Meta Description:', 'Full HTML Code:') || '';\n    FullHTML = getBetween(normalized, 'Full Final HTML Code:') || getBetween(normalized, 'Full HTML Code:') || getBetween(normalized, 'FullHTML:') || '';\n\n    // As a last attempt, if BlogTitle still contains everything, try to split by the textual labels inside it\n    if (!MetaTitle && /Meta Title:/i.test(BlogTitle)) {\n      const byLabels = BlogTitle.split(/Meta Title:/i);\n      BlogTitle = (byLabels[0] || '').trim();\n      const rest = (byLabels[1] || '').trim();\n      const nextSplit = rest.split(/Meta Description:/i);\n      MetaTitle = (nextSplit[0] || '').trim();\n      const after = (nextSplit[1] || '').trim();\n      const htmlSplit = after.split(/Full Final HTML Code:|Full HTML Code:|FullHTML:/i);\n      MetaDescription = (htmlSplit[0] || '').trim();\n      FullHTML = (htmlSplit.slice(1).join('') || '').trim();\n    }\n  }\n}\n\n// Return as single object (n8n expects an array of items)\nreturn [\n  {\n    json: {\n      BlogTitle,\n      MetaTitle,\n      MetaDescription,\n      FullHTML\n    }\n  }\n];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1072,
+                -208
+            ],
+            "id": "a6c5d701-7cee-4149-89e8-e69d1b505f6d",
+            "name": "Code in JavaScript5"
+        },
+        {
+            "parameters": {
+                "jsCode": "// n8n Code node (Function / Function Item)\n// Assumes the incoming item has the big text in items[0].json.text\n// If your field name differs, change `raw` accordingly.\n\nconst raw = (items && items[0] && items[0].json && (items[0].json.text || items[0].json.data || items[0].json.content))\n  ? (items[0].json.text || items[0].json.data || items[0].json.content)\n  : '';\n\n// 1) Normalize literal backslash-n sequences into real newlines\nlet normalized = raw.replace(/\\\\n/g, '\\n');\n\n// 2) Try extracting using labeled headers (flexible to slight variations)\nconst re = /Blog Title:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*Meta Title:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*Meta Description:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*(?:Full Final HTML Code:|Full HTML Code:|FullHTML:|Full Final HTML:)\\s*([\\s\\S]*)/i;\nconst m = normalized.match(re);\n\nlet BlogTitle = '', MetaTitle = '', MetaDescription = '', FullHTML = '';\n\nif (m) {\n  BlogTitle = m[1].trim();\n  MetaTitle = m[2].trim();\n  MetaDescription = m[3].trim();\n  FullHTML = m[4].trim();\n} else {\n  // Fallback 1: split by FOUR or more blank lines (handles multiple newline styles)\n  const splitter = /\\n{4,}|\\r\\n{4,}|(?:\\\\n){4,}/;\n  const parts = normalized.split(splitter).map(p => p.trim()).filter(p => p.length);\n\n  if (parts.length >= 4) {\n    BlogTitle = parts[0];\n    MetaTitle = parts[1];\n    MetaDescription = parts[2];\n    FullHTML = parts.slice(3).join('\\n\\n'); // in case HTML contains extra separators\n  } else {\n    // Fallback 2: try to find headers individually\n    const getBetween = (text, startLabel, endLabel) => {\n      const s = text.indexOf(startLabel);\n      if (s === -1) return '';\n      const start = s + startLabel.length;\n      const e = endLabel ? text.indexOf(endLabel, start) : text.length;\n      return text.substring(start, e === -1 ? text.length : e).trim();\n    };\n\n    BlogTitle = getBetween(normalized, 'Blog Title:', 'Meta Title:') || '';\n    MetaTitle = getBetween(normalized, 'Meta Title:', 'Meta Description:') || '';\n    MetaDescription = getBetween(normalized, 'Meta Description:', 'Full Final HTML Code:') || getBetween(normalized, 'Meta Description:', 'Full HTML Code:') || '';\n    FullHTML = getBetween(normalized, 'Full Final HTML Code:') || getBetween(normalized, 'Full HTML Code:') || getBetween(normalized, 'FullHTML:') || '';\n\n    // As a last attempt, if BlogTitle still contains everything, try to split by the textual labels inside it\n    if (!MetaTitle && /Meta Title:/i.test(BlogTitle)) {\n      const byLabels = BlogTitle.split(/Meta Title:/i);\n      BlogTitle = (byLabels[0] || '').trim();\n      const rest = (byLabels[1] || '').trim();\n      const nextSplit = rest.split(/Meta Description:/i);\n      MetaTitle = (nextSplit[0] || '').trim();\n      const after = (nextSplit[1] || '').trim();\n      const htmlSplit = after.split(/Full Final HTML Code:|Full HTML Code:|FullHTML:/i);\n      MetaDescription = (htmlSplit[0] || '').trim();\n      FullHTML = (htmlSplit.slice(1).join('') || '').trim();\n    }\n  }\n}\n\n// Return as single object (n8n expects an array of items)\nreturn [\n  {\n    json: {\n      BlogTitle,\n      MetaTitle,\n      MetaDescription,\n      FullHTML\n    }\n  }\n];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1184,
+                -112
+            ],
+            "id": "090d8a16-59c4-40cd-aa2d-beacf9f5e080",
+            "name": "Code in JavaScript6"
+        },
+        {
+            "parameters": {
+                "jsCode": "// n8n Code node (Function / Function Item)\n// Assumes the incoming item has the big text in items[0].json.text\n// If your field name differs, change `raw` accordingly.\n\nconst raw = (items && items[0] && items[0].json && (items[0].json.text || items[0].json.data || items[0].json.content))\n  ? (items[0].json.text || items[0].json.data || items[0].json.content)\n  : '';\n\n// 1) Normalize literal backslash-n sequences into real newlines\nlet normalized = raw.replace(/\\\\n/g, '\\n');\n\n// 2) Try extracting using labeled headers (flexible to slight variations)\nconst re = /Blog Title:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*Meta Title:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*Meta Description:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*(?:Full Final HTML Code:|Full HTML Code:|FullHTML:|Full Final HTML:)\\s*([\\s\\S]*)/i;\nconst m = normalized.match(re);\n\nlet BlogTitle = '', MetaTitle = '', MetaDescription = '', FullHTML = '';\n\nif (m) {\n  BlogTitle = m[1].trim();\n  MetaTitle = m[2].trim();\n  MetaDescription = m[3].trim();\n  FullHTML = m[4].trim();\n} else {\n  // Fallback 1: split by FOUR or more blank lines (handles multiple newline styles)\n  const splitter = /\\n{4,}|\\r\\n{4,}|(?:\\\\n){4,}/;\n  const parts = normalized.split(splitter).map(p => p.trim()).filter(p => p.length);\n\n  if (parts.length >= 4) {\n    BlogTitle = parts[0];\n    MetaTitle = parts[1];\n    MetaDescription = parts[2];\n    FullHTML = parts.slice(3).join('\\n\\n'); // in case HTML contains extra separators\n  } else {\n    // Fallback 2: try to find headers individually\n    const getBetween = (text, startLabel, endLabel) => {\n      const s = text.indexOf(startLabel);\n      if (s === -1) return '';\n      const start = s + startLabel.length;\n      const e = endLabel ? text.indexOf(endLabel, start) : text.length;\n      return text.substring(start, e === -1 ? text.length : e).trim();\n    };\n\n    BlogTitle = getBetween(normalized, 'Blog Title:', 'Meta Title:') || '';\n    MetaTitle = getBetween(normalized, 'Meta Title:', 'Meta Description:') || '';\n    MetaDescription = getBetween(normalized, 'Meta Description:', 'Full Final HTML Code:') || getBetween(normalized, 'Meta Description:', 'Full HTML Code:') || '';\n    FullHTML = getBetween(normalized, 'Full Final HTML Code:') || getBetween(normalized, 'Full HTML Code:') || getBetween(normalized, 'FullHTML:') || '';\n\n    // As a last attempt, if BlogTitle still contains everything, try to split by the textual labels inside it\n    if (!MetaTitle && /Meta Title:/i.test(BlogTitle)) {\n      const byLabels = BlogTitle.split(/Meta Title:/i);\n      BlogTitle = (byLabels[0] || '').trim();\n      const rest = (byLabels[1] || '').trim();\n      const nextSplit = rest.split(/Meta Description:/i);\n      MetaTitle = (nextSplit[0] || '').trim();\n      const after = (nextSplit[1] || '').trim();\n      const htmlSplit = after.split(/Full Final HTML Code:|Full HTML Code:|FullHTML:/i);\n      MetaDescription = (htmlSplit[0] || '').trim();\n      FullHTML = (htmlSplit.slice(1).join('') || '').trim();\n    }\n  }\n}\n\n// Return as single object (n8n expects an array of items)\nreturn [\n  {\n    json: {\n      BlogTitle,\n      MetaTitle,\n      MetaDescription,\n      FullHTML\n    }\n  }\n];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1296,
+                -16
+            ],
+            "id": "bc5fc686-1287-4b42-9abd-aaceaf27d99d",
+            "name": "Code in JavaScript7"
+        },
+        {
+            "parameters": {
+                "jsCode": "// n8n Code node (Function / Function Item)\n// Assumes the incoming item has the big text in items[0].json.text\n// If your field name differs, change `raw` accordingly.\n\nconst raw = (items && items[0] && items[0].json && (items[0].json.text || items[0].json.data || items[0].json.content))\n  ? (items[0].json.text || items[0].json.data || items[0].json.content)\n  : '';\n\n// 1) Normalize literal backslash-n sequences into real newlines\nlet normalized = raw.replace(/\\\\n/g, '\\n');\n\n// 2) Try extracting using labeled headers (flexible to slight variations)\nconst re = /Blog Title:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*Meta Title:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*Meta Description:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*(?:Full Final HTML Code:|Full HTML Code:|FullHTML:|Full Final HTML:)\\s*([\\s\\S]*)/i;\nconst m = normalized.match(re);\n\nlet BlogTitle = '', MetaTitle = '', MetaDescription = '', FullHTML = '';\n\nif (m) {\n  BlogTitle = m[1].trim();\n  MetaTitle = m[2].trim();\n  MetaDescription = m[3].trim();\n  FullHTML = m[4].trim();\n} else {\n  // Fallback 1: split by FOUR or more blank lines (handles multiple newline styles)\n  const splitter = /\\n{4,}|\\r\\n{4,}|(?:\\\\n){4,}/;\n  const parts = normalized.split(splitter).map(p => p.trim()).filter(p => p.length);\n\n  if (parts.length >= 4) {\n    BlogTitle = parts[0];\n    MetaTitle = parts[1];\n    MetaDescription = parts[2];\n    FullHTML = parts.slice(3).join('\\n\\n'); // in case HTML contains extra separators\n  } else {\n    // Fallback 2: try to find headers individually\n    const getBetween = (text, startLabel, endLabel) => {\n      const s = text.indexOf(startLabel);\n      if (s === -1) return '';\n      const start = s + startLabel.length;\n      const e = endLabel ? text.indexOf(endLabel, start) : text.length;\n      return text.substring(start, e === -1 ? text.length : e).trim();\n    };\n\n    BlogTitle = getBetween(normalized, 'Blog Title:', 'Meta Title:') || '';\n    MetaTitle = getBetween(normalized, 'Meta Title:', 'Meta Description:') || '';\n    MetaDescription = getBetween(normalized, 'Meta Description:', 'Full Final HTML Code:') || getBetween(normalized, 'Meta Description:', 'Full HTML Code:') || '';\n    FullHTML = getBetween(normalized, 'Full Final HTML Code:') || getBetween(normalized, 'Full HTML Code:') || getBetween(normalized, 'FullHTML:') || '';\n\n    // As a last attempt, if BlogTitle still contains everything, try to split by the textual labels inside it\n    if (!MetaTitle && /Meta Title:/i.test(BlogTitle)) {\n      const byLabels = BlogTitle.split(/Meta Title:/i);\n      BlogTitle = (byLabels[0] || '').trim();\n      const rest = (byLabels[1] || '').trim();\n      const nextSplit = rest.split(/Meta Description:/i);\n      MetaTitle = (nextSplit[0] || '').trim();\n      const after = (nextSplit[1] || '').trim();\n      const htmlSplit = after.split(/Full Final HTML Code:|Full HTML Code:|FullHTML:/i);\n      MetaDescription = (htmlSplit[0] || '').trim();\n      FullHTML = (htmlSplit.slice(1).join('') || '').trim();\n    }\n  }\n}\n\n// Return as single object (n8n expects an array of items)\nreturn [\n  {\n    json: {\n      BlogTitle,\n      MetaTitle,\n      MetaDescription,\n      FullHTML\n    }\n  }\n];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1408,
+                80
+            ],
+            "id": "9d589c1e-572d-45bf-a9b5-7a5bd6bd16b6",
+            "name": "Code in JavaScript8"
+        },
+        {
+            "parameters": {
+                "jsCode": "// n8n Code node (Function / Function Item)\n// Assumes the incoming item has the big text in items[0].json.text\n// If your field name differs, change `raw` accordingly.\n\nconst raw = (items && items[0] && items[0].json && (items[0].json.text || items[0].json.data || items[0].json.content))\n  ? (items[0].json.text || items[0].json.data || items[0].json.content)\n  : '';\n\n// 1) Normalize literal backslash-n sequences into real newlines\nlet normalized = raw.replace(/\\\\n/g, '\\n');\n\n// 2) Try extracting using labeled headers (flexible to slight variations)\nconst re = /Blog Title:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*Meta Title:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*Meta Description:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*(?:Full Final HTML Code:|Full HTML Code:|FullHTML:|Full Final HTML:)\\s*([\\s\\S]*)/i;\nconst m = normalized.match(re);\n\nlet BlogTitle = '', MetaTitle = '', MetaDescription = '', FullHTML = '';\n\nif (m) {\n  BlogTitle = m[1].trim();\n  MetaTitle = m[2].trim();\n  MetaDescription = m[3].trim();\n  FullHTML = m[4].trim();\n} else {\n  // Fallback 1: split by FOUR or more blank lines (handles multiple newline styles)\n  const splitter = /\\n{4,}|\\r\\n{4,}|(?:\\\\n){4,}/;\n  const parts = normalized.split(splitter).map(p => p.trim()).filter(p => p.length);\n\n  if (parts.length >= 4) {\n    BlogTitle = parts[0];\n    MetaTitle = parts[1];\n    MetaDescription = parts[2];\n    FullHTML = parts.slice(3).join('\\n\\n'); // in case HTML contains extra separators\n  } else {\n    // Fallback 2: try to find headers individually\n    const getBetween = (text, startLabel, endLabel) => {\n      const s = text.indexOf(startLabel);\n      if (s === -1) return '';\n      const start = s + startLabel.length;\n      const e = endLabel ? text.indexOf(endLabel, start) : text.length;\n      return text.substring(start, e === -1 ? text.length : e).trim();\n    };\n\n    BlogTitle = getBetween(normalized, 'Blog Title:', 'Meta Title:') || '';\n    MetaTitle = getBetween(normalized, 'Meta Title:', 'Meta Description:') || '';\n    MetaDescription = getBetween(normalized, 'Meta Description:', 'Full Final HTML Code:') || getBetween(normalized, 'Meta Description:', 'Full HTML Code:') || '';\n    FullHTML = getBetween(normalized, 'Full Final HTML Code:') || getBetween(normalized, 'Full HTML Code:') || getBetween(normalized, 'FullHTML:') || '';\n\n    // As a last attempt, if BlogTitle still contains everything, try to split by the textual labels inside it\n    if (!MetaTitle && /Meta Title:/i.test(BlogTitle)) {\n      const byLabels = BlogTitle.split(/Meta Title:/i);\n      BlogTitle = (byLabels[0] || '').trim();\n      const rest = (byLabels[1] || '').trim();\n      const nextSplit = rest.split(/Meta Description:/i);\n      MetaTitle = (nextSplit[0] || '').trim();\n      const after = (nextSplit[1] || '').trim();\n      const htmlSplit = after.split(/Full Final HTML Code:|Full HTML Code:|FullHTML:/i);\n      MetaDescription = (htmlSplit[0] || '').trim();\n      FullHTML = (htmlSplit.slice(1).join('') || '').trim();\n    }\n  }\n}\n\n// Return as single object (n8n expects an array of items)\nreturn [\n  {\n    json: {\n      BlogTitle,\n      MetaTitle,\n      MetaDescription,\n      FullHTML\n    }\n  }\n];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1520,
+                176
+            ],
+            "id": "66e45e18-bad0-4c1e-bc82-857fd9b94758",
+            "name": "Code in JavaScript9"
+        },
+        {
+            "parameters": {
+                "jsCode": "// n8n Code node (Function / Function Item)\n// Assumes the incoming item has the big text in items[0].json.text\n// If your field name differs, change `raw` accordingly.\n\nconst raw = (items && items[0] && items[0].json && (items[0].json.text || items[0].json.data || items[0].json.content))\n  ? (items[0].json.text || items[0].json.data || items[0].json.content)\n  : '';\n\n// 1) Normalize literal backslash-n sequences into real newlines\nlet normalized = raw.replace(/\\\\n/g, '\\n');\n\n// 2) Try extracting using labeled headers (flexible to slight variations)\nconst re = /Blog Title:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*Meta Title:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*Meta Description:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*(?:Full Final HTML Code:|Full HTML Code:|FullHTML:|Full Final HTML:)\\s*([\\s\\S]*)/i;\nconst m = normalized.match(re);\n\nlet BlogTitle = '', MetaTitle = '', MetaDescription = '', FullHTML = '';\n\nif (m) {\n  BlogTitle = m[1].trim();\n  MetaTitle = m[2].trim();\n  MetaDescription = m[3].trim();\n  FullHTML = m[4].trim();\n} else {\n  // Fallback 1: split by FOUR or more blank lines (handles multiple newline styles)\n  const splitter = /\\n{4,}|\\r\\n{4,}|(?:\\\\n){4,}/;\n  const parts = normalized.split(splitter).map(p => p.trim()).filter(p => p.length);\n\n  if (parts.length >= 4) {\n    BlogTitle = parts[0];\n    MetaTitle = parts[1];\n    MetaDescription = parts[2];\n    FullHTML = parts.slice(3).join('\\n\\n'); // in case HTML contains extra separators\n  } else {\n    // Fallback 2: try to find headers individually\n    const getBetween = (text, startLabel, endLabel) => {\n      const s = text.indexOf(startLabel);\n      if (s === -1) return '';\n      const start = s + startLabel.length;\n      const e = endLabel ? text.indexOf(endLabel, start) : text.length;\n      return text.substring(start, e === -1 ? text.length : e).trim();\n    };\n\n    BlogTitle = getBetween(normalized, 'Blog Title:', 'Meta Title:') || '';\n    MetaTitle = getBetween(normalized, 'Meta Title:', 'Meta Description:') || '';\n    MetaDescription = getBetween(normalized, 'Meta Description:', 'Full Final HTML Code:') || getBetween(normalized, 'Meta Description:', 'Full HTML Code:') || '';\n    FullHTML = getBetween(normalized, 'Full Final HTML Code:') || getBetween(normalized, 'Full HTML Code:') || getBetween(normalized, 'FullHTML:') || '';\n\n    // As a last attempt, if BlogTitle still contains everything, try to split by the textual labels inside it\n    if (!MetaTitle && /Meta Title:/i.test(BlogTitle)) {\n      const byLabels = BlogTitle.split(/Meta Title:/i);\n      BlogTitle = (byLabels[0] || '').trim();\n      const rest = (byLabels[1] || '').trim();\n      const nextSplit = rest.split(/Meta Description:/i);\n      MetaTitle = (nextSplit[0] || '').trim();\n      const after = (nextSplit[1] || '').trim();\n      const htmlSplit = after.split(/Full Final HTML Code:|Full HTML Code:|FullHTML:/i);\n      MetaDescription = (htmlSplit[0] || '').trim();\n      FullHTML = (htmlSplit.slice(1).join('') || '').trim();\n    }\n  }\n}\n\n// Return as single object (n8n expects an array of items)\nreturn [\n  {\n    json: {\n      BlogTitle,\n      MetaTitle,\n      MetaDescription,\n      FullHTML\n    }\n  }\n];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1632,
+                272
+            ],
+            "id": "e267c2f8-b4b0-4deb-badf-8765900ad909",
+            "name": "Code in JavaScript10"
+        },
+        {
+            "parameters": {
+                "jsCode": "// n8n Code node (Function / Function Item)\n// Assumes the incoming item has the big text in items[0].json.text\n// If your field name differs, change `raw` accordingly.\n\nconst raw = (items && items[0] && items[0].json && (items[0].json.text || items[0].json.data || items[0].json.content))\n  ? (items[0].json.text || items[0].json.data || items[0].json.content)\n  : '';\n\n// 1) Normalize literal backslash-n sequences into real newlines\nlet normalized = raw.replace(/\\\\n/g, '\\n');\n\n// 2) Try extracting using labeled headers (flexible to slight variations)\nconst re = /Blog Title:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*Meta Title:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*Meta Description:\\s*([\\s\\S]*?)\\s*(?:\\n{1,}|\\r\\n{1,})\\s*(?:Full Final HTML Code:|Full HTML Code:|FullHTML:|Full Final HTML:)\\s*([\\s\\S]*)/i;\nconst m = normalized.match(re);\n\nlet BlogTitle = '', MetaTitle = '', MetaDescription = '', FullHTML = '';\n\nif (m) {\n  BlogTitle = m[1].trim();\n  MetaTitle = m[2].trim();\n  MetaDescription = m[3].trim();\n  FullHTML = m[4].trim();\n} else {\n  // Fallback 1: split by FOUR or more blank lines (handles multiple newline styles)\n  const splitter = /\\n{4,}|\\r\\n{4,}|(?:\\\\n){4,}/;\n  const parts = normalized.split(splitter).map(p => p.trim()).filter(p => p.length);\n\n  if (parts.length >= 4) {\n    BlogTitle = parts[0];\n    MetaTitle = parts[1];\n    MetaDescription = parts[2];\n    FullHTML = parts.slice(3).join('\\n\\n'); // in case HTML contains extra separators\n  } else {\n    // Fallback 2: try to find headers individually\n    const getBetween = (text, startLabel, endLabel) => {\n      const s = text.indexOf(startLabel);\n      if (s === -1) return '';\n      const start = s + startLabel.length;\n      const e = endLabel ? text.indexOf(endLabel, start) : text.length;\n      return text.substring(start, e === -1 ? text.length : e).trim();\n    };\n\n    BlogTitle = getBetween(normalized, 'Blog Title:', 'Meta Title:') || '';\n    MetaTitle = getBetween(normalized, 'Meta Title:', 'Meta Description:') || '';\n    MetaDescription = getBetween(normalized, 'Meta Description:', 'Full Final HTML Code:') || getBetween(normalized, 'Meta Description:', 'Full HTML Code:') || '';\n    FullHTML = getBetween(normalized, 'Full Final HTML Code:') || getBetween(normalized, 'Full HTML Code:') || getBetween(normalized, 'FullHTML:') || '';\n\n    // As a last attempt, if BlogTitle still contains everything, try to split by the textual labels inside it\n    if (!MetaTitle && /Meta Title:/i.test(BlogTitle)) {\n      const byLabels = BlogTitle.split(/Meta Title:/i);\n      BlogTitle = (byLabels[0] || '').trim();\n      const rest = (byLabels[1] || '').trim();\n      const nextSplit = rest.split(/Meta Description:/i);\n      MetaTitle = (nextSplit[0] || '').trim();\n      const after = (nextSplit[1] || '').trim();\n      const htmlSplit = after.split(/Full Final HTML Code:|Full HTML Code:|FullHTML:/i);\n      MetaDescription = (htmlSplit[0] || '').trim();\n      FullHTML = (htmlSplit.slice(1).join('') || '').trim();\n    }\n  }\n}\n\n// Return as single object (n8n expects an array of items)\nreturn [\n  {\n    json: {\n      BlogTitle,\n      MetaTitle,\n      MetaDescription,\n      FullHTML\n    }\n  }\n];\n"
+            },
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                1744,
+                368
+            ],
+            "id": "769f5251-7b1f-4a48-b8aa-fe02790b531d",
+            "name": "Code in JavaScript11"
+        },
+        {
+            "parameters": {
+                "content": "",
+                "height": 976,
+                "width": 1136
+            },
+            "type": "n8n-nodes-base.stickyNote",
+            "position": [
+                -1856,
+                -800
+            ],
+            "typeVersion": 1,
+            "id": "25fa36d3-c0dd-4e71-8fdd-0bf8200f9db8",
+            "name": "Sticky Note4"
+        }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Edit Fields",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields": {
+            "main": [
+                [
+                    {
+                        "node": "AI Agent",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AI Agent": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "AI Agent",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Webhook1": {
+            "main": [
+                [
+                    {
+                        "node": "Edit Fields1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Edit Fields1": {
+            "main": [
+                [
+                    {
+                        "node": "Switch",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Switch": {
+            "main": [
+                [
+                    {
+                        "node": "MCM",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "AcePeak",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Teloz",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "TechKnowledge Open System (TKOS)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "RingFlow",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Meratalk",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Letsdial",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Softtop",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "CallMama",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Ajoxi",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Rozper",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Twiching",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model1": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "MCM",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "MCM": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model2": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "AcePeak",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model3": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "TechKnowledge Open System (TKOS)",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model4": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "RingFlow",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model5": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Rozper",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model6": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Meratalk",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model7": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Letsdial",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model8": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Ajoxi",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model9": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Twiching",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model10": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "CallMama",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model11": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Softtop",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Gemini Chat Model12": {
+            "ai_languageModel": [
+                [
+                    {
+                        "node": "Teloz",
+                        "type": "ai_languageModel",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AcePeak": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Teloz": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "TechKnowledge Open System (TKOS)": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "RingFlow": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript4",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Meratalk": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript5",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Letsdial": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript6",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Softtop": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript7",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "CallMama": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript8",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Ajoxi": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript9",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Rozper": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript10",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Twiching": {
+            "main": [
+                [
+                    {
+                        "node": "Code in JavaScript11",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript1": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript2": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript3": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript4": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript5": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript6": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript7": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript8": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript9": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript10": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Code in JavaScript11": {
+            "main": [
+                [
+                    {
+                        "node": "Respond to Webhook1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "pinData": {},
+    "meta": {
+        "templateCredsSetupCompleted": true,
+        "instanceId": "5b533a58b55c9cfffb3ca6a1fd154d9ee56f64098154b77dce684a20e62b0a1a"
+    }
+}
