@@ -1,0 +1,304 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "339628ac-83c0-40de-a829-fb6f27f84d68",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -224,
+        0
+      ],
+      "id": "5ac2d772-0f29-48f1-8494-33d550f9d52f",
+      "name": "Webhook",
+      "webhookId": "339628ac-83c0-40de-a829-fb6f27f84d68"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        720,
+        0
+      ],
+      "id": "38956ecb-1f4b-406d-9b19-e5ce033eafc7",
+      "name": "Respond to Webhook",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d707f0ad-68cf-40d8-885a-7b0f99bf62de",
+              "name": "url",
+              "value": "={{ $json.body.url }}",
+              "type": "string"
+            },
+            {
+              "id": "193b19c5-d486-4680-bf98-3382a5a53212",
+              "name": "notes",
+              "value": "={{ $json.body.notes }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -80,
+        0
+      ],
+      "id": "fe68c7eb-8bb2-4470-816e-8026b85d8a08",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        64,
+        0
+      ],
+      "id": "390d0959-2c13-4f8f-b414-969f6f566bc9",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        288,
+        208
+      ],
+      "id": "da584ec2-b4d9-4e24-839c-5d27fe1ac0b9",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "MzMAELLX7ocbTJNT",
+          "name": "Google Gemini(PaLM) Api account 31"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $input.first().json.text;\n\n// Match each value block - handles both formats:\n// 1. *   **value1:** (bullet format)\n// 2. ### value1: (header format)\nconst blocks = text.match(/(?:[#*][ ]*\\*{0,2}value\\d+[ ]*[:*]{1,3}|### value\\d+:)[\\s\\S]*?(?=(?:[#*][ ]*\\*{0,2}value\\d+[ ]*[:*]{1,3}|### value\\d+:)|\\n?$)/g);\n\nif (!blocks) {\n  return [{ json: { error: \"No values found\" } }];\n}\n\nconst results = blocks.map((block) => {\n  // Extract value number from the header\n  const valueNumMatch = block.match(/(?:value(\\d+))/);\n  if (!valueNumMatch) {\n    return { json: {} };\n  }\n  \n  const num = valueNumMatch[1];\n  \n  // Extract fields - handle both formats\n  // Look for Error field\n  const errorMatch = block.match(/(?:\\*[ ]+\\*\\*|\\*\\*)?Error:\\*\\*([\\s\\S]*?)(?=(?:\\*[ ]+\\*\\*|\\*\\*)?Location:|###?|\\n?$)/i);\n  \n  // Look for Location field\n  const locationMatch = block.match(/(?:\\*[ ]+\\*\\*|\\*\\*)?Location:\\*\\*([\\s\\S]*?)(?=(?:\\*[ ]+\\*\\*|\\*\\*)?Suggested Fix:|###?|\\n?$)/i);\n  \n  // Look for Suggested Fix field\n  const fixesMatch = block.match(/(?:\\*[ ]+\\*\\*|\\*\\*)?Suggested Fix:\\*\\*([\\s\\S]*)/i);\n  \n  // Dynamic key names\n  const obj = {};\n  obj[`value${num}_error`] = errorMatch ? errorMatch[1].trim().replace(/^[\\n\\s*]+|[\\n\\s*]+$/g, '') : \"\";\n  obj[`value${num}_location`] = locationMatch ? locationMatch[1].trim().replace(/^[\\n\\s*]+|[\\n\\s*]+$/g, '') : \"\";\n  obj[`value${num}_suggested_fixes`] = fixesMatch ? fixesMatch[1].trim().replace(/^[\\n\\s*]+|[\\n\\s*]+$/g, '') : \"\";\n  \n  return { json: obj };\n});\n\nreturn results;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        576,
+        0
+      ],
+      "id": "a75e2fa4-6b47-431b-b922-f95a460bae0c",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a **Professional Content Editor**. Your task is to identify and correct meaningful errors while strictly ignoring technical noise and minor punctuation issues.\n\n**Strict Data Usage:**\n\n1. **Meta Tags:** Use `{{ $json.data }}` **ONLY** to extract and check text within `<title>` and `<meta name=\"description\">`.\n2. **Main Content:** Use `{{ $('Edit Fields').item.json.notes }}` for all **Spelling, Grammar, and Content** checks.\n\n**Strict Filtering Rules (What to IGNORE):**\n\n* **NO \"Silly\" Errors:** Ignore missing/extra full stops (periods) at the end of lines, minor spacing, or oxford comma preferences.\n* **NO Technical Noise:** Ignore HTML tags, attributes (class, id, href), or any strings containing underscores or numbers.\n* **High Threshold:** Only flag actual typos, incorrect verb tenses, subject-verb disagreement, or phrases that are genuinely confusing to a human reader.\n\n---\n\n### 📌 OUTPUT FORMAT\n\n* **value1:**\n* **Error:** [Detailed 1-2 sentence explanation of the specific error and its impact. Specify if it is in Meta Data or Body Content]\n* **Location:** [The specific phrase or sentence where the error was found]\n* **Suggested Fix:**\n1. [Direct correction]\n2. [Improved/Polished version]\n\n\n\n\n* **value2:**\n* **Error:** [Detailed 1-2 sentence explanation of the specific error and its impact. Specify if it is in Meta Data or Body Content]\n* **Location:** [The specific phrase or sentence where the error was found]\n* **Suggested Fix:**\n1. [Direct correction]\n2. [Improved/Polished version]\n\n---\n\n### ✅ Execution Rules:\n\n* **No Introduction/Conclusion:** Start the response immediately with `* **value1:**`.\n* **Concise Depth:** Keep the error description informative but under 40 words.\n* **Clear Suggestions:** Provide exactly two distinct suggestions for every error.\n* **Strict Adherence:** Follow the data source instructions exactly as defined above.\n\n",
+        "needsFallback": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        320,
+        0
+      ],
+      "id": "be76e35d-95fa-44d9-b807-0c91c71d0db8",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-2.5-flash",
+        "options": {
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        384,
+        208
+      ],
+      "id": "a415bf40-257f-44ad-b8a6-c31d1a2b7368",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "Q7VWeDG2LQcdO3eU",
+          "name": "Kedeyo"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the input data\nconst inputData = $input.first().json.data;\n\n// Function to remove CSS and JS from HTML\nfunction removeCSSAndJSFromHTML(html) {\n  let cleaned = html;\n  \n  // Remove <style> tags and their content\n  cleaned = cleaned.replace(/<style[^>]*>[\\s\\S]*?<\\/style>/gi, '');\n  \n  // Remove inline style attributes\n  cleaned = cleaned.replace(/style\\s*=\\s*[\"'][^\"']*[\"']/gi, '');\n  \n  // Remove <link> tags for stylesheets\n  cleaned = cleaned.replace(/<link[^>]*rel\\s*=\\s*[\"']stylesheet[\"'][^>]*>/gi, '');\n  \n  // Remove <script> tags and their content (JavaScript)\n  cleaned = cleaned.replace(/<script\\b[^>]*>[\\s\\S]*?<\\/script>/gi, '');\n  \n  // Remove inline event handlers (onclick, onload, etc.)\n  cleaned = cleaned.replace(/\\s+on\\w+\\s*=\\s*[\"'][^\"']*[\"']/gi, '');\n  \n  // Remove noscript tags and their content\n  cleaned = cleaned.replace(/<noscript[^>]*>[\\s\\S]*?<\\/noscript>/gi, '');\n  \n  // Remove JavaScript URLs in href/src (javascript:)\n  cleaned = cleaned.replace(/\\s+(?:href|src)\\s*=\\s*[\"']javascript:[^\"']*[\"']/gi, '');\n  \n  return cleaned;\n}\n\n// Process the input data\nconst processedData = removeCSSAndJSFromHTML(inputData);\n\n// Return the result\nreturn [{\n  json: {\n    data: processedData\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        0
+      ],
+      "id": "1e909d24-17ba-474d-98c5-04764105fffe",
+      "name": "Code in JavaScript1"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {
+    "Webhook": [
+      {
+        "headers": {
+          "host": "mcmflow.app.n8n.cloud",
+          "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+          "content-length": "3834",
+          "accept": "*/*",
+          "accept-encoding": "gzip, br",
+          "accept-language": "en-US,en;q=0.9,ak;q=0.8,hi;q=0.7,ja;q=0.6",
+          "cdn-loop": "cloudflare; loops=1; subreqs=1",
+          "cf-connecting-ip": "103.172.87.34",
+          "cf-ew-via": "15",
+          "cf-ipcountry": "IN",
+          "cf-ray": "9bf390dbb03d68a4-BOM",
+          "cf-visitor": "{\"scheme\":\"https\"}",
+          "cf-worker": "n8n.cloud",
+          "content-type": "application/json",
+          "origin": "http://70.36.107.109:2012",
+          "priority": "u=1, i",
+          "sec-ch-ua": "\"Google Chrome\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": "\"Windows\"",
+          "sec-fetch-dest": "empty",
+          "sec-fetch-mode": "cors",
+          "sec-fetch-site": "cross-site",
+          "x-forwarded-for": "103.172.87.34, 172.71.198.152",
+          "x-forwarded-host": "mcmflow.app.n8n.cloud",
+          "x-forwarded-port": "443",
+          "x-forwarded-proto": "https",
+          "x-forwarded-server": "traefik-prod-users-gwc-58-84cbd975f7-s8sd9",
+          "x-is-trusted": "yes",
+          "x-real-ip": "103.172.87.34"
+        },
+        "params": {},
+        "query": {},
+        "body": {
+          "url": "https://www.acepeak.com/",
+          "notes": "Skip to content\nLimited Time Offer\nSwitch to Acepeak and Get Up to 12 Months Free!\nGet it now\nACEPEAK LOGO\nStartup & Small\nCorporate\nTalk to an expert: +1 347 474 4009\nJoin a meeting\nSupport\nProducts\n\n\n\n\nSolutions\n\n\nPlan & Pricing\nBlog\nAbout Us\nContact Us\nView Demo\nThe complete AI communications in one platform\nJoin 5000+ companies already using Acepeak to seamlessly power the voice of their business with effortless, dependable AI.\nView Pricing\nContact Sales\nacepeak animation2\n1-logo-sparkle\n1-logo-telin\n1-logo-airtel\n1-logo-china-mobile\n1-logo-china-mobile\n1-logo-citic\n1-logo-pldt\n1-logo-wateen\n1-logo-wananchi\n1-logo-twilio\n1-log-t-mobile\n1-logo-telone\n1-logo-telkomsel\n1-logo-team\n1-logo-lumen\n1-logo-exatel\n1-logo-dialog\n1-logo-awaasar\n1-logo-infobip\n1-logo-sparkle\n1-logo-telin\n1-logo-airtel\n1-logo-china-mobile\n1-logo-china-mobile\n1-logo-citic\n1-logo-pldt\n1-logo-wateen\n1-logo-wananchi\n1-logo-twilio\n1-log-t-mobile\n1-logo-telone\n1-logo-telkomsel\n1-logo-team\n1-logo-lumen\n1-logo-exatel\n1-logo-dialog\n1-logo-awaasar\n1-logo-infobip\nMaking Employee and Customer Interactions Work Together\nOne Place for All\nYour team’s communication unified in one place\nBring calling, messaging, video, and collaboration into one simple platform that keeps teams connected and productive.\nExplore AceEX\nAceEX products\nUnified Calling & Messaging\nTeam Workspaces\nFile Sharing\nPresence Indicators\nCalendar Integration\n\n\n\n\nNEW\nPRODUCT SPOTLIGHT\nMeet Mia, your\nAI Receptionist\nYour always-on partner for summarizing calls, detecting sentiment, routing customers, and answering FAQs in real time.\n\nSmart call summaries\nAuto-drafted replies\nMultilingual understanding\nOne-tap CRM updates\nJoin waitlist\nWatch video\nGlobal Leader in AI-Powered Communication\nEngineered for unbreakable reliability, intelligent automation, and limitless scale.\n5,000+\nBusinesses worldwide\n180+\nCountries available\n10M+\nCall attempts daily\n100%\nGDPR & SOC 2 compliant\n99.99%\nProven uptime\nInnovation That Moves You Forward\nSmart, Always-Available Personal AI Assistant\nLearn more\nUnified, AI-Ready Omnichannel Contact Center\nLearn more\nIntelligent, High-Performance Outbound Calling Suite\nLearn more\nMake your workflow simpler with powerful integrations\nConnect with tools like Zoho, Zendesk, Pipedrive, and HubSpot to make your work easier. Use our open APIs to create custom integrations that fit your needs.\nzendesk\n\nzoho\nsalesforce\n\n\npipedrive\nSee Integrations\nExplore APIs\nSolutions for every industry\n\nSecure, seamless communication for patients and care teams.\nEnhance coordination and streamline clinical workflows.\nLearn more\nOutcome: 40% faster patient response times\nThe leader in AI communications\n\nYour Personal AI Assistant for Efficiency\nAutomate tasks and get real-time support, effortlessly.\n\nReach Customers Instantly with Business SMS\nSend bulk messages and manage communications easily.\n\nUnified Communication with Omnichannel Support\nEngage customers across multiple channels from one place.\nAI That Unites Your Business Communications\nView Pricing\nContact Sales\nacepeak white logo\nAcepeak brings AI-driven voice, messaging, and contact center tools together to help teams communicate with clarity and consistency.\nProducts:\nBusiness Phone System\nPersonal AI Assistant\nTeam chat\nBusiness SMS\nOnline Fax\nConversation Intelligence\nOmnichannel Contact Center\nOutbound Dialing\nAI Agent Assist\nIntelligent Virtual Agents\nEnterprise Contact Center\nAI Receptionist\nAbout Us\nContact Us\nPricing\nPrivacy Policy\nTerms and Conditions\nFollow Us:\n \n \n \n \nCopyright © 2026  |  Acepeak  |  All Rights Reserved",
+          "timestamp": "2026-01-17T05:48:49.540Z"
+        },
+        "webhookUrl": "https://mcmflow.app.n8n.cloud/webhook/339628ac-83c0-40de-a829-fb6f27f84d68",
+        "executionMode": "production"
+      }
+    ]
+  },
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5b533a58b55c9cfffb3ca6a1fd154d9ee56f64098154b77dce684a20e62b0a1a"
+  }
+}
