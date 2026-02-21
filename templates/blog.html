@@ -1,0 +1,983 @@
+{% extends "base_dashboard.html" %}
+{% block title %}Blog Generation Tool{% endblock %}
+{% block content %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f8fafc;
+            color: #334155;
+            line-height: 1.6;
+        }
+        
+        
+        input[type="text"]:hover,
+        input[type="url"]:hover {
+            border-color: #3b82f6;
+        }
+        textarea:hover {
+            border-color: #3b82f6;
+        }
+        
+        
+        .container {
+            max-width: 100%;
+            margin:0;
+            
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            background: #3b82f6;;
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .form-container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -15px 20px;
+        }
+        
+        .form-group {
+            flex: 1;
+            min-width: 250px;
+            padding: 0 15px;
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: all 0.3s;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-color: white;
+        }
+        
+        
+        input[type="text"]:hover,
+        input[type="url"]:hover {
+            border-color: #3b82f6;
+        }
+        textarea:hover {
+            border-color: #3b82f6;
+        }
+        
+        select {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none;
+        }
+        
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+            background-image: none;
+        }
+        
+        .supporting-keywords {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .supporting-keywords input {
+            flex: 1;
+            margin-right: 10px;
+            background-image: none;
+        }
+        
+        .add-keyword {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .add-keyword:hover {
+            background: #2563eb;
+            transform: scale(1.06);
+        }
+        
+        .keyword-tags {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        
+        .keyword-tag {
+            background: #dbeafe;
+            color: #3b82f6;;
+            padding: 5px 12px;
+            border-radius: 20px;
+            margin: 5px 5px 5px 0;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+        
+        .remove-keyword {
+            margin-left: 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .company-selector, .tone-selector {
+            position: relative;
+        }
+        
+        .company-options, .tone-options {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .company-options.show, .tone-options.show {
+            display: block;
+        }
+        
+        .company-option, .tone-option {
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .company-option:hover, .tone-option:hover {
+            background-color: #f1f5f9;
+        }
+        
+        .company-option.selected, .tone-option.selected {
+            background-color: #dbeafe;
+            color: #3b82f6;;
+        }
+        
+        .tone-tags {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        
+        .tone-tag {
+            background: #dcfce7;
+            color: #166534;
+            padding: 5px 12px;
+            border-radius: 20px;
+            margin: 5px 5px 5px 0;
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+        
+        .remove-tone {
+            margin-left: 8px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .submit-btn {
+            background: #3b82f6;;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 14px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        
+        .submit-btn:hover {
+            background: #2778f9;;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 14px rgba(31, 65, 176, 0.2);
+        }
+        
+        .result-section {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-top: 30px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .tab-container {
+            margin-bottom: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #cbd5e1;
+        }
+        
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #64748b;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            color: #1e40af;
+            border-bottom: 3px solid #1e40af;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px 0;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .optimization-details {
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .optimization-details h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #1e293b;
+        }
+        
+        .detail-row {
+            display: flex;
+            margin-bottom: 12px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            min-width: 150px;
+            color: #1e293b;
+        }
+        
+        .detail-value {
+            flex: 1;
+            color: #475569;
+        }
+        
+        .preview-container {
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 20px;
+            min-height: 300px;
+            background: #f8fafc;
+            overflow-y: auto;
+            max-height: 500px;
+        }
+        
+        .source-code {
+            font-family: 'Courier New', monospace;
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 6px;
+            min-height: 300px;
+            max-height: 500px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+        
+        .download-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .download-btn {
+            background: #3b82f6;;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 20px;
+            margin-left: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+        }
+        
+        .download-btn:hover {
+            background: #2777f8;;
+            transform: translateY(-5px);
+             border-color: #4361ee;
+        
+            
+            
+        }
+        
+        .download-btn i {
+            margin-right: 8px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 5px solid #f1f5f9;
+            border-top: 5px solid #1e40af;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .success-message {
+            background: #dcfce7;
+            color: #166534;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+            border: 1px solid #bbf7d0;
+        }
+        
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+            border: 1px solid #fecaca;
+        }
+        
+        @media (max-width: 768px) {
+            .form-group {
+                min-width: 100%;
+            }
+            
+            .download-buttons {
+                flex-direction: column;
+            }
+            
+            .download-btn {
+                margin-left: 0;
+                margin-bottom: 10px;
+                width: 100%;
+            }
+            
+            .detail-row {
+                flex-direction: column;
+            }
+            
+            
+            
+            
+            .detail-label {
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+    <div class="container">
+        <header>
+            <h1>Blog Generation Tool</h1>
+            <p>Create compelling blog content with AI assistance</p>
+        </header>
+        
+        <div class="form-container">
+            <div class="success-message" id="successMessage">
+                <i class="fas fa-check-circle"></i> Your blog has been generated successfully!
+            </div>
+            
+            <div class="error-message" id="errorMessage">
+                <i class="fas fa-exclamation-circle"></i> <span id="errorText">There was an error generating your blog.</span>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="focusKeyword">Focus Keyword <span style="color: red;">*</span></label>
+                    <input type="text" id="focusKeyword" placeholder="Enter focus keyword" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="supportingKeyword">Supporting Keywords</label>
+                    <div class="supporting-keywords">
+                        <input type="text" id="supportingKeyword" placeholder="Enter supporting keyword">
+                        <button class="add-keyword" id="addKeyword">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div class="keyword-tags" id="keywordTags"></div>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="competitorUrl">Competitor URL (Optional)</label>
+                    <input type="url" id="competitorUrl" placeholder="https://example.com" style="background-image: none;">
+                </div>
+                
+                <div class="form-group">
+                    <label for="domainContent">Domain & Content</label>
+                    <select id="domainContent">
+                        <option value="">Select Domain & Content</option>
+                        <option value="UCaas / Virtual Number">UCaas / Virtual Number</option>
+                        <option value="Wholesale VoIP / Wholesale Voice">Wholesale VoIP / Wholesale Voice</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="companyName">Company Name</label>
+                    <div class="company-selector">
+                        <div class="company-display" id="companyDisplay" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px 15px; cursor: pointer; background-color: white;">
+                            Select Company Name
+                        </div>
+                        <div class="company-options" id="companyOptions">
+                            <div class="company-option" data-value="My Country Mobile (MCM)">My Country Mobile (MCM)</div>
+                            <div class="company-option" data-value="AcePeak">AcePeak</div>
+                            <div class="company-option" data-value="Teloz">Teloz</div>
+                            <div class="company-option" data-value="TechKnowledge Open System (TKOS)">TechKnowledge Open System (TKOS)</div>
+                            <div class="company-option" data-value="RingFlow">RingFlow</div>
+                            <div class="company-option" data-value="Meratalk">Meratalk</div>
+                            <div class="company-option" data-value="Letsdial">Letsdial</div>
+                            <div class="company-option" data-value="Softtop">Softtop</div>
+                            <div class="company-option" data-value="CallMama">CallMama</div>
+                            <div class="company-option" data-value="Ajoxi">Ajoxi</div>
+                            <div class="company-option" data-value="Rozper">Rozper</div>
+                            <div class="company-option" data-value="Twiching">Twiching</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="tone">Tone of Blog (Select multiple)</label>
+                    <div class="tone-selector">
+                        <div class="tone-display" id="toneDisplay" style="border: 1px solid #cbd5e1; border-radius: 6px; padding: 12px 15px; cursor: pointer; background-color: white;">
+                            Click to select tones
+                        </div>
+                        <div class="tone-options" id="toneOptions">
+                            <div class="tone-option" data-value="Formal">Formal</div>
+                            <div class="tone-option" data-value="Casual">Casual</div>
+                            <div class="tone-option" data-value="Professional">Professional</div>
+                            <div class="tone-option" data-value="Friendly">Friendly</div>
+                            <div class="tone-option" data-value="Authoritative">Authoritative</div>
+                            <div class="tone-option" data-value="Conversational">Conversational</div>
+                            <div class="tone-option" data-value="Persuasive">Persuasive</div>
+                            <div class="tone-option" data-value="Technical">Technical</div>
+                            <div class="tone-option" data-value="Educational">Educational</div>
+                            <div class="tone-option" data-value="Analytical">Analytical</div>
+                        </div>
+                    </div>
+                    <div class="tone-tags" id="toneTags"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="wordCount">No. of Words</label>
+                    <input type="number" id="wordCount" placeholder="e.g., 1000" min="100" max="5000">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="description">Description <span style="color: red;">*</span></label>
+                    <textarea id="description" placeholder="Enter blog description" required></textarea>
+                </div>
+            </div>
+            
+            <button class="submit-btn" id="submitBtn">
+                Generate Blog
+            </button>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Generating your blog content...</p>
+            </div>
+        </div>
+        
+        <div class="result-section">
+            <div class="optimization-details" id="optimizationDetails">
+                <h3>Optimization Details</h3>
+                <div class="detail-row">
+                    <div class="detail-label">Blog Title:</div>
+                    <div class="detail-value" id="blogTitle">-</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Meta Title:</div>
+                    <div class="detail-value" id="metaTitle">-</div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label">Meta Description:</div>
+                    <div class="detail-value" id="metaDescription">-</div>
+                </div>
+            </div>
+            
+            <div class="tab-container">
+                <div class="tabs">
+                    <div class="tab active" data-tab="formatted">Formatted View</div>
+                    <div class="tab" data-tab="source">Source Code</div>
+                </div>
+                
+                <div class="tab-content active" id="formattedTab">
+                    <div class="preview-container" id="previewContainer">
+                        <p style="text-align: center; color: #64748b; margin-top: 120px;">
+                            Your generated blog content will appear here
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="sourceTab">
+                    <div class="source-code" id="sourceCode">
+                        // Your generated HTML code will appear here
+                    </div>
+                </div>
+            </div>
+            
+            <div class="download-buttons">
+                <button class="download-btn" id="downloadHtml">
+                    <i class="fas fa-download"></i> Download as .html
+                </button>
+                <button class="download-btn" id="downloadTxt">
+                    <i class="fas fa-download"></i> Download as .txt
+                </button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const focusKeywordInput = document.getElementById('focusKeyword');
+            const supportingKeywordInput = document.getElementById('supportingKeyword');
+            const addKeywordBtn = document.getElementById('addKeyword');
+            const keywordTagsContainer = document.getElementById('keywordTags');
+            const competitorUrlInput = document.getElementById('competitorUrl');
+            const domainContentSelect = document.getElementById('domainContent');
+            const companyDisplay = document.getElementById('companyDisplay');
+            const companyOptions = document.getElementById('companyOptions');
+            const toneDisplay = document.getElementById('toneDisplay');
+            const toneOptions = document.getElementById('toneOptions');
+            const toneTagsContainer = document.getElementById('toneTags');
+            const wordCountInput = document.getElementById('wordCount');
+            const descriptionTextarea = document.getElementById('description');
+            const submitBtn = document.getElementById('submitBtn');
+            const loadingDiv = document.getElementById('loading');
+            const successMessage = document.getElementById('successMessage');
+            const errorMessage = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            const optimizationDetails = document.getElementById('optimizationDetails');
+            const blogTitleEl = document.getElementById('blogTitle');
+            const metaTitleEl = document.getElementById('metaTitle');
+            const metaDescriptionEl = document.getElementById('metaDescription');
+            const previewContainer = document.getElementById('previewContainer');
+            const sourceCodeDiv = document.getElementById('sourceCode');
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const downloadHtmlBtn = document.getElementById('downloadHtml');
+            const downloadTxtBtn = document.getElementById('downloadTxt');
+            
+            // Supporting keywords array
+            let supportingKeywords = [];
+            let selectedTones = [];
+            let selectedCompany = null;
+            
+            // Add keyword function
+            addKeywordBtn.addEventListener('click', function() {
+                const keyword = supportingKeywordInput.value.trim();
+                if (keyword && !supportingKeywords.includes(keyword)) {
+                    supportingKeywords.push(keyword);
+                    updateKeywordTags();
+                    supportingKeywordInput.value = '';
+                }
+            });
+            
+            // Support pressing Enter to add keyword
+            supportingKeywordInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addKeywordBtn.click();
+                }
+            });
+            
+            // Update keyword tags display
+            function updateKeywordTags() {
+                keywordTagsContainer.innerHTML = '';
+                supportingKeywords.forEach((keyword, index) => {
+                    const tag = document.createElement('div');
+                    tag.className = 'keyword-tag';
+                    tag.innerHTML = `
+                        ${keyword}
+                        <span class="remove-keyword" data-index="${index}">
+                            <i class="fas fa-times"></i>
+                        </span>
+                    `;
+                    keywordTagsContainer.appendChild(tag);
+                });
+                
+                // Add event listeners to remove buttons
+                document.querySelectorAll('.remove-keyword').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const index = parseInt(this.getAttribute('data-index'));
+                        supportingKeywords.splice(index, 1);
+                        updateKeywordTags();
+                    });
+                });
+            }
+            
+            // Company selection functionality
+            companyDisplay.addEventListener('click', function() {
+                companyOptions.classList.toggle('show');
+            });
+            
+            // Close company options when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!companyDisplay.contains(e.target) && !companyOptions.contains(e.target)) {
+                    companyOptions.classList.remove('show');
+                }
+            });
+            
+            // Add event listeners to company options
+            document.querySelectorAll('.company-option').forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const company = this.getAttribute('data-value');
+                    selectCompany(company);
+                });
+            });
+            
+            // Select company
+            function selectCompany(company) {
+                selectedCompany = company;
+                updateCompanyDisplay();
+                updateCompanyOptionsDisplay();
+                companyOptions.classList.remove('show');
+            }
+            
+            // Update company display text
+            function updateCompanyDisplay() {
+                companyDisplay.textContent = selectedCompany || 'Select Company Name';
+            }
+            
+            // Update company options display
+            function updateCompanyOptionsDisplay() {
+                document.querySelectorAll('.company-option').forEach(option => {
+                    const company = option.getAttribute('data-value');
+                    if (company === selectedCompany) {
+                        option.classList.add('selected');
+                    } else {
+                        option.classList.remove('selected');
+                    }
+                });
+            }
+            
+            // Tone selection functionality
+            toneDisplay.addEventListener('click', function() {
+                toneOptions.classList.toggle('show');
+            });
+            
+            // Close tone options when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!toneDisplay.contains(e.target) && !toneOptions.contains(e.target)) {
+                    toneOptions.classList.remove('show');
+                }
+            });
+            
+            // Add event listeners to tone options
+            document.querySelectorAll('.tone-option').forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const tone = this.getAttribute('data-value');
+                    toggleToneSelection(tone);
+                });
+            });
+            
+            // Toggle tone selection
+            function toggleToneSelection(tone) {
+                const index = selectedTones.indexOf(tone);
+                if (index === -1) {
+                    selectedTones.push(tone);
+                } else {
+                    selectedTones.splice(index, 1);
+                }
+                updateToneTags();
+                updateToneOptionsDisplay();
+                updateToneDisplayText();
+            }
+            
+            // Update tone tags display
+            function updateToneTags() {
+                toneTagsContainer.innerHTML = '';
+                selectedTones.forEach((tone) => {
+                    const tag = document.createElement('div');
+                    tag.className = 'tone-tag';
+                    tag.innerHTML = `
+                        ${tone}
+                        <span class="remove-tone" data-tone="${tone}">
+                            <i class="fas fa-times"></i>
+                        </span>
+                    `;
+                    toneTagsContainer.appendChild(tag);
+                });
+                
+                // Add event listeners to remove buttons
+                document.querySelectorAll('.remove-tone').forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const tone = this.getAttribute('data-tone');
+                        toggleToneSelection(tone);
+                        updateToneOptionsDisplay();
+                        updateToneDisplayText();
+                    });
+                });
+            }
+            
+            // Update tone options display
+            function updateToneOptionsDisplay() {
+                document.querySelectorAll('.tone-option').forEach(option => {
+                    const tone = option.getAttribute('data-value');
+                    if (selectedTones.includes(tone)) {
+                        option.classList.add('selected');
+                    } else {
+                        option.classList.remove('selected');
+                    }
+                });
+            }
+            
+            // Update tone display text
+            function updateToneDisplayText() {
+                if (selectedTones.length === 0) {
+                    toneDisplay.textContent = 'Click to select tones';
+                } else {
+                    toneDisplay.textContent = selectedTones.join(', ');
+                }
+            }
+            
+            // Tab switching
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update active content
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === `${tabId}Tab`) {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+            
+            // Form submission
+            submitBtn.addEventListener('click', async function() {
+                // Validate required fields
+                if (!focusKeywordInput.value.trim()) {
+                    alert('Please enter a focus keyword');
+                    focusKeywordInput.focus();
+                    return;
+                }
+                
+                if (!descriptionTextarea.value.trim()) {
+                    alert('Please enter a description');
+                    descriptionTextarea.focus();
+                    return;
+                }
+                
+                if (!selectedCompany) {
+                    alert('Please select a company name');
+                    companyDisplay.focus();
+                    return;
+                }
+                
+                // Show loading
+                loadingDiv.style.display = 'block';
+                successMessage.style.display = 'none';
+                errorMessage.style.display = 'none';
+                
+                // Prepare data
+                const formData = {
+                    focusKeyword: focusKeywordInput.value.trim(),
+                    supportingKeywords: supportingKeywords,
+                    competitorUrl: competitorUrlInput.value.trim(),
+                    domainContent: domainContentSelect.value,
+                    companyName: selectedCompany,
+                    tone: selectedTones,
+                    wordCount: wordCountInput.value || 1000,
+                    description: descriptionTextarea.value.trim()
+                };
+                
+                try {
+                    const response = await fetch('', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const result = await response.json();
+                    
+                    // Hide loading
+                    loadingDiv.style.display = 'none';
+                    
+                    // Show success message
+                    successMessage.style.display = 'block';
+                    
+                    // Extract data from the webhook response
+                    if (result && result.length > 0) {
+                        const data = result[0];
+                        
+                        // Update optimization details
+                        blogTitleEl.textContent = data.BlogTitle || '-';
+                        metaTitleEl.textContent = data.MetaTitle || '-';
+                        metaDescriptionEl.textContent = data.MetaDescription || '-';
+                        
+                        // Extract HTML from FullHTML field
+                        let htmlContent = data.FullHTML || '';
+                        
+                        // Check if HTML is wrapped in code block
+                        const htmlMatch = htmlContent.match(/```html\n([\s\S]*?)\n```/);
+                        if (htmlMatch && htmlMatch[1]) {
+                            htmlContent = htmlMatch[1];
+                        }
+                        
+                        // Update preview and source code with the actual response
+                        previewContainer.innerHTML = htmlContent;
+                        sourceCodeDiv.textContent = htmlContent;
+                    } else {
+                        throw new Error('No data received from the server');
+                    }
+                    
+                } catch (error) {
+                    // Hide loading
+                    loadingDiv.style.display = 'none';
+                    
+                    // Show error message
+                    errorText.textContent = `Error: ${error.message}`;
+                    errorMessage.style.display = 'block';
+                    
+                    console.error('Error:', error);
+                }
+            });
+            
+            // Download functions
+            downloadHtmlBtn.addEventListener('click', function() {
+                const content = sourceCodeDiv.textContent;
+                if (!content || content === '// Your generated HTML code will appear here') {
+                    alert('No content to download. Please generate a blog first.');
+                    return;
+                }
+                
+                const blob = new Blob([content], { type: 'text/html' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'blog-content.html';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+            
+            downloadTxtBtn.addEventListener('click', function() {
+                const content = sourceCodeDiv.textContent;
+                if (!content || content === '// Your generated HTML code will appear here') {
+                    alert('No content to download. Please generate a blog first.');
+                    return;
+                }
+                
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'blog-content.txt';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="{% static 'Gemini_Generated_Image_p859g5p859g5p859.svg' %}">
+    <link rel="stylesheet" href="{% static 'css/effects.css' %}">
+    <title>{% block title %}Flowgen Dashboard{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #0ea5e9;
+            --secondary-color: #0284c7;
+            --success-color: #16a34a;
+            --danger-color: #dc2626;
+            --warning-color: #ca8a04;
+            --info-color: #0891b2;
+            --dark-color: #1f2937;
+            --light-gray: #f8fafc;
+            --border-color: #e2e8f0;
+            --gradient-bg: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            --sidebar-width: 260px;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+        }
+
+        .sidebar.mobile-closed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            display: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.show {
+            display: block;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-menu {
+            padding: 0.5rem 0;
+        }
+
+        .menu-section {
+            margin-bottom: 2rem;
+        }
+
+        .menu-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: #64748b;
+            padding: 0 2rem;
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+        }
+
+        .menu-item {
+            padding: 0.85rem 1.5rem;
+            margin: 0.25rem 1rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: #94a3b8;
+            text-decoration: none;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+            color: #f1f5f9;
+            transform: translateX(4px);
+        }
+
+        .menu-item.active {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+            font-weight: 600;
+            border: none;
+            border-left: none;
+        }
+
+        .menu-item-content {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex: 1;
+        }
+
+        .menu-item i {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: transform 0.2s ease;
+        }
+
+        .menu-item:hover i {
+            transform: scale(1.1);
+        }
+
+        .info-icon {
+            color: #64748b;
+            font-size: 0.9rem;
+            cursor: help;
+            transition: color 0.2s;
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+
+        .menu-item:hover .info-icon {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .info-icon:hover {
+            color: #60a5fa;
+        }
+
+        /* Custom Dropdown Styles - Enhanced */
+        .dropdown-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .dropdown-items {
+            position: relative;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            margin: 0 1rem 1rem 1rem;
+            padding: 0.5rem;
+            display: none;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .dropdown-items.show {
+            display: block;
+            animation: slideDown 0.2s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dropdown-link {
+            color: #94a3b8;
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 2px;
+            transition: all 0.2s;
+            cursor: pointer;
+            font-size: 0.95rem;
+            border: none;
+            width: 100%;
+            text-align: left;
+            background: transparent;
+        }
+
+        .dropdown-link:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #f1f5f9;
+            transform: translateX(4px);
+        }
+
+        .dropdown-link.active {
+            background-color: rgba(14, 165, 233, 0.15);
+            color: #38bdf8;
+            font-weight: 600;
+        }
+
+        .dropdown-link .menu-item-content {
+             gap: 12px;
+        }
+        
+        .dropdown-link i {
+             width: 20px;
+             text-align: center;
+             font-size: 1rem;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+        }
+
+        .dropdown-arrow {
+            margin-left: auto;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        .dropdown-arrow.rotated {
+            transform: rotate(180deg);
+            color: #f1f5f9;
+        }
+
+        /* Logo Styles */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: center;
+            width: 100%;
+            padding: 0;
+            margin: 0;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            position: relative;
+            width: 36px;
+            height: 36px;
+            flex-shrink: 0;
+        }
+
+        .logo-icon-inner {
+            width: 100%;
+            height: 100%;
+            background: conic-gradient(from 0deg, #667eea, #764ba2, #667eea);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: rotate 3s linear infinite;
+        }
+
+        .logo-icon-inner i {
+            color: white;
+            font-size: 16px;
+        }
+
+        .logo-text {
+            font-weight: 800;
+            font-size: 1.4rem;
+            background: linear-gradient(135deg, #667eea, #764ba2, #667eea);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease infinite;
+            white-space: nowrap;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 1.5rem;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .page-title h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .page-title p {
+            color: #64748b;
+            margin-bottom: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .content-type-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .content-type-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .content-type-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-type-card.active {
+            border-color: var(--primary-color);
+            background: linear-gradient(135deg, #f0f7ff 0%, #e6f3ff 100%);
+        }
+
+        .content-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+        }
+
+        .content-type-name {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .content-type-desc {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        .recent-activity {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .activity-item {
+            padding: 1rem;
+            border-bottom: none;
+            border-right: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 500;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-time {
+            font-size: 0.8rem;
+            color: #64748b;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-outline-primary {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Logout section styles */
+        .logout-section {
+            margin-top: auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 1rem;
+        }
+
+        .logout-item {
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            color: #ef4444;
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .logout-item:hover {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+        }
+
+        .logout-item-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logout-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+                overflow: visible;
+            }
+            
+            .sidebar-header {
+                padding: 1.5rem 0.5rem;
+            }
+
+            .sidebar-logo span, 
+            .menu-title, 
+            .menu-item span,
+            .logo-text {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .dropdown-items {
+                position: fixed;
+                left: 70px;
+                width: 200px;
+            }
+            
+            .dropdown-link {
+                padding: 0.75rem 1rem 0.75rem 2.5rem;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .sidebar.mobile-closed {
+                transform: translateX(0);
+            }
+            .sidebar-overlay {
+                display: none !important;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <a class="navbar-brand" href="{% url 'home' %}">
+                    <div class="logo-container">
+                        <img src="{% static 'Gemini_Generated_Image_p859g5p859g5p859.svg' %}" alt="Flowgen" class="flowgen-logo">
+                        <span class="logo-text">Flowgen</span>
+                    </div>
+                </a>
+            </div>
+            
+            <div class="sidebar-menu" role="navigation" aria-label="Main Navigation">
+                <div class="menu-section">
+                    <div class="menu-title">Main</div>
+                    <a href="{% url 'content_dashboard' %}" class="menu-item {% if request.resolver_match.url_name == 'content_dashboard' %}active{% endif %}"
+                       {% if request.resolver_match.url_name == 'content_dashboard' %}aria-current="page"{% endif %}>
+                        <div class="menu-item-content">
+                            <i class="fas fa-tachometer-alt" aria-hidden="true"></i>
+                            <span>Dashboard</span>
+                        </div>
+                        <i class="fas fa-info-circle info-icon" 
+                           data-bs-toggle="tooltip" 
+                           data-bs-placement="right" 
+                           title="View and access all AI-powered generators in one centralized place for faster workflow and easy navigation."
+                           aria-label="More information about Dashboard"></i>
+                    </a>
+                </div>
+                
+                <div class="menu-section">
+                    <div class="menu-title">Content Generation</div>
+                    <a href="{% url 'content_power_logic' %}" class="menu-item {% if request.resolver_match.url_name == 'content_power_logic' %}active{% endif %}"
+                       {% if request.resolver_match.url_name == 'content_power_logic' %}aria-current="page"{% endif %}>
+                        <div class="menu-item-content">
+                            <i class="fas fa-bolt" aria-hidden="true"></i>
+                            <span>Content Power</span>
+                        </div>
+                        <i class="fas fa-info-circle info-icon" 
+                           data-bs-toggle="tooltip" 
+                           data-bs-placement="right" 
+                           title="Create high-quality, theme-based content tailored specifically to your entity's brand identity and messaging."
+                           aria-label="More information about Content Power"></i>
+                    </a>
+                    
+                    <!-- Custom Dropdown Implementation -->
+                    <div class="dropdown-container">
+                        <a class="menu-item dropdown-toggle" href="#" onclick="toggleDropdown(event)" role="button" aria-expanded="false" aria-controls="blogDropdown">
+                            <div class="menu-item-content">
+                                <i class="fas fa-blog" aria-hidden="true"></i>
+                                <span>Blog Generator</span>
+                            </div>
+                            <i class="fas fa-chevron-down dropdown-arrow" aria-hidden="true"></i>
+                        </a>
+                        <div class="dropdown-items" id="blogDropdown">
+                            <a href="{% url 'content_power_blog' %}" class="dropdown-link {% if request.resolver_match.url_name == 'content_power_blog' %}active{% endif %}"
+                               {% if request.resolver_match.url_name == 'content_power_blog' %}aria-current="page"{% endif %}>
+                                <div class="menu-item-content">
+                                    <i class="fas fa-code-branch" aria-hidden="true"></i>
+                                    <span>Blog Generator(V1)</span>
+                                </div>
+                                <i class="fas fa-info-circle info-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="right" 
+                                   title="Generate SEO-optimized blogs aligned with your entity's needs, helping boost visibility and search ranking."
+                                   aria-label="More information about Blog Generator V1"></i>
+                            </a>
+                            <a href="{% url 'blog' %}" class="dropdown-link {% if request.resolver_match.url_name == 'blog' %}active{% endif %}"
+                               {% if request.resolver_match.url_name == 'blog' %}aria-current="page"{% endif %}>
+                                <div class="menu-item-content">
+                                    <i class="fas fa-lightbulb" aria-hidden="true"></i>
+                                    <span>Blog Generator(V2)</span>
+                                </div>
+                                <i class="fas fa-info-circle info-icon" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="right" 
+                                   title="An upgraded version that produces even more powerful, deeply optimized SEO blogs tailored to entity-specific needs."
+                                   aria-label="More information about Blog Generator V2"></i>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <a href="{% url 'landing_page' %}" class="menu-item {% if request.resolver_match.url_name == 'landing_page' %}active{% endif %}"
+                       {% if request.resolver_match.url_name == 'landing_page' %}aria-current="page"{% endif %}>
+                        <div class="menu-item-content">
+                            <i class="fas fa-window-restore" aria-hidden="true"></i>
+                            <span>Landing Pages</span>
+                        </div>
+                        <i class="fas fa-info-circle info-icon" 
+                           data-bs-toggle="tooltip" 
+                           data-bs-placement="right" 
+                           title="Create high-converting, professional landing pages tailored to your entity's goals and audience."
+                           aria-label="More information about Landing Pages"></i>
+                    </a>
+                    
+                    <a href="{% url 'comparison' %}" class="menu-item {% if request.resolver_match.url_name == 'comparison' %}active{% endif %}"
+                       {% if request.resolver_match.url_name == 'comparison' %}aria-current="page"{% endif %}>
+                        <div class="menu-item-content">
+                            <i class="fas fa-chart-bar" aria-hidden="true"></i>
+                            <span>Blog Analysis</span>
+                        </div>
+                        <i class="fas fa-info-circle info-icon" 
+                           data-bs-toggle="tooltip" 
+                           data-bs-placement="right" 
+                           title="Analyze your blog content, identify gaps, and receive smart suggestions. Automatically improve and refine the content based on your requirements."
+                           aria-label="More information about Blog Analysis"></i>
+                    </a>
+                    
+                    
+                    <a href="{% url 'page_analysis' %}" class="menu-item {% if request.resolver_match.url_name == 'page_analysis' %}active{% endif %}"
+                       {% if request.resolver_match.url_name == 'page_analysis' %}aria-current="page"{% endif %}>
+                        <div class="menu-item-content">
+                            <i class="fas fa-chart-bar" aria-hidden="true"></i>
+                            <span>Page Analysis</span>
+                        </div>
+                        <i class="fas fa-info-circle info-icon" 
+                           data-bs-toggle="tooltip" 
+                           data-bs-placement="right" 
+                           title="Analyze your blog content, identify gaps, and receive smart suggestions. Automatically improve and refine the content based on your requirements."
+                           aria-label="More information about Page Analysis"></i>
+                    </a>
+
+                    <a href="{% url 'pagedatamaker' %}" class="menu-item {% if request.resolver_match.url_name == 'pagedatamaker' %}active{% endif %}"
+                       {% if request.resolver_match.url_name == 'pagedatamaker' %}aria-current="page"{% endif %}>
+                        <div class="menu-item-content">
+                            <i class="fas fa-edit" aria-hidden="true"></i>
+                            <span>Page Data Maker</span>
+                        </div>
+                        <i class="fas fa-info-circle info-icon" 
+                           data-bs-toggle="tooltip" 
+                           data-bs-placement="right" 
+                           title="Update your website information and see formatted markdown response."
+                           aria-label="More information about Page Data Maker"></i>
+                    </a>
+                    
+                    <a href="{% url 'webpage_updater' %}" class="menu-item {% if request.resolver_match.url_name == 'webpage_updater' %}active{% endif %}"
+                       {% if request.resolver_match.url_name == 'webpage_updater' %}aria-current="page"{% endif %}>
+                        <div class="menu-item-content">
+                            <i class="fas fa-code-branch" aria-hidden="true"></i>
+                            <span>Page Data UPdater</span>
+                        </div>
+                        <i class="fas fa-info-circle info-icon" 
+                           data-bs-toggle="tooltip" 
+                           data-bs-placement="right" 
+                           title="Generate complete meta titles, descriptions, and tags perfectly optimized for your entity's SEO strategy."
+                           aria-label="More information about Meta Maker"></i>
+                    </a>
+                                                        
+                    <a href="{% url 'n8n_webhook' %}" class="menu-item {% if request.resolver_match.url_name == 'n8n_webhook' %}active{% endif %}"
+                       {% if request.resolver_match.url_name == 'n8n_webhook' %}aria-current="page"{% endif %}>
+                        <div class="menu-item-content">
+                            <i class="fas fa-code-branch" aria-hidden="true"></i>
+                            <span>Meta Maker</span>
+                        </div>
+                        <i class="fas fa-info-circle info-icon" 
+                           data-bs-toggle="tooltip" 
+                           data-bs-placement="right" 
+                           title="Generate complete meta titles, descriptions, and tags perfectly optimized for your entity's SEO strategy."
+                           aria-label="More information about Meta Maker"></i>
+                    </a>
+                </div>
+
+                <!-- Account Section with Logout -->
+                <div class="menu-section logout-section">
+                    <a href="{% url 'logout' %}" class="logout-item" onclick="return confirmLogout()" role="button">
+                        <div class="logout-item-content">
+                            <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+                            <span>Logout</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="content-header">
+                <div class="page-title">
+                    {% block page_title %}
+                    {# Only show Dashboard title on the dashboard page to prevent it from appearing on other pages #}
+                    {% if request.resolver_match.url_name == 'content_dashboard' %}
+                    <h1>Dashboard</h1>
+                    <p class="text-muted">Welcome to Flowgen</p>
+                    {% endif %}
+                    {% endblock %}
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-outline-primary d-md-none" type="button" onclick="toggleSidebarMobile()" aria-label="Toggle sidebar">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Messages/Alerts -->
+            {% if messages %}
+            <div class="alerts-container mb-4">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- Main Content Block -->
+            {% block content %}
+            <!-- Default content will be overridden by child templates -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Content Types</h3>
+                            <div class="card-actions">
+                                <button class="btn btn-sm btn-outline-primary">View All</button>
+                            </div>
+                        </div>
+                        <div class="content-type-grid">
+                            <div class="content-type-card" onclick="window.location.href='{% url 'content_power_logic' %}'">
+                                <div class="content-icon">
+                                    <i class="fas fa-bolt"></i>
+                                </div>
+                                <div class="content-type-name">Content Power</div>
+                                <div class="content-type-desc">Create high-quality content</div>
+                            </div>
+                            <div class="content-type-card" onclick="window.location.href='{% url 'content_power_blog' %}'">
+                                <div class="content-icon">
+                                    <i class="fas fa-blog"></i>
+                                </div>
+                                <div class="content-type-name">Blog Generator(V1)</div>
+                                <div class="content-type-desc">Generate blog articles</div>
+                            </div>
+                            <div class="content-type-card" onclick="window.location.href='{% url 'blog' %}'">
+                                <div class="content-icon">
+                                    <i class="fas fa-lightbulb"></i>
+                                </div>
+                                <div class="content-type-name">Blog Generator(V2)</div>
+                                <div class="content-type-desc">Advanced blog generation</div>
+                            </div>
+                            <div class="content-type-card" onclick="window.location.href='{% url 'landing_page' %}'">
+                                <div class="content-icon">
+                                    <i class="fas fa-window-restore"></i>
+                                </div>
+                                <div class="content-type-name">Landing Page</div>
+                                <div class="content-type-desc">Build landing pages</div>
+                            </div>
+                            <div class="content-type-card" onclick="window.location.href='{% url 'comparison' %}'">
+                                <div class="content-icon">
+                                    <i class="fas fa-chart-bar"></i>
+                                </div>
+                                <div class="content-type-name">Blog Analysis</div>
+                                <div class="content-type-desc">Analyze blog content</div>
+                            </div>
+                            
+                            
+                            <div class="content-type-card" onclick="window.location.href='{% url 'page_analysis' %}'">
+                                <div class="content-icon">
+                                    <i class="fas fa-chart-network"></i>
+                                </div>
+                                <div class="content-type-name">Page Analysis</div>
+                                <div class="content-type-desc">Analyze Page content</div>
+                            </div>
+                            
+                            <div class="content-type-card" onclick="window.location.href='{% url 'n8n_webhook' %}'">
+                                <div class="content-icon">
+                                    <i class="fas fa-code-branch"></i>
+                                </div>
+                                <div class="content-type-name">Meta Maker</div>
+                                <div class="content-type-desc">Generate meta tags</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-12">
+                    <div class="content-card">
+                        <div class="card-header">
+                            <h3 class="card-title">Recent Activity</h3>
+                            <div class="card-actions">
+                                <button class="btn btn-sm btn-outline-primary">View All</button>
+                            </div>
+                        </div>
+                        <ul class="recent-activity">
+                            <li class="activity-item">
+                                <div class="activity-icon" style="background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Blog post generated</div>
+                                    <div class="activity-time">2 hours ago</div>
+                                </div>
+                            </li>
+                            <li class="activity-item">
+                                <div class="activity-icon" style="background: linear-gradient(135deg, #34d399 0%, #10b981 100%);">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Comparison completed</div>
+                                    <div class="activity-time">5 hours ago</div>
+                                </div>
+                            </li>
+                            <li class="activity-item">
+                                <div class="activity-icon" style="background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Meta Maker test failed</div>
+                                    <div class="activity-time">Yesterday</div>
+                                </div>
+                            </li>
+                            <li class="activity-item">
+                                <div class="activity-icon" style="background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);">
+                                    <i class="fas fa-rocket"></i>
+                                </div>
+                                <div class="activity-content">
+                                    <div class="activity-title">New landing page created</div>
+                                    <div class="activity-time">2 days ago</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            {% endblock %}
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" id="loadingSpinner">
+        <div class="spinner"></div>
+        <p class="text-muted mt-2">Processing your request... Please wait</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Custom dropdown toggle function
+        function toggleDropdown(event) {
+            event.preventDefault();
+            const dropdown = document.getElementById('blogDropdown');
+            const arrow = event.currentTarget.querySelector('.dropdown-arrow');
+            
+            // Toggle dropdown visibility
+            dropdown.classList.toggle('show');
+            arrow.classList.toggle('rotated');
+            
+            // Close other dropdowns if any
+            document.querySelectorAll('.dropdown-items').forEach(item => {
+                if (item !== dropdown && item.classList.contains('show')) {
+                    item.classList.remove('show');
+                    item.previousElementSibling.querySelector('.dropdown-arrow').classList.remove('rotated');
+                }
+            });
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('blogDropdown');
+            const dropdownToggle = document.querySelector('.dropdown-toggle');
+            
+            if (!dropdown.contains(event.target) && !dropdownToggle.contains(event.target)) {
+                dropdown.classList.remove('show');
+                dropdownToggle.querySelector('.dropdown-arrow').classList.remove('rotated');
+            }
+        });
+
+        // Initialize tooltips
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl)
+            });
+            
+            // Auto-hide alerts after 5 seconds
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 5000);
+            });
+        });
+
+        // Utility functions
+        function showLoading() {
+            document.getElementById('loadingSpinner').style.display = 'block';
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingSpinner').style.display = 'none';
+        }
+
+        function showToast(message, type = 'info') {
+            // Simple toast implementation
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            toast.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Logout confirmation
+        function confirmLogout() {
+            return confirm('Are you sure you want to logout?');
+        }
+
+        // Mobile sidebar toggle
+        function toggleSidebarMobile() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const isClosed = sidebar.classList.contains('mobile-closed');
+            if (isClosed) {
+                sidebar.classList.remove('mobile-closed');
+                overlay.classList.add('show');
+            } else {
+                sidebar.classList.add('mobile-closed');
+                overlay.classList.remove('show');
+            }
+        }
+
+        // Close sidebar when clicking overlay
+        document.getElementById('sidebarOverlay').addEventListener('click', function() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.add('mobile-closed');
+            this.classList.remove('show');
+        });
+
+        // Form submission handling
+        document.addEventListener('submit', function(e) {
+            const form = e.target;
+            if (form.classList.contains('ajax-form')) {
+                e.preventDefault();
+                submitAjaxForm(form);
+            }
+        });
+
+        async function submitAjaxForm(form) {
+            showLoading();
+            
+            try {
+                const formData = new FormData(form);
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast('Content generated successfully!', 'success');
+                    if (data.content) {
+                        showResults('resultContainer', data.content);
+                    }
+                } else {
+                    showToast(data.error || 'Something went wrong!', 'danger');
+                }
+            } catch (error) {
+                showToast('Network error occurred!', 'danger');
+                console.error('Error:', error);
+            } finally {
+                hideLoading();
+            }
+        }
+        
+        
+    </script>
+
+    {% block extra_js %}{% endblock %}
+<script defer src="{% static 'js/effects.js' %}"></script>
+</body>
+</html>

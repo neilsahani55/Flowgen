@@ -1,0 +1,35 @@
+{% extends 'base_dashboard.html' %}
+{% load static %}
+
+{% block title %}Page Not Found - 404 Error - Flowgen{% endblock %}
+
+{% block content %}
+<style>
+  .nf-root {min-height: 100vh; display: flex; align-items: center; justify-content: center; background: #ffffff; font-family: Georgia, 'Times New Roman', serif;}
+  .nf-container {width: 100%; max-width: 900px; margin: 0 auto; padding: 0 16px;}
+  .nf-card {text-align: center;}
+  .nf-hero {background-image: url('https://cdn.dribbble.com/users/285475/screenshots/2083086/dribbble_1.gif'); height: 350px; background-position: center; background-repeat: no-repeat; background-size: contain; position: relative;}
+  .nf-hero h1 {position: absolute; inset: 0; display: flex; align-items: flex-start; justify-content: center; padding-top: 1.5rem; font-size: clamp(3rem, 8vw, 6rem); color: #000000; font-weight: 800;}
+  .nf-title {margin-top: -50px; font-size: clamp(1.5rem, 3vw, 2rem); color: #000000; font-weight: 700; margin-bottom: 0.75rem;}
+  .nf-text {color: #000000; margin-bottom: 1rem;}
+  .nf-actions {margin-top: 1.25rem;}
+  .nf-btn {display: inline-flex; align-items: center; justify-content: center; padding: 12px 20px; border-radius: 10px; font-weight: 600; text-decoration: none; transition: transform 180ms cubic-bezier(0.25, 0.46, 0.45, 0.94);}
+  .nf-btn-primary {background: #16a34a; color: #ffffff;}
+  .nf-btn-primary:hover {transform: translateY(-2px);}
+</style>
+
+<section class="nf-root">
+  <div class="nf-container">
+    <div class="nf-card">
+      <div class="nf-hero" aria-hidden="true">
+        <h1>404</h1>
+      </div>
+      <div class="nf-title">Look like you're lost</div>
+      <p class="nf-text">The page you are looking for is not available!</p>
+      <div class="nf-actions">
+        <a href="{% url 'home' %}" class="nf-btn nf-btn-primary" data-action="primary">Go to Home</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

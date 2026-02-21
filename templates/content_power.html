@@ -1,0 +1,1430 @@
+{% extends "base_dashboard.html" %}
+{% block title %}Content Power - Homepage Generator{% endblock %}
+{% block content %}
+    <style>
+        .container, .container * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Updated background to pure white (#FFFFFF) from dark gradient */
+        .cp-root {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #FFFFFF;
+            min-height: 100vh;
+            
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 100%;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(255, 255, 255, 0.999);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            color: #1e293b;
+            font-size: 32px;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 16px;
+            font-weight: 400;
+        }
+
+        .form-section {
+            transition: all 0.3s ease;
+        }
+
+        .form-section.hidden {
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #334155;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .label-icon {
+            font-size: 16px;
+        }
+
+        .required {
+            color: #ef4444;
+            font-size: 16px;
+        }
+
+        
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        input[type="text"],
+        input[type="url"],
+        textarea {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.3s;
+            background: #fafafa;
+            margin-top : 9px;
+        }
+
+        input[type="text"]:focus,
+        input[type="url"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        input[type="text"]:hover,
+        input[type="url"]:hover {
+            border-color: #3b82f6;
+        }
+        textarea:hover {
+            border-color: #3b82f6;
+        }
+        textarea#company_details,#competitor_content,#template_content {
+    margin-top: 9px;
+}
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+            line-height: 1.6;
+            margin-top : 9px;
+        }
+
+        .helper-text {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .helper-icon {
+            font-size: 14px;
+        }
+
+        button {
+            width: 75%;
+            padding: 16px;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #submitBtn {
+            width: 90%;
+            margin: 10px auto 0;
+            padding: 22px;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        button:hover {
+           transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        button:disabled:hover {
+            box-shadow: none;
+        }
+
+        .btn-icon {
+            font-size: 20px;
+            z-index: 1;
+        }
+
+        .btn-text {
+            z-index: 1;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            z-index: 1;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .status-message {
+            display: none;
+            margin-top: 24px;
+            padding: 18px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 500;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .status-message.info {
+            background: linear-gradient(135deg,#3b82f6 0%, #3b82f6 100%);
+            color: #1e40af;
+            border: 2px solid #3b82f6;
+        }
+
+        .status-message.error {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+            border: 2px solid #ef4444;
+        }
+
+        .status-message.success {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            border: 2px solid #10b981;
+        }
+
+        .status-icon {
+            font-size: 20px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 3px;
+            margin-top: 12px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #1e40af;
+            border-radius: 3px;
+            animation: progress 360s linear;
+        }
+
+        @keyframes progress {
+            0% { width: 0%; }
+            100% { width: 98%; }
+        }
+
+        .content-display {
+            display: none;
+            margin-top: 40px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .content-header h2 {
+            color: #1e293b;
+            font-size: 24px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .action-btn {
+            padding: 10px 18px;
+            background: linear-gradient(135deg, #3b82f6 0%, #3b82f6 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: auto;
+            margin: 0;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+        }
+
+        .action-btn.copied {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+
+        .action-icon {
+            font-size: 16px;
+        }
+
+        .content-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-color: #3b82f6;
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .stat-icon {
+            font-size: 20px;
+            color: #3b82f6;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            color: #1e293b;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .content-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 0;
+            background: #f8fafc;
+            padding: 6px;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 20px;
+            background: transparent;
+            color: #64748b;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .tab-btn.active {
+            color: white;
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .tab-icon {
+            font-size: 16px;
+        }
+
+        .content-body {
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            overflow: hidden;
+            margin-top: 16px;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+            max-height: 600px;
+            overflow-y: auto;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .formatted-content {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #1e293b;
+        }
+
+        .formatted-content h1,
+        .formatted-content h2,
+        .formatted-content h3,
+        .formatted-content h4 {
+            color: #0f172a;
+            margin-top: 28px;
+            margin-bottom: 14px;
+            font-weight: 700;
+        }
+
+        .formatted-content h1 {
+            font-size: 30px;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 12px;
+        }
+
+        .formatted-content h2 {
+            font-size: 24px;
+            color: #1e40af;
+        }
+
+        .formatted-content h3 {
+            font-size: 20px;
+            color: #1e40af;
+        }
+
+        .formatted-content p {
+            margin-bottom: 18px;
+        }
+
+        .formatted-content ul,
+        .formatted-content ol {
+            margin-left: 28px;
+            margin-bottom: 18px;
+        }
+
+        .formatted-content li {
+            margin-bottom: 10px;
+        }
+
+        .formatted-content strong {
+            color: #0f172a;
+            font-weight: 600;
+        }
+
+        .formatted-content a {
+            color: #3b82f6;
+            text-decoration: underline;
+            transition: color 0.2s;
+        }
+
+        .formatted-content a:hover {
+            color: #2563eb;
+        }
+
+        .formatted-content code {
+            background: #f1f5f9;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #e11d48;
+            border: 1px solid #e2e8f0;
+        }
+
+        .formatted-content blockquote {
+            border-left: 4px solid #3b82f6;
+            padding-left: 20px;
+            margin: 20px 0;
+            color: #475569;
+            font-style: italic;
+            background: #f8fafc;
+            padding: 16px 20px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .raw-content {
+            background: #0f172a;
+            padding: 24px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            color: #e2e8f0;
+        }
+
+        .json-key {
+            color: #7dd3fc;
+        }
+
+        .json-string {
+            color: #86efac;
+        }
+
+        .json-number {
+            color: #fbbf24;
+        }
+
+        .json-boolean {
+            color: #f472b6;
+        }
+
+        .json-null {
+            color: #94a3b8;
+        }
+
+        .tab-content::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .tab-content::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 5px;
+        }
+
+        .tab-content::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 5px;
+        }
+
+        .tab-content::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        .reset-button {
+            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+            margin-top: 20px;
+            box-shadow: 0 2px 8px rgba(100, 116, 139, 0.2);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-text {
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* Blog Redirect Button */
+        .blog-redirect-btn {
+            width: 100%;
+            max-width: 900px;
+            margin: 20px auto 0;
+            padding: 16px;
+            background: linear-gradient(135deg, #3b82f6 0%, #3b82f6 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+            animation: fadeIn 0.5s ease-out 0.3s both;
+        }
+
+        .blog-redirect-btn:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        .blog-redirect-btn:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 24px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+
+            .content-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+
+            .header-actions {
+                width: 100%;
+                flex-direction: column;
+            }
+
+            .action-btn {
+                width: 100%;
+            }
+
+            .content-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .content-tabs {
+                flex-direction: column;
+            }
+
+            .tab-btn {
+                width: 100%;
+            }
+        }
+        
+.footer {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+    align-items: stretch;
+    padding: 16px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+.footer__item { flex: 0 1 160px; }
+
+.blog-redirect-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 12px 16px;
+    background-color: #ffffff;
+    border: 1px solid #dbe1e6;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 180ms cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 180ms cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 180ms;
+    min-width: 140px;
+    box-shadow: 0 2px 10px rgba(2, 132, 199, 0.08);
+}
+
+.blog-redirect-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(2, 132, 199, 0.18);
+    border-color: #cbd5e1;
+}
+
+.blog-redirect-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.35);
+    transform: translateY(-1px);
+}
+
+.btn-icon {
+    font-size: 22px;
+}
+
+.btn-text {
+    font-size: 15px;
+    font-weight: 500;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .footer { gap: 8px; justify-content: center; }
+    .footer__item { flex: 1 1 calc(50% - 8px); }
+    .btn-icon { font-size: 20px; }
+    .btn-text { font-size: 14px; }
+}
+
+@media (max-width: 480px) {
+    .footer__item { flex: 1 1 100%; }
+}
+
+    </style>
+    <div class="cp-root">
+    <div class="container">
+        <div class="header">
+            <h1>&#x2728; Content Power Generator</h1>
+            <p class="subtitle">Create compelling homepage content powered by AI</p>
+        </div>
+        
+        <div class="form-section" id="formSection">
+            <form id="contentForm">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="company_name">
+                       
+                        Company Name
+                        <span class="required">*</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <input type="text" id="company_name" name="company_name" required 
+                               placeholder="e.g., MCM.io">
+                    </div>
+                    <div class="helper-text">
+                        <span class="helper-icon">&#x1F4AC;</span>
+                        Enter your company's official name
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="company_details">
+                        
+                        Company Details
+                        <span class="required">*</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <textarea id="company_details" name="company_details" required
+                                  placeholder="Tell us about your company, products, services, target audience, and unique value proposition..."></textarea>
+                    </div>
+                    <div class="helper-text">
+                        <span class="helper-icon">&#x1F4AC;</span>
+                        Provide detailed information for better results
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="competitor_url">
+                       
+                        Competitor URL
+                        <span class="required">*</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <input type="url" id="competitor_url" name="competitor_url" required 
+                               placeholder="https://www.competitor.com">
+                    </div>
+                    <div class="helper-text">
+                        <span class="helper-icon">&#x1F4AC;</span>
+                        We'll analyze this site for insights
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="competitor_content">
+                       
+                        Competitor Web Content
+                        <span >(Optional)</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <textarea id="competitor_content" name="competitor_content" 
+                                  placeholder="Paste competitor's content for deeper analysis..."></textarea>
+                    </div>
+                    <div class="helper-text">
+                        <span class="helper-icon">&#x1F4AC;</span>
+                        Add specific competitor content to analyze
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="template">
+                        
+                        Template URL
+                        <span class="required">*</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <input type="url" id="template" name="template" required 
+                               placeholder="https://www.templatesite.com">
+                    </div>
+                    <div class="helper-text">
+                        <span class="helper-icon">&#x1F4AC;</span>
+                        Provide URL of the template you want to follow
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="template_content">
+                       
+                        Template Content
+                        <span >(Optional)</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <textarea id="template_content" name="template_content"
+                                  placeholder="Provide any template or reference content you'd like to use as a base..."></textarea>
+                    </div>
+                    <div class="helper-text">
+                        <span class="helper-icon">&#x1F4AC;</span>
+                        Optional: Add a content template or structure
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn" data-action="primary">
+                   
+                    <span class="btn-text">Generate Content</span>
+                </button>
+            </form>
+        </div>
+
+        <div id="statusMessage" class="status-message"></div>
+
+        <div id="contentDisplay" class="content-display">
+            <div class="content-header">
+                <h2>
+                    <span>&#x2705;</span>
+                    Generated Content
+                </h2>
+                <div class="header-actions">
+                    <button class="action-btn" onclick="copyContent()">
+                        <span class="action-icon" id="copyIcon">&#x1F4CB;</span>
+                        <span id="copyBtnText">Copy</span>
+                    </button>
+                    <button class="action-btn" onclick="downloadContent()">
+                        <span class="action-icon">&#x1F4BE;</span>
+                        <span>Download</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="content-stats">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-icon">&#x1F4CA;</span>
+                        <span class="stat-label">Words</span>
+                    </div>
+                    <div class="stat-value" id="wordCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-icon">&#x1F524;</span>
+                        <span class="stat-label">Characters</span>
+                    </div>
+                    <div class="stat-value" id="charCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-icon">&#x1F4C4;</span>
+                        <span class="stat-label">Lines</span>
+                    </div>
+                    <div class="stat-value" id="lineCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-icon">&#x23F1;</span>
+                        <span class="stat-label">Read Time</span>
+                    </div>
+                    <div class="stat-value" id="readTime">0 min</div>
+                </div>
+            </div>
+
+            <div class="content-tabs">
+                <button class="tab-btn active" onclick="switchTab('formatted')">
+                    <span class="tab-icon">&#x1F441;</span>
+                    Formatted View
+                </button>
+                <button class="tab-btn" onclick="switchTab('raw')">
+                    <span class="tab-icon">&#x1F4DD;</span>
+                    Raw Data
+                </button>
+            </div>
+
+            <div class="content-body">
+                <div id="formattedTab" class="tab-content active">
+                    <div id="formattedContent" class="formatted-content">
+                        <div class="empty-state">
+                            <div class="empty-icon">&#x1F4ED;</div>
+                            <div class="empty-text">No content to display</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="rawTab" class="tab-content">
+                    <div id="rawContent" class="raw-content">
+                        <div class="empty-state">
+                            <div class="empty-icon">&#x1F4ED;</div>
+                            <div class="empty-text">No content to display</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="reset-button" onclick="resetForm()">
+                <span class="btn-icon">&#x1F504;</span>
+                <span class="btn-text">Generate New Content</span>
+            </button>
+        </div>
+        
+         <div class="footer">
+            <div class="footer__item">
+                <button type="button" class="blog-redirect-btn" onclick="window.location.href='{% url 'content_power_blog' %}'">
+                    <span class="btn-icon">&#128221;</span>
+                    <span class="btn-text">Generate Blog Post</span>
+                </button>
+            </div>
+            <div class="footer__item">
+                <button type="button" class="blog-redirect-btn" onclick="window.location.href='{% url 'content_power_logic' %}'">
+                    <span class="btn-icon">&#9889;</span>
+                    <span class="btn-text">Content Power</span>
+                </button>
+            </div>
+            <div class="footer__item">
+                <button type="button" class="blog-redirect-btn" onclick="window.location.href='{% url 'landing_page' %}'">
+                    <span class="btn-icon">&#127760;</span>
+                    <span class="btn-text">Landing Pages</span>
+                </button>
+            </div>
+            <div class="footer__item">
+                <button type="button" class="blog-redirect-btn" onclick="window.location.href='{% url 'n8n_webhook' %}'">
+                    <span class="btn-icon">&#128279;</span>
+                    <span class="btn-text">N8N Webhook</span>
+                </button>
+            </div>
+            <div class="footer__item">
+                <button type="button" class="blog-redirect-btn" onclick="window.location.href='{% url 'blog' %}'">
+                    <span class="btn-icon">&#128240;</span>
+                    <span class="btn-text">Blog Post</span>
+                </button>
+            </div>
+        </div>
+        
+        
+    </button>
+    </div>
+    
+    <!-- Blog Post Generator Redirect Button -->
+   
+    </div>
+{% endblock %}
+{% block extra_js %}
+    <script>
+        let pollingInterval = null;
+        let sessionId = null;
+        let currentContent = null;
+
+        // Form validation and submission
+        document.getElementById('contentForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const submitBtn = document.getElementById('submitBtn');
+            const statusMessage = document.getElementById('statusMessage');
+            const contentDisplay = document.getElementById('contentDisplay');
+            const formSection = document.getElementById('formSection');
+            
+            // Validate URL format
+            const competitorUrl = document.getElementById('competitor_url').value;
+            const templateUrl = document.getElementById('template').value;
+            
+            try {
+                new URL(competitorUrl);
+                new URL(templateUrl);
+            } catch (e) {
+                showStatus('error', '&#x274C; Please enter valid URLs (e.g., https://example.com)');
+                return;
+            }
+            
+            // Disable submit button with loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `
+                <span class="spinner"></span>
+                <span class="btn-text">Starting Workflow...</span>
+            `;
+            
+            // Hide previous content
+            contentDisplay.style.display = 'none';
+            
+            try {
+                const response = await fetch('', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    sessionId = data.session_id;
+                    
+                    // Hide form section
+                    formSection.classList.add('hidden');
+                    
+                    // Show waiting message with progress bar
+                    showStatus('info', `
+                        <span class="status-icon">&#x23F3;</span>
+                        <strong>Workflow Started Successfully!</strong><br>
+                        AI is analyzing your competitor and generating content. This typically takes 6-8 minutes...
+                        <div class="progress-bar"><div class="progress-fill"></div></div>
+                    `);
+                    
+                    // Start polling for results
+                    startPolling(sessionId);
+                } else {
+                    showStatus('error', `&#x274C; <strong>Error:</strong> ${data.message || 'Failed to start workflow'}`);
+                    resetButton(submitBtn);
+                }
+            } catch (error) {
+                showStatus('error', `&#x274C; <strong>Network Error:</strong> ${error.message}`);
+                resetButton(submitBtn);
+            }
+        });
+
+        function showStatus(type, message) {
+            const statusMessage = document.getElementById('statusMessage');
+            statusMessage.className = `status-message ${type}`;
+            statusMessage.innerHTML = message;
+            statusMessage.style.display = 'block';
+        }
+
+        function resetButton(btn) {
+            btn.disabled = false;
+            btn.innerHTML = `
+                <span class="btn-icon">&#x1F680;</span>
+                <span class="btn-text">Generate Content</span>
+            `;
+        }
+
+        function startPolling(sessionId) {
+            let pollCount = 0;
+            const maxPolls = 120; // 10 minutes maximum
+            
+            pollingInterval = setInterval(async () => {
+                pollCount++;
+                
+                if (pollCount >= maxPolls) {
+                    clearInterval(pollingInterval);
+                    showStatus('error', '&#x23F1; <strong>Timeout:</strong> Content generation took too long. Please try again.');
+                    document.getElementById('formSection').classList.remove('hidden');
+                    resetButton(document.getElementById('submitBtn'));
+                    return;
+                }
+                
+                try {
+                    const response = await fetch(`/content_power_status/?session_id=${sessionId}`);
+                    const data = await response.json();
+                    
+                    if (data.success && data.status === 'completed') {
+                        clearInterval(pollingInterval);
+                        
+                        if (data.content && isValidContent(data.content)) {
+                            showStatus('success', '&#x2705; <strong>Success!</strong> Your content has been generated successfully!');
+                            currentContent = data.content;
+                            displayContent(data.content);
+                        } else {
+                            showStatus('error', '&#x274C; <strong>Error:</strong> Content was generated but appears to be empty.');
+                            document.getElementById('formSection').classList.remove('hidden');
+                            resetButton(document.getElementById('submitBtn'));
+                        }
+                    } else if (data.status === 'not_found') {
+                        clearInterval(pollingInterval);
+                        showStatus('error', '&#x274C; <strong>Session Expired:</strong> Please submit the form again.');
+                        document.getElementById('formSection').classList.remove('hidden');
+                        resetButton(document.getElementById('submitBtn'));
+                    }
+                } catch (error) {
+                    console.error('Polling error:', error);
+                }
+            }, 5000);
+        }
+
+        function isValidContent(content) {
+            if (content === null || content === undefined) return false;
+            if (typeof content === 'string' && content.trim().length === 0) return false;
+            if (typeof content === 'object' && Object.keys(content).length === 0) return false;
+            return true;
+        }
+
+        function displayContent(content) {
+            const contentDisplay = document.getElementById('contentDisplay');
+            
+            // Extract text content
+            let contentText = extractTextContent(content);
+            
+            if (!contentText) {
+                contentText = 'No content available';
+            }
+            
+            // Update statistics
+            updateStats(contentText);
+            
+            // Display formatted content
+            displayFormattedContent(contentText);
+            
+            // Display raw content
+            displayRawContent(content);
+            
+            // Show the content display
+            contentDisplay.style.display = 'block';
+            
+            // Smooth scroll to content
+            setTimeout(() => {
+                contentDisplay.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
+        }
+
+        function extractTextContent(content) {
+            if (typeof content === 'string') {
+                return content;
+            } else if (typeof content === 'object' && content !== null) {
+                // Try common content keys
+                const keys = ['text', 'content', 'output', 'result', 'data', 'body', 'message'];
+                for (const key of keys) {
+                    if (content[key] && typeof content[key] === 'string') {
+                        return content[key];
+                    }
+                }
+                // If no string found, stringify the object
+                return JSON.stringify(content, null, 2);
+            }
+            return String(content);
+        }
+
+        function displayFormattedContent(text) {
+            const formattedDiv = document.getElementById('formattedContent');
+            
+            // Check if content contains HTML tags
+            const hasHtmlTags = /<[^>]+>/.test(text);
+            
+            if (hasHtmlTags) {
+                // Display HTML (with basic sanitization)
+                formattedDiv.innerHTML = sanitizeHtml(text);
+            } else {
+                // Convert markdown to HTML
+                formattedDiv.innerHTML = markdownToHtml(text);
+            }
+        }
+
+        function sanitizeHtml(html) {
+            // Basic sanitization - remove script tags
+            return html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+        }
+
+        function markdownToHtml(text) {
+            let html = text
+                // Escape HTML first
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                // Headers
+                .replace(/^#### (.*$)/gim, '<h4>$1</h4>')
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                // Bold
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/__(.+?)__/g, '<strong>$1</strong>')
+                // Italic
+                .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                .replace(/_(.+?)_/g, '<em>$1</em>')
+                // Links
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>')
+                // Code
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                // Lists
+                .replace(/^\* (.+)$/gim, '<li>$1</li>')
+                .replace(/^- (.+)$/gim, '<li>$1</li>')
+                .replace(/^\d+\. (.+)$/gim, '<li>$1</li>')
+                // Blockquotes
+                .replace(/^> (.+)$/gim, '<blockquote>$1</blockquote>')
+                // Paragraphs
+                .replace(/\n\n+/g, '</p><p>')
+                .replace(/\n/g, '<br>');
+            
+            // Wrap list items
+            html = html.replace(/(<li>.*?<\/li>(?:\s*<li>.*?<\/li>)*)/gs, '<ul>$1</ul>');
+            
+            // Wrap in paragraphs
+            if (!html.startsWith('<h') && !html.startsWith('<p>') && !html.startsWith('<ul>')) {
+                html = '<p>' + html + '</p>';
+            }
+            
+            return html;
+        }
+
+        function displayRawContent(content) {
+            const rawDiv = document.getElementById('rawContent');
+            
+            if (!isValidContent(content)) {
+                rawDiv.innerHTML = '<div class="empty-state"><div class="empty-icon">&#x1F4ED;</div><div class="empty-text">No content available</div></div>';
+                return;
+            }
+            
+            if (typeof content === 'string') {
+                rawDiv.textContent = content;
+            } else {
+                const jsonString = JSON.stringify(content, null, 2);
+                rawDiv.innerHTML = syntaxHighlight(jsonString);
+            }
+        }
+
+        function syntaxHighlight(json) {
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                let cls = 'json-number';
+                if (/^"/.test(match)) {
+                    cls = /:$/.test(match) ? 'json-key' : 'json-string';
+                } else if (/true|false/.test(match)) {
+                    cls = 'json-boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'json-null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+
+        function updateStats(text) {
+            if (!text) {
+                document.getElementById('wordCount').textContent = '0';
+                document.getElementById('charCount').textContent = '0';
+                document.getElementById('lineCount').textContent = '0';
+                document.getElementById('readTime').textContent = '0 min';
+                return;
+            }
+            
+            // Strip HTML tags for accurate counts
+            const plainText = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+            
+            // Word count
+            const words = plainText.split(/\s+/).filter(word => word.length > 0);
+            const wordCount = words.length;
+            document.getElementById('wordCount').textContent = wordCount.toLocaleString();
+            
+            // Character count
+            document.getElementById('charCount').textContent = plainText.length.toLocaleString();
+            
+            // Line count
+            const lines = text.split('\n').length;
+            document.getElementById('lineCount').textContent = lines.toLocaleString();
+            
+            // Reading time (average 200 words per minute)
+            const readTimeMinutes = Math.ceil(wordCount / 200);
+            document.getElementById('readTime').textContent = `${readTimeMinutes} min`;
+        }
+
+        function switchTab(tabName) {
+            const tabBtns = document.querySelectorAll('.tab-btn');
+            tabBtns.forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.tab-btn').classList.add('active');
+            
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            document.getElementById(tabName === 'formatted' ? 'formattedTab' : 'rawTab').classList.add('active');
+        }
+
+        function copyContent() {
+            const copyBtn = event.target.closest('.action-btn');
+            const copyBtnText = document.getElementById('copyBtnText');
+            const copyIcon = document.getElementById('copyIcon');
+            
+            const activeTab = document.querySelector('.tab-content.active');
+            let textToCopy = '';
+            
+            if (activeTab.id === 'formattedTab') {
+                textToCopy = document.getElementById('formattedContent').innerText;
+            } else {
+                textToCopy = document.getElementById('rawContent').innerText;
+            }
+            
+            if (!textToCopy || textToCopy.includes('No content')) {
+                showFeedback(copyBtnText, copyIcon, 'No Content', '&#x274C;', '&#x1F4CB;');
+                return;
+            }
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                copyBtn.classList.add('copied');
+                showFeedback(copyBtnText, copyIcon, 'Copied!', '&#x2705;', '&#x1F4CB;', () => {
+                    copyBtn.classList.remove('copied');
+                });
+            }).catch(() => {
+                showFeedback(copyBtnText, copyIcon, 'Failed', '&#x274C;', '&#x1F4CB;');
+            });
+        }
+
+        function showFeedback(textEl, iconEl, text, icon, defaultIcon, beforeReset) {
+            textEl.textContent = text;
+            iconEl.innerHTML = icon;
+            setTimeout(() => {
+                if (beforeReset) beforeReset();
+                textEl.textContent = 'Copy';
+                iconEl.innerHTML = defaultIcon;
+            }, 2000);
+        }
+
+        function downloadContent() {
+            if (!currentContent) {
+                alert('No content to download');
+                return;
+            }
+            
+            const activeTab = document.querySelector('.tab-content.active');
+            let textToDownload, filename;
+            
+            if (activeTab.id === 'formattedTab') {
+                textToDownload = document.getElementById('formattedContent').innerText;
+                filename = 'content-power-formatted.txt';
+            } else {
+                textToDownload = typeof currentContent === 'string' ? currentContent : JSON.stringify(currentContent, null, 2);
+                filename = typeof currentContent === 'string' ? 'content-power-output.txt' : 'content-power-output.json';
+            }
+            
+            const blob = new Blob([textToDownload], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function resetForm() {
+            if (currentContent && !confirm('Are you sure you want to start over? Current content will be lost.')) {
+                return;
+            }
+            
+            document.getElementById('contentForm').reset();
+            
+            document.getElementById('formSection').classList.remove('hidden');
+            document.getElementById('statusMessage').style.display = 'none';
+            document.getElementById('contentDisplay').style.display = 'none';
+            
+            resetButton(document.getElementById('submitBtn'));
+            
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+            }
+            
+            document.querySelectorAll('.tab-btn').forEach((btn, i) => btn.classList.toggle('active', i === 0));
+            document.querySelectorAll('.tab-content').forEach((content, i) => content.classList.toggle('active', i === 0));
+            
+            currentContent = null;
+            sessionId = null;
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        window.addEventListener('beforeunload', function (e) {
+            if (currentContent) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+    </script>
+{% endblock %}

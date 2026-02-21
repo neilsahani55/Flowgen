@@ -1,0 +1,4629 @@
+ {% extends "base_dashboard.html" %}
+{% block title %}Blog Analysis & Optimization Tool{% endblock %}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog Analysis & Optimization Tool</title>
+<!-- Add Mammoth.js for Word document processing -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<style>
+    :root {
+        --primary: #4361ee;
+        --secondary: #3f37c9;
+        --success: #4cc9f0;
+        --warning: #f8961e;
+        --danger: #f94144;
+        --light: #f8f9fa;
+        --dark: #212529;
+        --gray: #6c757d;
+        --border: #dee2e6;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+        background-color: #f5f7fb;
+        color: var(--dark);
+        line-height: 1.6;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding: 20px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+
+    .subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        padding-top: 2px;
+    }
+
+    .comparison-page .main-content {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+
+    @media (max-width: 768px) {
+        .comparison-page .main-content {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .comparison-page .card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        padding: 25px;
+        margin-bottom: 20px;
+    }
+
+    .comparison-page .card-title {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        color: var(--primary);
+        border-bottom: 2px solid var(--border);
+        padding-bottom: 10px;
+    }
+
+    .input-section textarea {
+        width: 100%;
+        min-height: 300px;
+        padding: 15px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 16px;
+        resize: vertical;
+        margin-bottom: 15px;
+        line-height: 1.6;
+        font-family: inherit;
+    }
+
+    .input-section textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+
+    .content-display {
+        background-color: white;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 10px;
+        max-height: 400px;
+        overflow-y: auto;
+        font-size: 16px;
+        line-height: 1.6;
+    }
+
+    .content-display h4 {
+        margin-bottom: 10px;
+        color: var(--primary);
+    }
+
+    .content-display a {
+        color: var(--primary);
+        text-decoration: underline;
+    }
+
+    .content-display a:hover {
+        color: var(--secondary);
+    }
+
+    .content-display strong {
+        font-weight: 600;
+    }
+
+    .content-display em {
+        font-style: italic;
+    }
+
+    .content-display ul,
+    .content-display ol {
+        padding-left: 20px;
+        margin: 10px 0;
+    }
+
+    .content-stats {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        font-size: 0.9rem;
+        color: var(--gray);
+    }
+
+    .file-upload {
+        margin-bottom: 15px;
+    }
+
+    .file-upload label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    .file-input-wrapper {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+    }
+
+    .file-input-wrapper input[type="file"] {
+        width: 100%;
+        padding: 10px;
+        border: 2px dashed var(--border);
+        border-radius: 8px;
+        background-color: var(--light);
+    }
+
+    .file-info {
+        margin-top: 10px;
+        padding: 10px;
+        background-color: var(--light);
+        border-radius: 6px;
+        font-size: 0.9rem;
+    }
+
+    .file-info.success {
+        background-color: rgba(76, 175, 80, 0.1);
+        border-left: 4px solid #4CAF50;
+        color: #2e7d32;
+    }
+
+    .file-info.error {
+        background-color: rgba(244, 67, 54, 0.1);
+        border-left: 4px solid #F44336;
+        color: #c62828;
+    }
+
+    .file-info.warning {
+        background-color: rgba(255, 152, 0, 0.1);
+        border-left: 4px solid #FF9800;
+        color: #ef6c00;
+    }
+
+    .file-info.processing {
+        background-color: rgba(67, 97, 238, 0.1);
+        border-left: 4px solid var(--primary);
+        color: var(--primary);
+    }
+
+    .supported-formats {
+        font-size: 0.8rem;
+        color: var(--gray);
+        margin-top: 5px;
+    }
+
+    .btn {
+        padding: 12px 20px;
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        background-color: var(--secondary);
+        transform: translateY(-2px);
+    }
+
+    .btn-block {
+        display: block;
+        width: 100%;
+    }
+
+    .btn:disabled {
+        background-color: var(--gray);
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .analysis-section .metric {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .metric-title {
+        font-weight: 600;
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .metric-value {
+        font-size: 1.1rem;
+        color: var(--primary);
+    }
+
+    .seo-score {
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+    }
+
+    .score-bar {
+        flex-grow: 1;
+        height: 10px;
+        background-color: var(--border);
+        border-radius: 5px;
+        margin: 0 10px;
+        overflow: hidden;
+    }
+
+    .score-fill {
+        height: 100%;
+        border-radius: 5px;
+        transition: width 0.5s ease;
+    }
+
+    .score-good {
+        background-color: #4CAF50;
+    }
+
+    .score-medium {
+        background-color: #FF9800;
+    }
+
+    .score-poor {
+        background-color: #F44336;
+    }
+
+    .edit-section .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    select,
+    input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 16px;
+    }
+
+    .tone-selector {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .tone-option {
+        padding: 8px 15px;
+        background-color: var(--light);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .tone-option.selected {
+        background-color: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .suggestions {
+        background-color: var(--light);
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 10px;
+    }
+
+    .suggestion-item {
+        padding: 8px;
+        margin-bottom: 8px;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        border-left: 3px solid transparent;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .suggestion-item:hover {
+        background-color: #e9ecef;
+        border-left-color: var(--primary);
+    }
+
+    .suggestion-item.ai-suggestion {
+        background-color: rgba(67, 97, 238, 0.05);
+        border-left: 3px solid var(--primary);
+    }
+
+    /* NEW: Red color for new alternatives from chatbot */
+    .suggestion-item.new-alternative {
+        background-color: rgba(249, 65, 68, 0.05);
+        border-left: 3px solid var(--danger);
+    }
+
+    .suggestion-text {
+        flex: 1;
+        margin-right: 10px;
+    }
+
+    .add-suggestion-btn {
+        background: none;
+        border: none;
+        color: var(--success);
+        cursor: pointer;
+        font-size: 1.2rem;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+    }
+
+    .add-suggestion-btn:hover {
+        background-color: var(--success);
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .loading {
+        text-align: center;
+        padding: 20px;
+    }
+
+    .spinner {
+        border: 4px solid rgba(0, 0, 0, 0.1);
+        border-left-color: var(--primary);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 15px;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .status-message {
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+
+    .status-success {
+        background-color: rgba(76, 201, 240, 0.2);
+        color: var(--success);
+        border: 1px solid var(--success);
+    }
+
+    .status-error {
+        background-color: rgba(249, 65, 68, 0.2);
+        color: var(--danger);
+        border: 1px solid var(--danger);
+    }
+
+    footer {
+        text-align: center;
+        margin-top: 40px;
+        padding: 20px;
+        color: var(--gray);
+        font-size: 0.9rem;
+    }
+
+    .placeholder-text {
+        color: var(--gray);
+        font-style: italic;
+    }
+
+    .keyword-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 5px;
+    }
+
+    .keyword-tag {
+        background-color: var(--light);
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 0.9rem;
+        border: 1px solid var(--border);
+    }
+
+    .recommendations-list {
+        max-height: 300px;
+        overflow-y: auto;
+        padding-right: 10px;
+    }
+
+    .recommendations-list ul {
+        padding-left: 20px;
+    }
+
+    .recommendations-list li {
+        margin-bottom: 8px;
+        padding: 8px;
+        background-color: var(--light);
+        border-radius: 4px;
+    }
+
+    .upload-instructions {
+        background-color: #e3f2fd;
+        border-left: 4px solid var(--primary);
+        padding: 15px;
+        margin: 15px 0;
+        border-radius: 4px;
+    }
+
+    .upload-instructions h4 {
+        margin-bottom: 8px;
+        color: var(--primary);
+    }
+
+    .upload-instructions ul {
+        padding-left: 20px;
+    }
+
+    .upload-instructions li {
+        margin-bottom: 5px;
+    }
+
+    .paste-helper {
+        background-color: #f8f9fa;
+        border: 1px dashed #dee2e6;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .paste-helper:hover {
+        background-color: #e9ecef;
+        border-color: var(--primary);
+    }
+
+    .paste-helper p {
+        margin: 0;
+        color: var(--gray);
+    }
+
+    .paste-helper .icon {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        color: var(--primary);
+    }
+
+    .auto-process-notice {
+        background-color: #e8f5e8;
+        border: 1px solid #4CAF50;
+        border-radius: 6px;
+        padding: 10px;
+        margin: 10px 0;
+        text-align: center;
+        font-size: 0.9rem;
+        color: #2e7d32;
+    }
+
+    .format-preserved-notice {
+        background-color: #e3f2fd;
+        border: 1px solid var(--primary);
+        border-radius: 6px;
+        padding: 10px;
+        margin: 10px 0;
+        font-size: 0.9rem;
+        color: var(--primary);
+    }
+
+    .content-tabs {
+        display: flex;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 15px;
+    }
+
+    .content-tab {
+        padding: 10px 20px;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .content-tab.active {
+        border-bottom-color: var(--primary);
+        color: var(--primary);
+        font-weight: 600;
+    }
+
+    .content-tab:hover {
+        background-color: var(--light);
+    }
+
+    .tab-content {
+        display: none;
+    }
+
+    .tab-content.active {
+        display: block;
+    }
+
+    .ai-suggestions-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        color: var(--primary);
+        font-weight: 600;
+    }
+
+    .ai-suggestions-header .icon {
+        margin-right: 8px;
+        font-size: 1.2rem;
+    }
+
+    /* New styles for improved meta description area */
+    .meta-description-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .meta-description-input {
+        flex-grow: 1;
+        min-height: 120px;
+        width: 100%;
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 16px;
+        resize: vertical;
+        font-family: inherit;
+    }
+
+    .meta-description-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+
+    .ai-description-suggestions {
+        margin-top: 10px;
+    }
+
+    /* New styles for updated blog display */
+    .updated-blog-section {
+        margin-top: 30px;
+    }
+
+    .updated-blog-display {
+        background-color: white;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 10px;
+        max-height: 600px;
+        overflow-y: auto;
+        font-size: 16px;
+        line-height: 1.6;
+    }
+
+    .updated-blog-display h1,
+    .updated-blog-display h2,
+    .updated-blog-display h3,
+    .updated-blog-display h4 {
+        margin-bottom: 15px;
+        color: var(--primary);
+    }
+
+    .updated-blog-display p {
+        margin-bottom: 15px;
+    }
+
+    .updated-blog-display ul,
+    .updated-blog-display ol {
+        margin-bottom: 15px;
+        padding-left: 25px;
+    }
+
+    .updated-blog-display li {
+        margin-bottom: 8px;
+    }
+
+    .updated-blog-display table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+    .updated-blog-display th,
+    .updated-blog-display td {
+        padding: 10px;
+        border: 1px solid var(--border);
+        text-align: left;
+    }
+
+    .updated-blog-display th {
+        background-color: var(--light);
+        font-weight: 600;
+    }
+
+    .updated-blog-display a {
+        color: var(--primary);
+        text-decoration: underline;
+    }
+
+    .updated-blog-display a:hover {
+        color: var(--secondary);
+    }
+
+    .updated-blog-display strong {
+        font-weight: 600;
+    }
+
+    .updated-blog-display em {
+        font-style: italic;
+    }
+
+    .blog-meta-info {
+        background-color: var(--light);
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 15px;
+    }
+
+    .blog-meta-info h4 {
+        margin-bottom: 10px;
+        color: var(--primary);
+    }
+
+    .blog-meta-info p {
+        margin-bottom: 8px;
+    }
+
+    /* NEW: Styles for blog title section */
+    .blog-title-section {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .blog-title-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .blog-title-input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 16px;
+        resize: vertical;
+        font-family: inherit;
+    }
+
+    .blog-title-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+
+    .ai-blog-title-suggestions {
+        margin-top: 10px;
+    }
+
+    /* NEW: Styles for download section */
+    .download-section {
+        margin-top: 20px;
+        text-align: center;
+        padding: 15px;
+        background-color: var(--light);
+        border-radius: 8px;
+        border: 1px solid var(--border);
+    }
+
+    .download-btn {
+        background-color: var(--success);
+        margin-left: 10px;
+    }
+
+    .download-btn:hover {
+        background-color: #3a9bc9;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 15px;
+    }
+
+    /* NEW: Styles for iframe display */
+    .blog-iframe-container {
+        width: 100%;
+        height: 600px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: hidden;
+        margin-top: 10px;
+    }
+
+    .blog-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        background: white;
+    }
+
+    .iframe-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        color: var(--gray);
+        font-style: italic;
+    }
+
+    /* NEW: Styles for dual button layout */
+    .dual-button-container {
+        display: flex;
+        gap: 15px;
+        margin-top: 20px;
+    }
+
+    .dual-button-container .btn {
+        flex: 1;
+        width: 50%;
+    }
+
+    .update-details-btn {
+        background-color: var(--warning);
+    }
+
+    .update-details-btn:hover {
+        background-color: #e68900;
+    }
+
+    .update-complete-btn {
+        background-color: var(--success);
+    }
+
+    .update-complete-btn:hover {
+        background-color: #3a9bc9;
+    }
+
+    /* NEW: Chatbot Popup Styles */
+    .chatbot-toggle {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        transition: all 0.3s ease;
+    }
+
+    .chatbot-toggle:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .chatbot-toggle .icon {
+        color: white;
+        font-size: 1.5rem;
+    }
+
+    .chatbot-popup {
+        position: fixed;
+        bottom: 100px;
+        right: 30px;
+        width: 380px;
+        height: 500px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        z-index: 1001;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        transform: translateY(20px);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .chatbot-popup.active {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .chatbot-header {
+        padding: 20px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .chatbot-header h3 {
+        margin: 0;
+        font-size: 1.2rem;
+    }
+
+    .chatbot-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background-color 0.2s ease;
+    }
+
+    .chatbot-close:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .chatbot-messages {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .message {
+        padding: 12px 16px;
+        border-radius: 18px;
+        max-width: 80%;
+        line-height: 1.4;
+        word-wrap: break-word;
+    }
+
+    .message.user {
+        align-self: flex-end;
+        background-color: var(--primary);
+        color: white;
+        border-bottom-right-radius: 4px;
+    }
+
+    .message.bot {
+        align-self: flex-start;
+        background-color: var(--light);
+        color: var(--dark);
+        border-bottom-left-radius: 4px;
+        border: 1px solid var(--border);
+    }
+
+    .message.system {
+        align-self: center;
+        background-color: #e3f2fd;
+        color: var(--primary);
+        font-style: italic;
+        font-size: 0.9rem;
+        max-width: 90%;
+        text-align: center;
+        padding: 8px 12px;
+    }
+
+    .chatbot-input {
+        padding: 20px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        gap: 10px;
+        background-color: #f8f9fa;
+    }
+
+    .chatbot-input input {
+        flex: 1;
+        padding: 12px 16px;
+        border: 1px solid var(--border);
+        border-radius: 25px;
+        font-size: 14px;
+        outline: none;
+        background: white;
+    }
+
+    .chatbot-input input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.1);
+    }
+
+    .chatbot-input button {
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 25px;
+        padding: 12px 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .chatbot-input button:hover {
+        background-color: var(--secondary);
+        transform: scale(1.05);
+    }
+
+    .chatbot-input button:disabled {
+        background-color: var(--gray);
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .chatbot-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .chatbot-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* NEW: Styles for selected suggestions in chatbot */
+    .selected-suggestion {
+        background-color: rgba(76, 201, 240, 0.1);
+        border: 1px solid var(--success);
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+
+    .selected-suggestion-header {
+        font-weight: 600;
+        color: var(--primary);
+        margin-bottom: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .selected-suggestion-list {
+        list-style-type: decimal;
+        padding-left: 20px;
+    }
+
+    .selected-suggestion-list li {
+        margin-bottom: 5px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 5px;
+        border-radius: 4px;
+    }
+
+    .selected-suggestion-list li:hover {
+        background-color: rgba(76, 201, 240, 0.1);
+    }
+
+    .remove-suggestion-btn {
+        background: none;
+        border: none;
+        color: var(--danger);
+        cursor: pointer;
+        font-size: 1rem;
+        padding: 2px 6px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+    }
+
+    .remove-suggestion-btn:hover {
+        background-color: var(--danger);
+        color: white;
+    }
+
+    .suggestion-item {
+        cursor: pointer;
+    }
+
+    @media (max-width: 768px) {
+        .chatbot-popup {
+            width: calc(100vw - 40px);
+            height: 70vh;
+            right: 20px;
+            left: 20px;
+            bottom: 20px;
+        }
+
+        .chatbot-toggle {
+            bottom: 20px;
+            right: 20px;
+        }
+    }
+
+    /* NEW: Custom icon styles for better appearance */
+    .icon-clipboard {
+        display: inline-block;
+        width: 48px;
+        height: 48px;
+        background: var(--primary);
+        border-radius: 50%;
+        position: relative;
+        margin: 0 auto 15px;
+    }
+
+    .icon-clipboard:before {
+        content: "";
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        width: 24px;
+        height: 28px;
+        background: white;
+        border-radius: 2px;
+    }
+
+    .icon-clipboard:after {
+        content: "";
+        position: absolute;
+        top: 10px;
+        left: 18px;
+        width: 12px;
+        height: 4px;
+        background: var(--primary);
+        border-radius: 1px;
+    }
+
+    .icon-ai {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        background: var(--primary);
+        color: white;
+        border-radius: 50%;
+        font-size: 12px;
+        font-weight: bold;
+        margin-right: 8px;
+    }
+
+    .icon-chat {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        position: relative;
+    }
+
+    .icon-chat:before {
+        content: "";
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        width: 20px;
+        height: 15px;
+        background: white;
+        border-radius: 8px 8px 0 8px;
+        box-shadow: 0 0 0 2px white;
+    }
+
+    .icon-chat:after {
+        content: "";
+        position: absolute;
+        top: 15px;
+        left: 10px;
+        width: 10px;
+        height: 10px;
+        background: white;
+        border-radius: 0 0 5px 0;
+    }
+
+    /* NEW: Styles for AI Agent Selection Buttons */
+    .ai-agent-selector {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+        margin-bottom: 15px;
+        justify-content: center;
+    }
+
+    .ai-agent-btn {
+        flex: 1;
+        padding: 10px 15px;
+        background-color: var(--light);
+        color: var(--dark);
+        border: 2px solid var(--border);
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .ai-agent-btn:hover {
+        background-color: #e9ecef;
+        border-color: var(--primary);
+        transform: translateY(-2px);
+    }
+
+    .ai-agent-btn.selected {
+        background-color: var(--primary);
+        color: white;
+        border-color: var(--primary);
+    }
+
+    .ai-agent-btn:disabled {
+        background-color: var(--gray);
+        cursor: not-allowed;
+        transform: none;
+        border-color: var(--border);
+    }
+
+    /* NEW: Editable Keywords Styles */
+    .editable-keywords-container {
+        margin-top: 10px;
+    }
+
+    .keyword-input-group {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    .keyword-input {
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        font-size: 14px;
+    }
+
+    .keyword-input:focus {
+        outline: none;
+        border-color: var(--primary);
+    }
+
+    .small-btn {
+        padding: 8px 12px;
+        font-size: 14px;
+        background-color: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .small-btn:hover {
+        background-color: var(--secondary);
+    }
+
+    .small-btn.add-btn {
+        background-color: var(--success);
+    }
+
+    .small-btn.add-btn:hover {
+        background-color: #3a9bc9;
+    }
+
+    .small-btn.edit-btn {
+        background-color: var(--warning);
+    }
+
+    .small-btn.edit-btn:hover {
+        background-color: #e68900;
+    }
+
+    .small-btn.remove-btn {
+        background-color: var(--danger);
+    }
+
+    .small-btn.remove-btn:hover {
+        background-color: #d32f2f;
+    }
+
+    .editable-keyword-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 10px;
+    }
+
+    .editable-keyword-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background-color: var(--light);
+        padding: 6px 10px;
+        border-radius: 15px;
+        border: 1px solid var(--border);
+        font-size: 0.9rem;
+    }
+
+    .editable-keyword-text {
+        margin-right: 4px;
+    }
+
+    .keyword-actions {
+        display: flex;
+        gap: 4px;
+    }
+
+    .keyword-action-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 12px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+    }
+
+    .keyword-action-btn.edit {
+        color: var(--warning);
+    }
+
+    .keyword-action-btn.edit:hover {
+        background-color: var(--warning);
+        color: white;
+    }
+
+    .keyword-action-btn.remove {
+        color: var(--danger);
+    }
+
+    .keyword-action-btn.remove:hover {
+        background-color: var(--danger);
+        color: white;
+    }
+
+    .keyword-edit-input {
+        padding: 4px 8px;
+        border: 1px solid var(--primary);
+        border-radius: 4px;
+        font-size: 0.9rem;
+        width: 120px;
+    }
+
+    .keyword-edit-input:focus {
+        outline: none;
+        border-color: var(--secondary);
+    }
+</style>
+</head>
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="content-card">
+            <div class="comparison-page">
+                <style>
+                    :root {
+                        --primary: #4361ee;
+                        --secondary: #3f37c9;
+                        --success: #3b82f6;
+                        --warning: #3b82f6;
+                        --danger: #f94144;
+                        --light: #f8f9fa;
+                        --dark: #212529;
+                        --gray: #6c757d;
+                        --border: #dee2e6;
+                    }
+
+                    * {
+                        margin: 0;
+                        padding: 0;
+                        box-sizing: border-box;
+                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    }
+
+                    .comparison-page {
+                        color: var(--dark);
+                        line-height: 1.6;
+                    }
+
+                    .comparison-page .container {
+                        max-width: 100%;
+                        margin: 0;
+                        padding: 0;
+                        width: 100%;
+                        box-sizing: border-box;
+                        overflow-x: hidden;
+                    }
+
+                    .comparison-page .container>header,
+                    .comparison-page .container>.main-content {
+                        width: 100%;
+                        max-width: 100%;
+                        margin: 0;
+                        padding: 0;
+                        box-sizing: border-box;
+                    }
+
+                    .comparison-page header {
+                        text-align: center;
+                        margin-bottom: 30px;
+                        padding: 20px;
+                        background: linear-gradient(135deg, var(--primary), var(--secondary));
+                        color: white;
+                        border-radius: 10px;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                    }
+
+                    .comparison-page h1 {
+                        font-size: 2.5rem;
+                        margin-bottom: 10px;
+                    }
+
+                    .comparison-page .subtitle {
+                        font-size: 1.2rem;
+                        opacity: 0.9;
+                    }
+
+                    /* STRUCTURAL UPDATE: Use flexbox to ensure full-width sections */
+                    .comparison-page .main-content {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 30px;
+                        align-items: stretch;
+                        width: 100%;
+                        max-width: 100%;
+                        margin: 0;
+                        padding: 0;
+                        box-sizing: border-box;
+                    }
+
+                    /* Ensure direct children fully utilize parent width and avoid overflow */
+                    .comparison-page .main-content>* {
+                        width: 100%;
+                        min-width: 0;
+                    }
+
+                    .comparison-page .input-section,
+                    .comparison-page .output-section {
+                        width: 100%;
+                        min-width: 0;
+                        align-self: stretch;
+                    }
+
+                    .comparison-page .card {
+                        width: 100%;
+                        display: block;
+                        margin-left: 0;
+                        margin-right: 0;
+                        box-sizing: border-box;
+                    }
+
+                    .comparison-page .analysis-section.card,
+                    .comparison-page .edit-section.card {
+                        width: 100%;
+                    }
+
+                    .comparison-page .main-content .card>* {
+                        max-width: 100%;
+                    }
+
+                    .comparison-page .card-title {
+                        white-space: normal;
+                    }
+
+                    /* Responsive: maintain vertical stacking across sizes while preserving spacing */
+                    @media (max-width: 768px) {
+                        .comparison-page .main-content {
+                            flex-direction: column;
+                        }
+                    }
+
+                    .comparison-page .card {
+                        background: white;
+                        border-radius: 10px;
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+                        padding: 25px;
+                        margin-bottom: 20px;
+                    }
+
+                    .comparison-page .card-title {
+                        font-size: 1.5rem;
+                        margin-bottom: 20px;
+                        color: var(--primary);
+                        border-bottom: 2px solid var(--border);
+                        padding-bottom: 10px;
+                    }
+
+                    .input-section textarea {
+                        width: 100%;
+                        min-height: 300px;
+                        padding: 15px;
+                        border: 1px solid var(--border);
+                        border-radius: 8px;
+                        font-size: 16px;
+                        resize: vertical;
+                        margin-bottom: 15px;
+                        line-height: 1.6;
+                        font-family: inherit;
+                    }
+
+                    .input-section textarea:focus {
+                        outline: none;
+                        border-color: var(--primary);
+                        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+                    }
+
+                    .content-display {
+                        background-color: white;
+                        border: 1px solid var(--border);
+                        border-radius: 8px;
+                        padding: 15px;
+                        margin-top: 10px;
+                        max-height: 400px;
+                        overflow-y: auto;
+                        font-size: 16px;
+                        line-height: 1.6;
+                    }
+
+                    .content-display h4 {
+                        margin-bottom: 10px;
+                        color: var(--primary);
+                    }
+
+                    .content-display a {
+                        color: var(--primary);
+                        text-decoration: underline;
+                    }
+
+                    .content-display a:hover {
+                        color: var(--secondary);
+                    }
+
+                    .content-display strong {
+                        font-weight: 600;
+                    }
+
+                    .content-display em {
+                        font-style: italic;
+                    }
+
+                    .content-display ul,
+                    .content-display ol {
+                        padding-left: 20px;
+                        margin: 10px 0;
+                    }
+
+                    .content-stats {
+                        display: flex;
+                        justify-content: space-between;
+                        margin-top: 10px;
+                        font-size: 0.9rem;
+                        color: var(--gray);
+                    }
+
+                    .file-upload {
+                        margin-bottom: 15px;
+                    }
+
+                    .file-upload label {
+                        display: block;
+                        margin-bottom: 8px;
+                        font-weight: 600;
+                    }
+
+                    .file-input-wrapper {
+                        position: relative;
+                        display: inline-block;
+                        width: 100%;
+                    }
+
+                    .file-input-wrapper input[type="file"] {
+                        width: 100%;
+                        padding: 10px;
+                        border: 2px dashed var(--border);
+                        border-radius: 8px;
+                        background-color: var(--light);
+                    }
+
+                    .file-info {
+                        margin-top: 10px;
+                        padding: 10px;
+                        background-color: var(--light);
+                        border-radius: 6px;
+                        font-size: 0.9rem;
+                    }
+
+                    .file-info.success {
+                        background-color: rgba(76, 175, 80, 0.1);
+                        border-left: 4px solid #4CAF50;
+                        color: #2e7d32;
+                    }
+
+                    .file-info.error {
+                        background-color: rgba(244, 67, 54, 0.1);
+                        border-left: 4px solid #F44336;
+                        color: #c62828;
+                    }
+
+                    .file-info.warning {
+                        background-color: rgba(255, 152, 0, 0.1);
+                        border-left: 4px solid #FF9800;
+                        color: #ef6c00;
+                    }
+
+                    .file-info.processing {
+                        background-color: rgba(67, 97, 238, 0.1);
+                        border-left: 4px solid var(--primary);
+                        color: var(--primary);
+                    }
+
+                    .supported-formats {
+                        font-size: 0.8rem;
+                        color: var(--gray);
+                        margin-top: 5px;
+                    }
+
+                    .btn {
+                        padding: 12px 20px;
+                        background-color: var(--primary);
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-size: 16px;
+                        font-weight: 600;
+                        transition: all 0.3s ease;
+                    }
+
+                    .btn:hover {
+                        background-color: var(--secondary);
+                        transform: translateY(-2px);
+                    }
+
+                    .btn-block {
+                        display: block;
+                        width: 100%;
+                    }
+
+                    .btn:disabled {
+                        background-color: var(--gray);
+                        cursor: not-allowed;
+                        transform: none;
+                    }
+
+                    .analysis-section .metric {
+                        margin-bottom: 20px;
+                        padding-bottom: 15px;
+                        border-bottom: 1px solid var(--border);
+                    }
+
+                    .metric-title {
+                        font-weight: 600;
+                        margin-bottom: 8px;
+                        display: flex;
+                        justify-content: space-between;
+                    }
+
+                    .metric-value {
+                        font-size: 1.1rem;
+                        color: var(--primary);
+                    }
+
+                    .seo-score {
+                        display: flex;
+                        align-items: center;
+                        margin-top: 10px;
+                    }
+
+                    .score-bar {
+                        flex-grow: 1;
+                        height: 10px;
+                        background-color: var(--border);
+                        border-radius: 5px;
+                        margin: 0 10px;
+                        overflow: hidden;
+                    }
+
+                    .score-fill {
+                        height: 100%;
+                        border-radius: 5px;
+                        transition: width 0.5s ease;
+                    }
+
+                    .score-good {
+                        background-color: #4CAF50;
+                    }
+
+                    .score-medium {
+                        background-color: #FF9800;
+                    }
+
+                    .score-poor {
+                        background-color: #F44336;
+                    }
+
+                    .edit-section .form-group {
+                        margin-bottom: 20px;
+                    }
+
+                    .form-group label {
+                        display: block;
+                        margin-bottom: 8px;
+                        font-weight: 600;
+                    }
+
+                    select,
+                    input {
+                        width: 100%;
+                        padding: 12px;
+                        border: 1px solid var(--border);
+                        border-radius: 6px;
+                        font-size: 16px;
+                    }
+
+                    .tone-selector {
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 10px;
+                        margin-top: 10px;
+                    }
+
+                    .tone-option {
+                        padding: 8px 15px;
+                        background-color: var(--light);
+                        border: 1px solid var(--border);
+                        border-radius: 20px;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                    }
+
+
+                    .tone-option:hover {
+                        border-color: #3b82f6;
+                    }
+
+
+                    .tone-option.selected {
+                        background-color: var(--primary);
+                        color: white;
+                        border-color: var(--primary);
+                    }
+
+                    .suggestions {
+                        background-color: var(--light);
+                        padding: 15px;
+                        border-radius: 8px;
+                        margin-top: 10px;
+                    }
+
+                    .suggestion-item {
+                        padding: 8px;
+                        margin-bottom: 8px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        transition: background-color 0.2s;
+                        border-left: 3px solid transparent;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+
+                    .suggestion-item:hover {
+                        background-color: #e9ecef;
+                        border-left-color: var(--primary);
+                    }
+
+                    .suggestion-item.ai-suggestion {
+                        background-color: rgba(67, 97, 238, 0.05);
+                        border-left: 3px solid var(--primary);
+                    }
+
+                    .suggestion-item.new-alternative {
+                        background-color: rgba(249, 65, 68, 0.05);
+                        border-left: 3px solid var(--danger);
+                    }
+
+                    .suggestion-text {
+                        flex: 1;
+                        margin-right: 10px;
+                    }
+
+                    .add-suggestion-btn {
+                        background: none;
+                        border: none;
+                        color: var(--success);
+                        cursor: pointer;
+                        font-size: 1.2rem;
+                        padding: 4px 8px;
+                        border-radius: 4px;
+                        transition: all 0.2s ease;
+                    }
+
+                    .add-suggestion-btn:hover {
+                        background-color: var(--success);
+                        color: white;
+                        transform: scale(1.1);
+                    }
+
+                    .loading {
+                        text-align: center;
+                        padding: 20px;
+                    }
+
+                    .spinner {
+                        border: 4px solid rgba(0, 0, 0, 0.1);
+                        border-left-color: var(--primary);
+                        border-radius: 50%;
+                        width: 40px;
+                        height: 40px;
+                        animation: spin 1s linear infinite;
+                        margin: 0 auto 15px;
+                    }
+
+                    @keyframes spin {
+                        to {
+                            transform: rotate(360deg);
+                        }
+                    }
+
+                    .hidden {
+                        display: none;
+                    }
+
+                    .status-message {
+                        padding: 10px;
+                        border-radius: 6px;
+                        margin-bottom: 15px;
+                        text-align: center;
+                    }
+
+                    .status-success {
+                        background-color: rgba(76, 201, 240, 0.2);
+                        color: var(--success);
+                        border: 1px solid var(--success);
+                    }
+
+                    .status-error {
+                        background-color: rgba(249, 65, 68, 0.2);
+                        color: var(--danger);
+                        border: 1px solid var(--danger);
+                    }
+
+                    footer {
+                        text-align: center;
+                        margin-top: 40px;
+                        padding: 20px;
+                        color: var(--gray);
+                        font-size: 0.9rem;
+                    }
+
+                    .placeholder-text {
+                        color: var(--gray);
+                        font-style: italic;
+                    }
+
+                    .keyword-list {
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 8px;
+                        margin-top: 5px;
+                    }
+
+                    .keyword-tag {
+                        background-color: var(--light);
+                        padding: 4px 12px;
+                        border-radius: 15px;
+                        font-size: 0.9rem;
+                        border: 1px solid var(--border);
+                    }
+
+                    .recommendations-list {
+                        max-height: 300px;
+                        overflow-y: auto;
+                        padding-right: 10px;
+                    }
+
+                    .recommendations-list ul {
+                        padding-left: 20px;
+                    }
+
+                    .recommendations-list li {
+                        margin-bottom: 8px;
+                        padding: 8px;
+                        background-color: var(--light);
+                        border-radius: 4px;
+                    }
+
+                    .upload-instructions {
+                        background-color: #e3f2fd;
+                        border-left: 4px solid var(--primary);
+                        padding: 15px;
+                        margin: 15px 0;
+                        border-radius: 4px;
+                    }
+
+                    .upload-instructions h4 {
+                        margin-bottom: 8px;
+                        color: var(--primary);
+                    }
+
+                    .upload-instructions ul {
+                        padding-left: 20px;
+                    }
+
+                    .upload-instructions li {
+                        margin-bottom: 5px;
+                    }
+
+                    .paste-helper {
+                        background-color: #f8f9fa;
+                        border: 1px dashed #dee2e6;
+                        border-radius: 8px;
+                        padding: 20px;
+                        text-align: center;
+                        margin-bottom: 15px;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                    }
+
+                    .paste-helper:hover {
+                        background-color: #e9ecef;
+                        border-color: var(--primary);
+                    }
+
+                    .paste-helper p {
+                        margin: 0;
+                        color: var(--gray);
+                    }
+
+                    .paste-helper .icon {
+                        font-size: 2rem;
+                        margin-bottom: 10px;
+                        color: var(--primary);
+                    }
+
+                    .auto-process-notice {
+                        background-color: #e8f5e8;
+                        border: 1px solid #4CAF50;
+                        border-radius: 6px;
+                        padding: 10px;
+                        margin: 10px 0;
+                        text-align: center;
+                        font-size: 0.9rem;
+                        color: #2e7d32;
+                    }
+
+                    .format-preserved-notice {
+                        background-color: #e3f2fd;
+                        border: 1px solid var(--primary);
+                        border-radius: 6px;
+                        padding: 10px;
+                        margin: 10px 0;
+                        font-size: 0.9rem;
+                        color: var(--primary);
+                    }
+
+                    .content-tabs {
+                        display: flex;
+                        border-bottom: 1px solid var(--border);
+                        margin-bottom: 15px;
+                    }
+
+                    .content-tab {
+                        padding: 10px 20px;
+                        cursor: pointer;
+                        border-bottom: 3px solid transparent;
+                        transition: all 0.3s ease;
+                    }
+
+                    .content-tab.active {
+                        border-bottom-color: var(--primary);
+                        color: var(--primary);
+                        font-weight: 600;
+                    }
+
+                    .content-tab:hover {
+                        background-color: var(--light);
+                    }
+
+                    .tab-content {
+                        display: none;
+                    }
+
+                    .tab-content.active {
+                        display: block;
+                    }
+
+                    .ai-suggestions-header {
+                        display: flex;
+                        align-items: center;
+                        margin-bottom: 10px;
+                        color: var(--primary);
+                        font-weight: 600;
+                    }
+
+                    .ai-suggestions-header .icon {
+                        margin-right: 8px;
+                        font-size: 1.2rem;
+                    }
+
+                    .meta-description-container {
+                        display: flex;
+                        flex-direction: column;
+                        height: 100%;
+                    }
+
+                    .meta-description-input {
+                        flex-grow: 1;
+                        min-height: 120px;
+                        width: 100%;
+                        padding: 12px;
+                        border: 1px solid var(--border);
+                        border-radius: 6px;
+                        font-size: 16px;
+                        resize: vertical;
+                        font-family: inherit;
+                    }
+
+                    .meta-description-input:focus {
+                        outline: none;
+                        border-color: var(--primary);
+                        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+                    }
+
+                    .ai-description-suggestions {
+                        margin-top: 10px;
+                    }
+
+                    .updated-blog-section {
+                        margin-top: 30px;
+                    }
+
+                    .updated-blog-display {
+                        background-color: white;
+                        border: 1px solid var(--border);
+                        border-radius: 8px;
+                        padding: 20px;
+                        margin-top: 10px;
+                        max-height: 600px;
+                        overflow-y: auto;
+                        font-size: 16px;
+                        line-height: 1.6;
+                    }
+
+                    .updated-blog-display h1,
+                    .updated-blog-display h2,
+                    .updated-blog-display h3,
+                    .updated-blog-display h4 {
+                        margin-bottom: 15px;
+                        color: var(--primary);
+                    }
+
+                    .updated-blog-display p {
+                        margin-bottom: 15px;
+                    }
+
+                    .updated-blog-display ul,
+                    .updated-blog-display ol {
+                        margin-bottom: 15px;
+                        padding-left: 25px;
+                    }
+
+                    .updated-blog-display li {
+                        margin-bottom: 8px;
+                    }
+
+                    .updated-blog-display table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-bottom: 20px;
+                    }
+
+                    .updated-blog-display th,
+                    .updated-blog-display td {
+                        padding: 10px;
+                        border: 1px solid var(--border);
+                        text-align: left;
+                    }
+
+                    .updated-blog-display th {
+                        background-color: var(--light);
+                        font-weight: 600;
+                    }
+
+                    .updated-blog-display a {
+                        color: var(--primary);
+                        text-decoration: underline;
+                    }
+
+                    .updated-blog-display a:hover {
+                        color: var(--secondary);
+                    }
+
+                    .updated-blog-display strong {
+                        font-weight: 600;
+                    }
+
+                    .updated-blog-display em {
+                        font-style: italic;
+                    }
+
+                    .blog-meta-info {
+                        background-color: var(--light);
+                        padding: 15px;
+                        border-radius: 6px;
+                        margin-bottom: 15px;
+                    }
+
+                    .blog-meta-info h4 {
+                        margin-bottom: 10px;
+                        color: var(--primary);
+                    }
+
+                    .blog-meta-info p {
+                        margin-bottom: 8px;
+                    }
+
+                    .blog-title-section {
+                        margin-bottom: 20px;
+                        padding-bottom: 15px;
+                        border-bottom: 1px solid var(--border);
+                    }
+
+                    .blog-title-container {
+                        display: flex;
+                        flex-direction: column;
+                        height: 100%;
+                    }
+
+                    .blog-title-input {
+                        width: 100%;
+                        padding: 12px;
+                        border: 1px solid var(--border);
+                        border-radius: 6px;
+                        font-size: 16px;
+                        resize: vertical;
+                        font-family: inherit;
+                    }
+
+                    .blog-title-input:focus {
+                        outline: none;
+                        border-color: var(--primary);
+                        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+                    }
+
+                    .ai-blog-title-suggestions {
+                        margin-top: 10px;
+                    }
+
+                    .download-section {
+                        margin-top: 20px;
+                        text-align: center;
+                        padding: 15px;
+                        background-color: var(--light);
+                        border-radius: 8px;
+                        border: 1px solid var(--border);
+                    }
+
+                    .download-btn {
+                        background-color: var(--success);
+                        margin-left: 10px;
+                    }
+
+                    .download-btn:hover {
+                        background-color: #2777f8;
+                        ;
+                    }
+
+                    .btn-group {
+                        display: flex;
+                        gap: 10px;
+                        justify-content: center;
+                        margin-top: 15px;
+                    }
+
+                    .blog-iframe-container {
+                        width: 100%;
+                        height: 600px;
+                        border: 1px solid var(--border);
+                        border-radius: 8px;
+                        overflow: hidden;
+                        margin-top: 10px;
+                    }
+
+                    .blog-iframe {
+                        width: 100%;
+                        height: 100%;
+                        border: none;
+                        background: white;
+                    }
+
+                    .iframe-placeholder {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        height: 100%;
+                        color: var(--gray);
+                        font-style: italic;
+                    }
+
+                    .dual-button-container {
+                        display: flex;
+                        gap: 15px;
+                        margin-top: 20px;
+                    }
+
+                    .dual-button-container .btn {
+                        flex: 1;
+                        width: 50%;
+                    }
+
+                    .update-details-btn {
+                        background-color: var(--warning);
+                    }
+
+                    .update-details-btn:hover {
+                        background-color: #2777f8;
+                        ;
+                    }
+
+                    .update-complete-btn {
+                        background-color: var(--success);
+                    }
+
+                    .update-complete-btn:hover {
+                        background-color: #2777f8;
+                        ;
+                    }
+
+                    .chatbot-toggle {
+                        position: fixed;
+                        bottom: 30px;
+                        right: 30px;
+                        width: 60px;
+                        height: 60px;
+                        background: linear-gradient(135deg, var(--primary), var(--secondary));
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        cursor: pointer;
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+                        z-index: 1000;
+                        transition: all 0.3s ease;
+                    }
+
+                    .chatbot-toggle:hover {
+                        transform: scale(1.1);
+                        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+                    }
+
+                    .chatbot-toggle .icon {
+                        color: white;
+                        font-size: 1.5rem;
+                    }
+
+                    .chatbot-popup {
+                        position: fixed;
+                        bottom: 100px;
+                        right: 30px;
+                        width: 380px;
+                        height: 500px;
+                        background: white;
+                        border-radius: 15px;
+                        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+                        z-index: 1001;
+                        display: flex;
+                        flex-direction: column;
+                        overflow: hidden;
+                        transform: translateY(20px);
+                        opacity: 0;
+                        visibility: hidden;
+                        transition: all 0.3s ease;
+                    }
+
+                    .chatbot-popup.active {
+                        transform: translateY(0);
+                        opacity: 1;
+                        visibility: visible;
+                    }
+
+                    .chatbot-header {
+                        padding: 20px;
+                        background: linear-gradient(135deg, var(--primary), var(--secondary));
+                        color: white;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+
+                    .chatbot-header h3 {
+                        margin: 0;
+                        font-size: 1.2rem;
+                    }
+
+                    .chatbot-close {
+                        background: none;
+                        border: none;
+                        color: white;
+                        font-size: 1.5rem;
+                        cursor: pointer;
+                        padding: 0;
+                        width: 30px;
+                        height: 30px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border-radius: 50%;
+                        transition: background-color 0.2s ease;
+                    }
+
+                    .chatbot-close:hover {
+                        background-color: rgba(255, 255, 255, 0.2);
+                    }
+
+                    .chatbot-messages {
+                        flex: 1;
+                        padding: 20px;
+                        overflow-y: auto;
+                        display: flex;
+                        flex-direction: column;
+                        gap: 15px;
+                    }
+
+                    .message {
+                        padding: 12px 16px;
+                        border-radius: 18px;
+                        max-width: 80%;
+                        line-height: 1.4;
+                        word-wrap: break-word;
+                    }
+
+                    .message.user {
+                        align-self: flex-end;
+                        background-color: var(--primary);
+                        color: white;
+                        border-bottom-right-radius: 4px;
+                    }
+
+                    .message.bot {
+                        align-self: flex-start;
+                        background-color: var(--light);
+                        color: var(--dark);
+                        border-bottom-left-radius: 4px;
+                        border: 1px solid var(--border);
+                    }
+
+                    .message.system {
+                        align-self: center;
+                        background-color: #e3f2fd;
+                        color: var(--primary);
+                        font-style: italic;
+                        font-size: 0.9rem;
+                        max-width: 90%;
+                        text-align: center;
+                        padding: 8px 12px;
+                    }
+
+                    .chatbot-input {
+                        padding: 20px;
+                        border-top: 1px solid var(--border);
+                        display: flex;
+                        gap: 10px;
+                        background-color: #f8f9fa;
+                    }
+
+                    .chatbot-input input {
+                        flex: 1;
+                        padding: 12px 16px;
+                        border: 1px solid var(--border);
+                        border-radius: 25px;
+                        font-size: 14px;
+                        outline: none;
+                        background: white;
+                    }
+
+                    .chatbot-input input:focus {
+                        border-color: var(--primary);
+                        box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.1);
+                    }
+
+                    .chatbot-input button {
+                        background-color: var(--primary);
+                        color: white;
+                        border: none;
+                        border-radius: 25px;
+                        padding: 12px 20px;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+
+                    .chatbot-input button:hover {
+                        background-color: var(--secondary);
+                        transform: scale(1.05);
+                    }
+
+                    .chatbot-input button:disabled {
+                        background-color: var(--gray);
+                        cursor: not-allowed;
+                        transform: none;
+                    }
+
+                    .chatbot-overlay {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background: rgba(0, 0, 0, 0.5);
+                        z-index: 999;
+                        opacity: 0;
+                        visibility: hidden;
+                        transition: all 0.3s ease;
+                    }
+
+                    .chatbot-overlay.active {
+                        opacity: 1;
+                        visibility: visible;
+                    }
+
+                    .selected-suggestion {
+                        background-color: rgba(76, 201, 240, 0.1);
+                        border: 1px solid var(--success);
+                        border-radius: 8px;
+                        padding: 10px;
+                        margin-bottom: 10px;
+                    }
+
+                    .selected-suggestion-header {
+                        font-weight: 600;
+                        color: var(--primary);
+                        margin-bottom: 5px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+
+                    .selected-suggestion-list {
+                        list-style-type: decimal;
+                        padding-left: 20px;
+                    }
+
+                    .selected-suggestion-list li {
+                        margin-bottom: 5px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 5px;
+                        border-radius: 4px;
+                    }
+
+                    .selected-suggestion-list li:hover {
+                        background-color: rgba(76, 201, 240, 0.1);
+                    }
+
+                    .remove-suggestion-btn {
+                        background: none;
+                        border: none;
+                        color: var(--danger);
+                        cursor: pointer;
+                        font-size: 1rem;
+                        padding: 2px 6px;
+                        border-radius: 4px;
+                        transition: all 0.2s ease;
+                    }
+
+                    .remove-suggestion-btn:hover {
+                        background-color: var(--danger);
+                        color: white;
+                    }
+
+                    @media (max-width: 768px) {
+                        .chatbot-popup {
+                            width: calc(100vw - 40px);
+                            height: 70vh;
+                            right: 20px;
+                            left: 20px;
+                            bottom: 20px;
+                        }
+
+                        .chatbot-toggle {
+                            bottom: 20px;
+                            right: 20px;
+                        }
+                    }
+
+                    .icon-clipboard {
+                        display: inline-block;
+                        width: 48px;
+                        height: 48px;
+                        background: var(--primary);
+                        border-radius: 50%;
+                        position: relative;
+                        margin: 0 auto 15px;
+                    }
+
+                    .icon-clipboard:before {
+                        content: "";
+                        position: absolute;
+                        top: 12px;
+                        left: 12px;
+                        width: 24px;
+                        height: 28px;
+                        background: white;
+                        border-radius: 2px;
+                    }
+
+                    .icon-clipboard:after {
+                        content: "";
+                        position: absolute;
+                        top: 10px;
+                        left: 18px;
+                        width: 12px;
+                        height: 4px;
+                        background: var(--primary);
+                        border-radius: 1px;
+                    }
+
+                    .icon-ai {
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        width: 24px;
+                        height: 24px;
+                        background: var(--primary);
+                        color: white;
+                        border-radius: 50%;
+                        font-size: 12px;
+                        font-weight: bold;
+                        margin-right: 8px;
+                    }
+
+                    .icon-chat {
+                        display: inline-block;
+                        width: 30px;
+                        height: 30px;
+                        position: relative;
+                    }
+
+                    .icon-chat:before {
+                        content: "";
+                        position: absolute;
+                        top: 5px;
+                        left: 5px;
+                        width: 20px;
+                        height: 15px;
+                        background: white;
+                        border-radius: 8px 8px 0 8px;
+                        box-shadow: 0 0 0 2px white;
+                    }
+
+                    .icon-chat:after {
+                        content: "";
+                        position: absolute;
+                        top: 15px;
+                        left: 10px;
+                        width: 10px;
+                        height: 10px;
+                        background: white;
+                        border-radius: 0 0 5px 0;
+                    }
+
+                    .ai-agent-selector {
+                        display: flex;
+                        gap: 10px;
+                        margin-top: 15px;
+                        margin-bottom: 15px;
+                        justify-content: center;
+                    }
+
+                    .ai-agent-btn {
+                        flex: 1;
+                        padding: 10px 15px;
+                        background-color: var(--light);
+                        color: var(--dark);
+                        border: 2px solid var(--border);
+                        border-radius: 6px;
+                        cursor: pointer;
+                        font-size: 14px;
+                        font-weight: 600;
+                        transition: all 0.3s ease;
+                        text-align: center;
+                    }
+
+                    .ai-agent-btn:hover {
+                        background-color: #e9ecef;
+                        border-color: var(--primary);
+                        transform: translateY(-2px);
+                    }
+
+                    .ai-agent-btn.selected {
+                        background-color: var(--primary);
+                        color: white;
+                        border-color: var(--primary);
+                    }
+
+                    .ai-agent-btn:disabled {
+                        background-color: var(--gray);
+                        cursor: not-allowed;
+                        transform: none;
+                        border-color: var(--border);
+                    }
+
+                    /* NEW: Editable Keywords Styles */
+                    .editable-keywords-container {
+                        margin-top: 10px;
+                    }
+
+                    .keyword-input-group {
+                        display: flex;
+                        gap: 8px;
+                        margin-bottom: 10px;
+                    }
+
+                    .keyword-input {
+                        flex: 1;
+                        padding: 8px 12px;
+                        border: 1px solid var(--border);
+                        border-radius: 4px;
+                        font-size: 14px;
+                    }
+
+                    .keyword-input:focus {
+                        outline: none;
+                        border-color: var(--primary);
+                    }
+
+                    .small-btn {
+                        padding: 8px 12px;
+                        font-size: 14px;
+                        background-color: var(--primary);
+                        color: white;
+                        border: none;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                    }
+
+                    .small-btn:hover {
+                        background-color: var(--secondary);
+                    }
+
+                    .small-btn.add-btn {
+                        background-color: var(--success);
+                    }
+
+                    .small-btn.add-btn:hover {
+                        background-color: #2777f8;
+                        ;
+                    }
+
+                    .small-btn.edit-btn {
+                        background-color: var(--warning);
+                    }
+
+                    .small-btn.edit-btn:hover {
+                        background-color: #e68900;
+                    }
+
+                    .small-btn.remove-btn {
+                        background-color: var(--danger);
+                    }
+
+                    .small-btn.remove-btn:hover {
+                        background-color: #d32f2f;
+                    }
+
+                    .editable-keyword-list {
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 8px;
+                        margin-top: 10px;
+                    }
+
+                    .editable-keyword-item {
+                        display: flex;
+                        align-items: center;
+                        gap: 6px;
+                        background-color: var(--light);
+                        padding: 6px 10px;
+                        border-radius: 15px;
+                        border: 1px solid var(--border);
+                        font-size: 0.9rem;
+                    }
+
+                    .editable-keyword-text {
+                        margin-right: 4px;
+                    }
+
+                    .keyword-actions {
+                        display: flex;
+                        gap: 4px;
+                    }
+
+                    .keyword-action-btn {
+                        background: none;
+                        border: none;
+                        cursor: pointer;
+                        font-size: 12px;
+                        width: 20px;
+                        height: 20px;
+                        border-radius: 50%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        transition: all 0.2s ease;
+                    }
+
+                    .keyword-action-btn.edit {
+                        color: var(--warning);
+                    }
+
+                    .keyword-action-btn.edit:hover {
+                        background-color: var(--warning);
+                        color: white;
+                    }
+
+                    .keyword-action-btn.remove {
+                        color: var(--danger);
+                    }
+
+                    .keyword-action-btn.remove:hover {
+                        background-color: var(--danger);
+                        color: white;
+                    }
+
+                    .keyword-edit-input {
+                        padding: 4px 8px;
+                        border: 1px solid var(--primary);
+                        border-radius: 4px;
+                        font-size: 0.9rem;
+                        width: 120px;
+                    }
+
+                    .keyword-edit-input:focus {
+                        outline: none;
+                        border-color: var(--secondary);
+                    }
+
+                    input[type="text"]:hover,
+                    input[type="url"]:hover {
+                        border-color: #3f37c9;
+                    }
+
+                    textarea:hover {
+                        border-color: #3f37c9;
+                    }
+                </style>
+                <div class="container">
+                    <header>
+                        <h1 style="padding : 10px;">Blog Analysis & Optimization Tool</h1>
+                        <p class="subtitle" style="padding-bottom: 10px">Upload or paste your blog content for
+                            comprehensive analysis and optimization</p>
+                    </header>
+
+                    <div class="main-content">
+                        <div class="input-section">
+                            <div class="card">
+                                <h2 class="card-title">Input Your Blog</h2>
+
+                                <div class="file-upload">
+                                    <label for="blog-file">Upload Blog File</label>
+                                    <div class="file-input-wrapper">
+                                        <input type="file" id="blog-file" accept=".txt,.doc,.docx,.html">
+                                        <div class="supported-formats">Supported formats: .txt, .doc, .docx, .html files
+                                        </div>
+                                    </div>
+                                    <div id="file-info" class="file-info hidden"></div>
+                                </div>
+
+                                <div class="upload-instructions">
+                                    <h4>Advanced Format Preservation:</h4>
+                                    <ul>
+                                        <li><strong>Hyperlinks:</strong> All clickable links preserved from Word
+                                            documents</li>
+                                        <li><strong>Formatting:</strong> Bold, italic, and underline formatting
+                                            maintained</li>
+                                        <li><strong>Lists:</strong> Bullet points and numbered lists preserved</li>
+                                        <li><strong>Structure:</strong> Headings and paragraphs maintained</li>
+                                        <li><strong>HTML Files:</strong> Full HTML structure and styling preserved</li>
+                                    </ul>
+                                </div>
+
+                                <div>
+                                    <label for="blog-content">Blog Content</label>
+
+                                    <!-- Paste Helper -->
+                                    <div class="paste-helper" id="paste-helper">
+                                        <div class="icon-clipboard"></div>
+                                        <p><strong>Click here to paste your content</strong><br>
+                                            Or upload a file above</p>
+                                    </div>
+
+                                    <!-- Content Tabs -->
+                                    <div class="content-tabs">
+                                        <div class="content-tab active" data-tab="textarea">Plain Text</div>
+                                        <div class="content-tab" data-tab="formatted">Formatted View</div>
+                                    </div>
+
+                                    <!-- Text Area Tab -->
+                                    <div class="tab-content active" id="textarea-tab">
+                                        <textarea id="blog-content"
+                                            placeholder="Your blog content will appear here after uploading a file or pasting text..."></textarea>
+                                    </div>
+
+                                    <!-- Formatted View Tab -->
+                                    <div class="tab-content" id="formatted-tab">
+                                        <div class="content-display" id="formatted-content">
+                                            <p class="placeholder-text">Formatted content will appear here after
+                                                processing a Word document or HTML file...</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Auto Process Notice -->
+                                    <div id="auto-process-notice" class="auto-process-notice hidden">
+                                        <strong>? Content extracted successfully!</strong> Your document has been
+                                        processed with formatting preserved.
+                                    </div>
+
+                                    <!-- Format Preservation Notice -->
+                                    <div id="format-notice" class="format-preserved-notice hidden">
+                                        <strong>Formatting Preserved:</strong> Hyperlinks, bold text, italics, and lists
+                                        have been maintained from your document.
+                                    </div>
+
+                                    <!-- Content Stats -->
+                                    <div class="content-stats">
+                                        <span id="word-count">0 words</span>
+                                        <span id="char-count">0 characters</span>
+                                        <span id="link-count">0 links</span>
+                                    </div>
+                                </div>
+
+                                <!-- NEW: AI Agent Selection Buttons -->
+                                <div class="ai-agent-selector">
+                                    <button id="ai-agent-gemini" class="ai-agent-btn selected">Google Gemini</button>
+                                    <button id="ai-agent-grok" class="ai-agent-btn">Grok</button>
+                                    <button id="ai-agent-chatgpt" class="ai-agent-btn">Chat GPT</button>
+                                </div>
+
+                                <button id="analyze-btn" class="btn btn-block">Analyze Blog</button>
+                            </div>
+
+                            <div id="loading-section" class="loading hidden">
+                                <div class="spinner"></div>
+                                <p>Analyzing your blog content...</p>
+                            </div>
+                        </div>
+
+                        <div class="output-section">
+                            <div class="analysis-section card">
+                                <h2 class="card-title">Blog Analysis</h2>
+
+                                <div class="metric">
+                                    <div class="metric-title">
+                                        <span>Perspective</span>
+                                        <span class="metric-value placeholder-text" id="perspective-value">Waiting for
+                                            analysis...</span>
+                                    </div>
+                                    <p>Identifies whether the blog is written in 1st, 2nd, or 3rd person perspective.
+                                    </p>
+                                </div>
+
+                                <div class="metric">
+                                    <div class="metric-title">
+                                        <span>Tone</span>
+                                        <span class="metric-value placeholder-text" id="tone-value">Waiting for
+                                            analysis...</span>
+                                    </div>
+                                    <p>Analyzes the emotional tone and style of the writing.</p>
+                                </div>
+
+                                <div class="metric">
+                                    <div class="metric-title">
+                                        <span>SEO Score</span>
+                                        <span class="metric-value placeholder-text" id="seo-score-value">Waiting for
+                                            analysis...</span>
+                                    </div>
+                                    <div class="seo-score">
+                                        <span>0</span>
+                                        <div class="score-bar">
+                                            <div id="score-fill" class="score-fill" style="width: 0%"></div>
+                                        </div>
+                                        <span>100</span>
+                                    </div>
+                                    <p>Measures how well optimized your blog is for search engines.</p>
+                                </div>
+
+                                <!-- NEW: Blog Title Section -->
+                                <div class="metric blog-title-section">
+                                    <div class="metric-title">
+                                        <span>Blog Title</span>
+                                    </div>
+                                    <div id="blog-title-value">
+                                        <p><strong>Title:</strong> <span class="placeholder-text"
+                                                id="title-value">Waiting for analysis...</span></p>
+                                    </div>
+                                </div>
+
+                                <div class="metric">
+                                    <div class="metric-title">
+                                        <span>Metadata</span>
+                                    </div>
+                                    <div id="metadata-value">
+                                        <p><strong>Meta Title:</strong> <span class="placeholder-text"
+                                                id="meta-title-value">Waiting for analysis...</span></p>
+                                        <p><strong>Meta Description:</strong> <span class="placeholder-text"
+                                                id="meta-description-value">Waiting for analysis...</span></p>
+                                    </div>
+                                </div>
+
+                                <!-- UPDATED: Focus Keywords with Editable Functionality -->
+                                <div class="metric">
+                                    <div class="metric-title">
+                                        <span>Focus Keywords</span>
+                                    </div>
+                                    <div id="focus-keywords-container">
+                                        <p class="placeholder-text" id="focus-keywords-value">Waiting for analysis...
+                                        </p>
+                                        <!-- NEW: Editable Keywords Interface -->
+                                        <div class="editable-keywords-container hidden" id="focus-keywords-editable">
+                                            <div class="keyword-input-group">
+                                                <input type="text" class="keyword-input" id="focus-keyword-input"
+                                                    placeholder="Enter a focus keyword">
+                                                <button class="small-btn add-btn"
+                                                    id="add-focus-keyword-btn">Add</button>
+                                            </div>
+                                            <div class="editable-keyword-list" id="focus-keywords-list"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- UPDATED: Related Keywords with Editable Functionality -->
+                                <div class="metric">
+                                    <div class="metric-title">
+                                        <span>Related Keywords</span>
+                                    </div>
+                                    <div id="related-keywords-container">
+                                        <p class="placeholder-text" id="related-keywords-value">Waiting for analysis...
+                                        </p>
+                                        <!-- NEW: Editable Keywords Interface -->
+                                        <div class="editable-keywords-container hidden" id="related-keywords-editable">
+                                            <div class="keyword-input-group">
+                                                <input type="text" class="keyword-input" id="related-keyword-input"
+                                                    placeholder="Enter a related keyword">
+                                                <button class="small-btn add-btn"
+                                                    id="add-related-keyword-btn">Add</button>
+                                            </div>
+                                            <div class="editable-keyword-list" id="related-keywords-list"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="metric">
+                                    <div class="metric-title">
+                                        <span>Recommendations</span>
+                                    </div>
+                                    <div id="recommendations-value" class="recommendations-list">
+                                        <p class="placeholder-text">Analysis results will appear here after
+                                            processing...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="edit-section card">
+                                <h2 class="card-title">Optimize Your Blog</h2>
+
+                                <div class="form-group">
+                                    <label for="perspective-select">Perspective</label>
+                                    <select id="perspective-select">
+                                        <option value="first">First Person (I, we)</option>
+                                        <option value="second">Second Person (you)</option>
+                                        <option value="third">Third Person (he, she, they)</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Tone</label>
+                                    <div class="tone-selector">
+                                        <div class="tone-option" data-tone="formal">Formal</div>
+                                        <div class="tone-option" data-tone="casual">Casual</div>
+                                        <div class="tone-option" data-tone="professional">Professional</div>
+                                        <div class="tone-option" data-tone="friendly">Friendly</div>
+                                        <div class="tone-option" data-tone="authoritative">Authoritative</div>
+                                        <div class="tone-option" data-tone="conversational">Conversational</div>
+                                        <div class="tone-option" data-tone="persuasive">Persuasive</div>
+                                        <div class="tone-option" data-tone="technical">Technical</div>
+                                        <div class="tone-option" data-tone="educational">Educational</div>
+                                        <div class="tone-option" data-tone="analytical">Analytical</div>
+                                    </div>
+                                </div>
+
+                                <!-- NEW: Blog Title Input -->
+                                <div class="form-group">
+                                    <label for="title-input">Blog Title</label>
+                                    <div class="blog-title-container">
+                                        <input type="text" id="title-input" class="blog-title-input"
+                                            placeholder="Enter blog title">
+                                        <div class="suggestions">
+                                            <div class="ai-suggestions-header">
+                                                <span class="icon-ai">AI</span>
+                                                <span>AI-Suggested Blog Titles:</span>
+                                            </div>
+                                            <div id="ai-blog-title-suggestions" class="ai-blog-title-suggestions">
+                                                <div class="suggestion-item placeholder-text">AI-generated blog title
+                                                    suggestions will appear here after analysis...</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="meta-title-input">Meta Title</label>
+                                    <input type="text" id="meta-title-input" placeholder="Enter meta title">
+                                    <div class="suggestions">
+                                        <div class="ai-suggestions-header">
+                                            <span class="icon-ai">AI</span>
+                                            <span>AI-Suggested Meta Titles:</span>
+                                        </div>
+                                        <div id="ai-meta-title-suggestions">
+                                            <div class="suggestion-item placeholder-text">AI-generated meta title
+                                                suggestions will appear here after analysis...</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="meta-description-input">Meta Description</label>
+                                    <div class="meta-description-container">
+                                        <textarea id="meta-description-input" class="meta-description-input"
+                                            placeholder="Enter meta description"></textarea>
+                                        <div class="suggestions">
+                                            <div class="ai-suggestions-header">
+                                                <span class="icon-ai">AI</span>
+                                                <span>AI-Suggested Descriptions:</span>
+                                            </div>
+                                            <div id="ai-description-suggestions" class="ai-description-suggestions">
+                                                <div class="suggestion-item placeholder-text">AI-generated description
+                                                    suggestions will appear here after analysis...</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- NEW: Dual Button Container -->
+                                <div class="dual-button-container">
+                                    <button id="update-details-btn" class="btn update-details-btn">Just update
+                                        details</button>
+                                    <button id="update-complete-btn" class="btn update-complete-btn">Update Complete
+                                        Blog</button>
+                                </div>
+                            </div>
+
+                            <!-- New Updated Blog Display Section -->
+                            <div id="updated-blog-section" class="updated-blog-section card hidden">
+                                <h2 class="card-title">Optimized Blog Result</h2>
+
+                                <div class="blog-meta-info">
+                                    <h4>Optimization Details</h4>
+                                    <p><strong>Blog Title:</strong> <span id="optimized-blog-title">-</span></p>
+                                    <p><strong>Meta Title:</strong> <span id="optimized-meta-title">-</span></p>
+                                    <p><strong>Meta Description:</strong> <span id="optimized-meta-description">-</span>
+                                    </p>
+                                </div>
+
+                                <!-- NEW: Updated to use iframe for proper HTML rendering -->
+                                <div class="blog-iframe-container">
+                                    <iframe id="updated-blog-iframe" class="blog-iframe"
+                                        srcdoc="<div class='iframe-placeholder'>Your optimized blog content will appear here after updating...</div>"></iframe>
+                                </div>
+
+                                <!-- NEW: Download Section -->
+                                <div class="download-section">
+                                    <h4>Download Your Optimized Blog</h4>
+                                    <p>Save your optimized blog content as an HTML file:</p>
+                                    <div class="btn-group">
+                                        <button id="download-html-btn" class="btn download-btn">Download as
+                                            HTML</button>
+                                        <button id="download-txt-btn" class="btn download-btn">Download as Text</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <footer>
+                        <p>Blog Analysis & Optimization Tool &copy; 2025 | Powered by Advanced AI Analysis</p>
+
+                    </footer>
+                </div>
+
+                <!-- NEW: Chatbot Popup -->
+                <div class="chatbot-overlay" id="chatbot-overlay"></div>
+
+                <div class="chatbot-popup" id="chatbot-popup">
+                    <div class="chatbot-header">
+                        <h3>AI Chat Assistant</h3>
+                        <button class="chatbot-close" id="chatbot-close">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path
+                                    d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="chatbot-messages" id="chatbot-messages">
+                        <div class="message system">
+                            Hello! I'm here to help you with your blog optimization. You can send AI suggestions to me
+                            for further refinement.
+                        </div>
+                        <!-- NEW: Selected Suggestions Container -->
+                        <div id="selected-suggestions-container" class="selected-suggestions-container"></div>
+                    </div>
+                    <div class="chatbot-input">
+                        <input type="text" id="chatbot-input" placeholder="Type your message here..." disabled>
+                        <button id="chatbot-send-btn" disabled>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- NEW: Chatbot Toggle Button -->
+                <div class="chatbot-toggle" id="chatbot-toggle">
+                    <div class="icon-chat"></div>
+                </div>
+
+                {% endblock %}
+
+                {% block extra_js %}
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        const analyzeBtn = document.getElementById('analyze-btn');
+                        const updateDetailsBtn = document.getElementById('update-details-btn');
+                        const updateCompleteBtn = document.getElementById('update-complete-btn');
+                        const blogContent = document.getElementById('blog-content');
+                        const blogFile = document.getElementById('blog-file');
+                        const fileInfo = document.getElementById('file-info');
+                        const loadingSection = document.getElementById('loading-section');
+                        const inputSection = document.querySelector('.input-section');
+                        const toneOptions = document.querySelectorAll('.tone-option');
+                        const pasteHelper = document.getElementById('paste-helper');
+                        const wordCount = document.getElementById('word-count');
+                        const charCount = document.getElementById('char-count');
+                        const linkCount = document.getElementById('link-count');
+                        const autoProcessNotice = document.getElementById('auto-process-notice');
+                        const formatNotice = document.getElementById('format-notice');
+                        const formattedContent = document.getElementById('formatted-content');
+                        const contentTabs = document.querySelectorAll('.content-tab');
+                        const tabContents = document.querySelectorAll('.tab-content');
+                        async function ensureMammothLoaded() {
+                            if (typeof mammoth !== 'undefined' && mammoth && mammoth.convertToHtml) {
+                                return;
+                            }
+                            const sources = [
+                                'https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js',
+                                'https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js',
+                                'https://unpkg.com/mammoth@1.6.0/mammoth.browser.min.js',
+                                '/static/js/mammoth.browser.min.js'
+                            ];
+                            const loadScript = (src) => new Promise((resolve, reject) => {
+                                const s = document.createElement('script');
+                                s.src = src;
+                                s.async = true;
+                                s.onload = resolve;
+                                s.onerror = reject;
+                                document.head.appendChild(s);
+                            });
+                            for (const src of sources) {
+                                try {
+                                    await loadScript(src);
+                                    if (typeof mammoth !== 'undefined' && mammoth && mammoth.convertToHtml) {
+                                        return;
+                                    }
+                                } catch (_) { /* try next source */ }
+                            }
+                            throw new Error('Mammoth library failed to load from all sources');
+                        }
+
+                        // NEW: Elements for blog title and suggestions
+                        const titleInput = document.getElementById('title-input');
+                        const aiBlogTitleSuggestions = document.getElementById('ai-blog-title-suggestions');
+                        const aiMetaTitleSuggestions = document.getElementById('ai-meta-title-suggestions');
+                        const aiDescriptionSuggestions = document.getElementById('ai-description-suggestions');
+                        const metaDescriptionInput = document.getElementById('meta-description-input');
+
+                        // New elements for updated blog display
+                        const updatedBlogSection = document.getElementById('updated-blog-section');
+                        const updatedBlogIframe = document.getElementById('updated-blog-iframe');
+                        const optimizedBlogTitle = document.getElementById('optimized-blog-title');
+                        const optimizedMetaTitle = document.getElementById('optimized-meta-title');
+                        const optimizedMetaDescription = document.getElementById('optimized-meta-description');
+
+                        // NEW: Download buttons
+                        const downloadHtmlBtn = document.getElementById('download-html-btn');
+                        const downloadTxtBtn = document.getElementById('download-txt-btn');
+
+                        // NEW: Chatbot elements
+                        const chatbotToggle = document.getElementById('chatbot-toggle');
+                        const chatbotPopup = document.getElementById('chatbot-popup');
+                        const chatbotOverlay = document.getElementById('chatbot-overlay');
+                        const chatbotClose = document.getElementById('chatbot-close');
+                        const chatbotMessages = document.getElementById('chatbot-messages');
+                        const chatbotInput = document.getElementById('chatbot-input');
+                        const chatbotSendBtn = document.getElementById('chatbot-send-btn');
+                        const selectedSuggestionsContainer = document.getElementById('selected-suggestions-container');
+
+                        // NEW: AI Agent Selection Elements
+                        const aiAgentGemini = document.getElementById('ai-agent-gemini');
+                        const aiAgentGrok = document.getElementById('ai-agent-grok');
+                        const aiAgentChatGPT = document.getElementById('ai-agent-chatgpt');
+                        const aiAgentButtons = [aiAgentGemini, aiAgentGrok, aiAgentChatGPT];
+
+                        // NEW: AI Agent object to store the selected value
+                        const AIAgent = {
+                            selected: 'Google Gemini' // Default value
+                        };
+
+                        // NEW: Data structure to store selected suggestions
+                        let selectedSuggestions = {
+                            blogTitles: [],
+                            metaTitles: [],
+                            descriptions: []
+                        };
+
+                        // NEW: Editable Keywords Elements
+                        const focusKeywordsInput = document.getElementById('focus-keyword-input');
+                        const addFocusKeywordBtn = document.getElementById('add-focus-keyword-btn');
+                        const focusKeywordsList = document.getElementById('focus-keywords-list');
+                        const focusKeywordsEditable = document.getElementById('focus-keywords-editable');
+
+                        const relatedKeywordsInput = document.getElementById('related-keyword-input');
+                        const addRelatedKeywordBtn = document.getElementById('add-related-keyword-btn');
+                        const relatedKeywordsList = document.getElementById('related-keywords-list');
+                        const relatedKeywordsEditable = document.getElementById('related-keywords-editable');
+
+                        // NEW: Keywords Data Storage
+                        let focusKeywordsData = [];
+                        let relatedKeywordsData = [];
+
+                        const analyzeWebhookUrl = '';
+                        const updateDetailsWebhookUrl = '';
+                        const updateCompleteWebhookUrl = 'https://mcmflow.app.n8n.cloud/webhook/89a60977-6a3f-4736-a3c7-b74540d1f54e';
+                        const chatbotWebhookUrl = 'https://mcmflow.app.n8n.cloud/webhook/4494d063-c53e-4599-ac9f-8d1bc9b01f64';
+
+                        // Supported file types - UPDATED: Added .html
+                        const supportedFormats = ['.txt', '.doc', '.docx', '.html'];
+
+                        // Store the current updated blog HTML for download
+                        let currentUpdatedBlogHtml = '';
+
+                        // Initialize
+                        updateContentStats();
+
+                        // NEW: Initialize AI Agent Selection
+                        initializeAIAgentSelection();
+
+                        // NEW: Initialize Keywords Functionality
+                        initializeKeywordsFunctionality();
+
+                        // NEW: AI Agent Selection Functions
+                        function initializeAIAgentSelection() {
+                            // Set default selection
+                            setAIAgentSelection('Google Gemini');
+
+                            // Add event listeners to AI agent buttons
+                            aiAgentButtons.forEach(button => {
+                                button.addEventListener('click', function () {
+                                    const agentName = this.textContent;
+                                    setAIAgentSelection(agentName);
+                                });
+                            });
+                        }
+
+                        function setAIAgentSelection(agentName) {
+                            // Update AIAgent object
+                            AIAgent.selected = agentName;
+
+                            // Update button states
+                            aiAgentButtons.forEach(button => {
+                                if (button.textContent === agentName) {
+                                    button.classList.add('selected');
+                                } else {
+                                    button.classList.remove('selected');
+                                }
+                            });
+
+                            console.log(`AI Agent selected: ${AIAgent.selected}`);
+                        }
+
+                        // NEW: Initialize Keywords Functionality
+                        function initializeKeywordsFunctionality() {
+                            // Focus Keywords Event Listeners
+                            addFocusKeywordBtn.addEventListener('click', function () {
+                                addKeyword('focus');
+                            });
+
+                            focusKeywordsInput.addEventListener('keypress', function (e) {
+                                if (e.key === 'Enter') {
+                                    addKeyword('focus');
+                                }
+                            });
+
+                            // Related Keywords Event Listeners
+                            addRelatedKeywordBtn.addEventListener('click', function () {
+                                addKeyword('related');
+                            });
+
+                            relatedKeywordsInput.addEventListener('keypress', function (e) {
+                                if (e.key === 'Enter') {
+                                    addKeyword('related');
+                                }
+                            });
+                        }
+
+                        // NEW: Add Keyword Function
+                        function addKeyword(type) {
+                            const input = type === 'focus' ? focusKeywordsInput : relatedKeywordsInput;
+                            const list = type === 'focus' ? focusKeywordsList : relatedKeywordsList;
+                            const data = type === 'focus' ? focusKeywordsData : relatedKeywordsData;
+
+                            const keyword = input.value.trim();
+
+                            if (keyword && !data.includes(keyword)) {
+                                data.push(keyword);
+                                renderKeywordsList(type);
+                                input.value = '';
+                                showStatus(`${type === 'focus' ? 'Focus' : 'Related'} keyword added: ${keyword}`, 'success');
+                            } else if (data.includes(keyword)) {
+                                showStatus('Keyword already exists!', 'error');
+                            }
+                        }
+
+                        // NEW: Remove Keyword Function
+                        function removeKeyword(type, index) {
+                            const data = type === 'focus' ? focusKeywordsData : relatedKeywordsData;
+                            const removedKeyword = data[index];
+
+                            data.splice(index, 1);
+                            renderKeywordsList(type);
+                            showStatus(`${type === 'focus' ? 'Focus' : 'Related'} keyword removed: ${removedKeyword}`, 'success');
+                        }
+
+                        // NEW: Edit Keyword Function
+                        function editKeyword(type, index) {
+                            const data = type === 'focus' ? focusKeywordsData : relatedKeywordsData;
+                            const list = type === 'focus' ? focusKeywordsList : relatedKeywordsList;
+
+                            const keywordItem = list.children[index];
+                            const keywordText = keywordItem.querySelector('.editable-keyword-text');
+                            const currentKeyword = data[index];
+
+                            // Create edit input
+                            const editInput = document.createElement('input');
+                            editInput.type = 'text';
+                            editInput.className = 'keyword-edit-input';
+                            editInput.value = currentKeyword;
+
+                            // Replace text with input
+                            keywordText.replaceWith(editInput);
+                            editInput.focus();
+
+                            // Save on Enter or blur
+                            const saveEdit = () => {
+                                const newKeyword = editInput.value.trim();
+                                if (newKeyword && newKeyword !== currentKeyword) {
+                                    if (!data.includes(newKeyword)) {
+                                        data[index] = newKeyword;
+                                        renderKeywordsList(type);
+                                        showStatus('Keyword updated successfully!', 'success');
+                                    } else {
+                                        showStatus('Keyword already exists!', 'error');
+                                        renderKeywordsList(type);
+                                    }
+                                } else {
+                                    renderKeywordsList(type);
+                                }
+                            };
+
+                            editInput.addEventListener('keypress', function (e) {
+                                if (e.key === 'Enter') {
+                                    saveEdit();
+                                }
+                            });
+
+                            editInput.addEventListener('blur', saveEdit);
+                        }
+
+                        // NEW: Render Keywords List
+                        function renderKeywordsList(type) {
+                            const data = type === 'focus' ? focusKeywordsData : relatedKeywordsData;
+                            const list = type === 'focus' ? focusKeywordsList : relatedKeywordsList;
+
+                            list.innerHTML = '';
+
+                            data.forEach((keyword, index) => {
+                                const keywordItem = document.createElement('div');
+                                keywordItem.className = 'editable-keyword-item';
+
+                                keywordItem.innerHTML = `
+                        <span class="editable-keyword-text">${keyword}</span>
+                        <div class="keyword-actions">
+                            <button class="keyword-action-btn edit" title="Edit keyword">&#9998;</button>
+                            <button class="keyword-action-btn remove" title="Remove keyword">&#128465;</button>
+                        </div>
+                    `;
+
+                                // Add event listeners
+                                const editBtn = keywordItem.querySelector('.keyword-action-btn.edit');
+                                const removeBtn = keywordItem.querySelector('.keyword-action-btn.remove');
+
+                                editBtn.addEventListener('click', () => editKeyword(type, index));
+                                removeBtn.addEventListener('click', () => removeKeyword(type, index));
+
+                                list.appendChild(keywordItem);
+                            });
+
+                            // Update the webhook payload data
+                            updateKeywordsInPayload();
+                        }
+
+                        // NEW: Update Keywords in Payload
+                        function updateKeywordsInPayload() {
+                            // These will be included in the webhook payload automatically
+                            // since we're storing them in focusKeywordsData and relatedKeywordsData
+                            console.log('Focus Keywords:', focusKeywordsData);
+                            console.log('Related Keywords:', relatedKeywordsData);
+                        }
+
+                        // NEW: Function to include AIAgent in webhook payloads
+                        function getPayloadWithAIAgent(basePayload) {
+                            return {
+                                ...basePayload,
+                                AIAgent: AIAgent.selected,
+                                focusKeywords: focusKeywordsData,
+                                relatedKeywords: relatedKeywordsData
+                            };
+                        }
+
+                        // Tab switching
+                        contentTabs.forEach(tab => {
+                            tab.addEventListener('click', function () {
+                                const tabName = this.getAttribute('data-tab');
+
+                                // Update tabs
+                                contentTabs.forEach(t => t.classList.remove('active'));
+                                this.classList.add('active');
+
+                                // Update content
+                                tabContents.forEach(content => content.classList.remove('active'));
+                                document.getElementById(`${tabName}-tab`).classList.add('active');
+                            });
+                        });
+
+                        // Tone selection
+                        toneOptions.forEach(option => {
+                            option.addEventListener('click', function () {
+                                this.classList.toggle('selected');
+                            });
+                        });
+
+                        // NEW: Chatbot toggle functionality
+                        function toggleChatbot() {
+                            chatbotPopup.classList.toggle('active');
+                            chatbotOverlay.classList.toggle('active');
+                        }
+
+                        chatbotToggle.addEventListener('click', toggleChatbot);
+                        chatbotClose.addEventListener('click', toggleChatbot);
+                        chatbotOverlay.addEventListener('click', toggleChatbot);
+
+                        // NEW: Add suggestion to chatbot
+                        function addSuggestionToChatbot(suggestion, type) {
+                            // Add to selected suggestions
+                            if (!selectedSuggestions[type].includes(suggestion)) {
+                                selectedSuggestions[type].push(suggestion);
+                                updateSelectedSuggestionsDisplay();
+                            }
+
+                            // Auto-open chatbot when suggestion is added
+                            if (!chatbotPopup.classList.contains('active')) {
+                                toggleChatbot();
+                            }
+                        }
+
+                        // NEW: Update selected suggestions display in chatbot
+                        function updateSelectedSuggestionsDisplay() {
+                            selectedSuggestionsContainer.innerHTML = '';
+
+                            // Create sections for each type
+                            const types = [
+                                { key: 'blogTitles', label: 'AI-Suggested Blog Titles' },
+                                { key: 'metaTitles', label: 'AI-Suggested Meta Titles' },
+                                { key: 'descriptions', label: 'AI-Suggested Descriptions' }
+                            ];
+
+                            types.forEach(type => {
+                                if (selectedSuggestions[type.key].length > 0) {
+                                    const suggestionSection = document.createElement('div');
+                                    suggestionSection.className = 'selected-suggestion';
+
+                                    const header = document.createElement('div');
+                                    header.className = 'selected-suggestion-header';
+                                    header.innerHTML = `
+                            <span>${type.label}:</span>
+                        `;
+
+                                    const list = document.createElement('ol');
+                                    list.className = 'selected-suggestion-list';
+
+                                    selectedSuggestions[type.key].forEach((suggestion, index) => {
+                                        const listItem = document.createElement('li');
+                                        listItem.innerHTML = `
+                                <span>${suggestion}</span>
+                                <button class="remove-suggestion-btn" data-type="${type.key}" data-index="${index}">&times;</button>
+                            `;
+                                        list.appendChild(listItem);
+                                    });
+
+                                    suggestionSection.appendChild(header);
+                                    suggestionSection.appendChild(list);
+                                    selectedSuggestionsContainer.appendChild(suggestionSection);
+                                }
+                            });
+                        }
+
+                        // NEW: Remove suggestion from chatbot
+                        function removeSuggestion(type, index) {
+                            if (selectedSuggestions[type] && selectedSuggestions[type].length > index) {
+                                selectedSuggestions[type].splice(index, 1);
+                                updateSelectedSuggestionsDisplay();
+                            }
+                        }
+
+                        // NEW: Add message to chatbot
+                        function addMessageToChatbot(message, type = 'user') {
+                            const messageElement = document.createElement('div');
+                            messageElement.className = `message ${type}`;
+                            messageElement.textContent = message;
+                            chatbotMessages.appendChild(messageElement);
+                            chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+                        }
+
+                        // NEW: Send chatbot message - FIXED: Handle new response format properly
+                        async function sendChatbotMessage() {
+                            const message = chatbotInput.value.trim();
+                            if (!message && Object.values(selectedSuggestions).every(arr => arr.length === 0)) return;
+
+                            // Prepare payload with selected suggestions and AIAgent
+                            const basePayload = {
+                                message: message,
+                                selectedSuggestions: selectedSuggestions,
+                                timestamp: new Date().toISOString(),
+                                source: 'blog-chatbot'
+                            };
+
+                            // Add AIAgent to payload
+                            const payload = getPayloadWithAIAgent(basePayload);
+
+                            // Add user message to chat
+                            if (message) {
+                                addMessageToChatbot(message, 'user');
+                            }
+
+                            // Clear input and disable during processing
+                            chatbotInput.value = '';
+                            chatbotInput.disabled = true;
+                            chatbotSendBtn.disabled = true;
+
+                            try {
+                                // Send message to chatbot webhook
+                                const response = await sendToWebhook(chatbotWebhookUrl, payload);
+
+                                // NEW: Handle the new response format with numbered fields
+                                if (response && Array.isArray(response)) {
+                                    // Process the response to update UI with alternatives
+                                    updateAISuggestionsFromChatbot(response);
+
+                                    // Display a success message in chatbot
+                                    addMessageToChatbot('I have generated new alternatives for your blog optimization. Check the suggestions below!', 'bot');
+                                } else if (response && response.reply) {
+                                    addMessageToChatbot(response.reply, 'bot');
+                                } else {
+                                    addMessageToChatbot('Thank you for your suggestions! I have received them for further processing.', 'bot');
+                                }
+
+                                // Clear selected suggestions after sending
+                                selectedSuggestions = {
+                                    blogTitles: [],
+                                    metaTitles: [],
+                                    descriptions: []
+                                };
+                                updateSelectedSuggestionsDisplay();
+
+                            } catch (error) {
+                                console.error('Error sending chatbot message:', error);
+                                addMessageToChatbot('Sorry, I encountered an error processing your message. Please try again.', 'bot');
+                            } finally {
+                                chatbotInput.disabled = false;
+                                chatbotSendBtn.disabled = false;
+                                chatbotInput.focus();
+                            }
+                        }
+
+                        // NEW: Update AI suggestions from chatbot response - FIXED: Handle new response format
+                        function updateAISuggestionsFromChatbot(response) {
+                            console.log("Updating AI suggestions from chatbot response:", response);
+
+                            // Check if response is an array and get the first item
+                            let chatbotData = response;
+                            if (Array.isArray(response) && response.length > 0) {
+                                chatbotData = response[0];
+                            }
+
+                            // Process enhanced blog titles
+                            if (chatbotData.enhancedBlogTitles1 || chatbotData.enhancedBlogTitles2 ||
+                                chatbotData.enhancedBlogTitles3 || chatbotData.enhancedBlogTitles4 ||
+                                chatbotData.enhancedBlogTitles5 || chatbotData.enhancedBlogTitles6) {
+
+                                const container = document.getElementById('ai-blog-title-suggestions');
+                                const targetInputId = 'title-input';
+
+                                // Clear placeholder if it exists
+                                if (container.querySelector('.placeholder-text')) {
+                                    container.innerHTML = '';
+                                }
+
+                                // Add new suggestions from chatbot
+                                for (let i = 1; i <= 6; i++) {
+                                    const key = `enhancedBlogTitles${i}`;
+                                    if (chatbotData[key]) {
+                                        const suggestionItem = document.createElement('div');
+                                        suggestionItem.className = 'suggestion-item new-alternative';
+                                        suggestionItem.setAttribute('data-target', targetInputId);
+
+                                        const suggestionText = document.createElement('span');
+                                        suggestionText.className = 'suggestion-text';
+                                        suggestionText.textContent = chatbotData[key];
+
+                                        const addButton = document.createElement('button');
+                                        addButton.className = 'add-suggestion-btn';
+                                        addButton.innerHTML = '+';
+                                        addButton.title = 'Send to chatbot';
+
+                                        suggestionItem.appendChild(suggestionText);
+                                        suggestionItem.appendChild(addButton);
+                                        container.appendChild(suggestionItem);
+                                    }
+                                }
+
+                                console.log(`Added enhanced blog titles to ai-blog-title-suggestions`);
+                            }
+
+                            // Process enhanced meta titles
+                            if (chatbotData.enhancedMetaTitles1 || chatbotData.enhancedMetaTitles2 || chatbotData.enhancedMetaTitles3) {
+
+                                const container = document.getElementById('ai-meta-title-suggestions');
+                                const targetInputId = 'meta-title-input';
+
+                                // Clear placeholder if it exists
+                                if (container.querySelector('.placeholder-text')) {
+                                    container.innerHTML = '';
+                                }
+
+                                // Add new suggestions from chatbot
+                                for (let i = 1; i <= 3; i++) {
+                                    const key = `enhancedMetaTitles${i}`;
+                                    if (chatbotData[key]) {
+                                        const suggestionItem = document.createElement('div');
+                                        suggestionItem.className = 'suggestion-item new-alternative';
+                                        suggestionItem.setAttribute('data-target', targetInputId);
+
+                                        const suggestionText = document.createElement('span');
+                                        suggestionText.className = 'suggestion-text';
+                                        suggestionText.textContent = chatbotData[key];
+
+                                        const addButton = document.createElement('button');
+                                        addButton.className = 'add-suggestion-btn';
+                                        addButton.innerHTML = '+';
+                                        addButton.title = 'Send to chatbot';
+
+                                        suggestionItem.appendChild(suggestionText);
+                                        suggestionItem.appendChild(addButton);
+                                        container.appendChild(suggestionItem);
+                                    }
+                                }
+
+                                console.log(`Added enhanced meta titles to ai-meta-title-suggestions`);
+                            }
+
+                            // Process enhanced descriptions
+                            if (chatbotData.enhancedDescriptions1 || chatbotData.enhancedDescriptions2 || chatbotData.enhancedDescriptions3) {
+
+                                const container = document.getElementById('ai-description-suggestions');
+                                const targetInputId = 'meta-description-input';
+
+                                // Clear placeholder if it exists
+                                if (container.querySelector('.placeholder-text')) {
+                                    container.innerHTML = '';
+                                }
+
+                                // Add new suggestions from chatbot
+                                for (let i = 1; i <= 3; i++) {
+                                    const key = `enhancedDescriptions${i}`;
+                                    if (chatbotData[key]) {
+                                        const suggestionItem = document.createElement('div');
+                                        suggestionItem.className = 'suggestion-item new-alternative';
+                                        suggestionItem.setAttribute('data-target', targetInputId);
+
+                                        const suggestionText = document.createElement('span');
+                                        suggestionText.className = 'suggestion-text';
+                                        suggestionText.textContent = chatbotData[key];
+
+                                        const addButton = document.createElement('button');
+                                        addButton.className = 'add-suggestion-btn';
+                                        addButton.innerHTML = '+';
+                                        addButton.title = 'Send to chatbot';
+
+                                        suggestionItem.appendChild(suggestionText);
+                                        suggestionItem.appendChild(addButton);
+                                        container.appendChild(suggestionItem);
+                                    }
+                                }
+
+                                console.log(`Added enhanced descriptions to ai-description-suggestions`);
+                            }
+                        }
+
+                        // NEW: Chatbot event listeners
+                        chatbotInput.addEventListener('keypress', function (e) {
+                            if (e.key === 'Enter') {
+                                sendChatbotMessage();
+                            }
+                        });
+
+                        chatbotSendBtn.addEventListener('click', sendChatbotMessage);
+
+                        // NEW: Remove suggestion event listener
+                        selectedSuggestionsContainer.addEventListener('click', function (e) {
+                            if (e.target.classList.contains('remove-suggestion-btn')) {
+                                const type = e.target.getAttribute('data-type');
+                                const index = parseInt(e.target.getAttribute('data-index'));
+                                removeSuggestion(type, index);
+                            }
+                        });
+
+                        // Enable chatbot after analysis
+                        function enableChatbot() {
+                            chatbotInput.disabled = false;
+                            chatbotSendBtn.disabled = false;
+                            chatbotInput.placeholder = "Type your message here...";
+                        }
+
+                        // FIXED: Suggestion selection with plus button
+                        document.addEventListener('click', function (e) {
+                            // Click on suggestion item (text) to update input field
+                            const suggestionItem = e.target.closest('.suggestion-item');
+                            if (suggestionItem && !e.target.classList.contains('add-suggestion-btn')) {
+                                const targetId = suggestionItem.getAttribute('data-target');
+                                if (targetId) {
+                                    const targetElement = document.getElementById(targetId);
+                                    const suggestionText = suggestionItem.querySelector('.suggestion-text').textContent;
+                                    if (targetElement) {
+                                        targetElement.value = suggestionText;
+                                        // Show success feedback
+                                        showStatus(`Updated ${targetId.replace('-input', '')} with suggestion`, 'success');
+                                    }
+                                }
+                            }
+
+                            // Plus button click to add to chatbot
+                            if (e.target.classList.contains('add-suggestion-btn')) {
+                                const suggestionItem = e.target.closest('.suggestion-item');
+                                const suggestionText = suggestionItem.querySelector('.suggestion-text').textContent;
+                                const source = suggestionItem.closest('.suggestions').querySelector('.ai-suggestions-header span:last-child').textContent;
+
+                                // Determine type based on source
+                                let type;
+                                if (source.includes('Blog Titles')) {
+                                    type = 'blogTitles';
+                                } else if (source.includes('Meta Titles')) {
+                                    type = 'metaTitles';
+                                } else if (source.includes('Descriptions')) {
+                                    type = 'descriptions';
+                                }
+
+                                if (type) {
+                                    addSuggestionToChatbot(suggestionText, type);
+                                    showStatus('Suggestion added to chatbot', 'success');
+                                }
+                            }
+                        });
+
+                        // Paste helper click handler
+                        pasteHelper.addEventListener('click', function () {
+                            blogContent.focus();
+                            showStatus('Please paste your content (Ctrl+V) in the text area', 'success');
+                        });
+
+                        // Text area event listeners for real-time updates
+                        blogContent.addEventListener('input', function () {
+                            updateContentStats();
+                            updateFormattedView();
+                            hideAutoProcessNotice();
+                            hideFormatNotice();
+                        });
+
+                        blogContent.addEventListener('paste', function (e) {
+                            setTimeout(() => {
+                                updateContentStats();
+                                updateFormattedView();
+                                showStatus('Content pasted successfully!', 'success');
+                                hideAutoProcessNotice();
+                                hideFormatNotice();
+                            }, 100);
+                        });
+
+                        // File upload handler - Robust processing & validation
+                        blogFile.addEventListener('change', async function (e) {
+                            const file = e.target.files && e.target.files[0];
+                            fileInfo.classList.remove('hidden');
+
+                            if (!file) {
+                                fileInfo.innerHTML = '<strong>No file selected.</strong> Please choose a file to upload.';
+                                fileInfo.className = 'file-info warning';
+                                return;
+                            }
+
+                            // Basic validation
+                            if (file.size === 0) {
+                                fileInfo.innerHTML = `<strong>Empty file:</strong> ${file.name}. Please upload a valid file.`;
+                                fileInfo.className = 'file-info error';
+                                blogFile.value = '';
+                                return;
+                            }
+
+                            // Check file extension
+                            const fileName = (file.name || '').toLowerCase();
+                            const isValidFormat = supportedFormats.some(format => fileName.endsWith(format));
+
+                            if (!isValidFormat) {
+                                fileInfo.innerHTML = `
+                        <strong>Unsupported file format:</strong> ${file.name}<br>
+                        Please upload a .txt, .doc, .docx, or .html file.
+                    `;
+                                fileInfo.className = 'file-info error';
+                                blogFile.value = '';
+                                return;
+                            }
+
+                            // Helper to safely set formatted HTML
+                            function safeSetFormattedHTML(rawHtml) {
+                                try {
+                                    const parser = new DOMParser();
+                                    const doc = parser.parseFromString(rawHtml, 'text/html');
+                                    // Remove scripts/styles/iframes for safety
+                                    doc.querySelectorAll('script, style, iframe, link[rel="import"]').forEach(el => el.remove());
+                                    // Use body content when available
+                                    const bodyHtml = doc.body ? doc.body.innerHTML : rawHtml;
+                                    formattedContent.innerHTML = bodyHtml || '<p class="placeholder-text">No displayable content found in HTML.</p>';
+                                } catch (err) {
+                                    console.error('Safe HTML parse error:', err);
+                                    formattedContent.innerHTML = '<p class="placeholder-text">Unable to render formatted HTML.</p>';
+                                }
+                            }
+
+                            // .txt
+                            if (fileName.endsWith('.txt')) {
+                                try {
+                                    const reader = new FileReader();
+                                    reader.onload = function (ev) {
+                                        const content = (ev && ev.target && ev.target.result) || '';
+                                        blogContent.value = content;
+                                        updateContentStats();
+                                        updateFormattedView();
+                                        fileInfo.innerHTML = `<strong>File loaded successfully:</strong> ${file.name}<br>Content has been loaded into the text area.`;
+                                        fileInfo.className = 'file-info success';
+                                        hideAutoProcessNotice();
+                                        hideFormatNotice();
+                                    };
+                                    reader.onerror = function (ev) {
+                                        console.error('TXT read error:', ev);
+                                        fileInfo.innerHTML = `<strong>Error reading file:</strong> ${file.name}<br>Please try again or paste your content directly.`;
+                                        fileInfo.className = 'file-info error';
+                                    };
+                                    reader.readAsText(file);
+                                } catch (err) {
+                                    console.error('TXT processing error:', err);
+                                    fileInfo.innerHTML = `<strong>Error processing text file:</strong> ${file.name}`;
+                                    fileInfo.className = 'file-info error';
+                                }
+                                return;
+                            }
+
+                            // .html
+                            if (fileName.endsWith('.html')) {
+                                try {
+                                    const reader = new FileReader();
+                                    reader.onload = function (ev) {
+                                        const rawHtml = (ev && ev.target && ev.target.result) || '';
+                                        blogContent.value = stripHtmlTags(rawHtml);
+                                        safeSetFormattedHTML(rawHtml);
+                                        updateContentStats();
+                                        showAutoProcessNotice();
+                                        showFormatNotice();
+                                        fileInfo.innerHTML = `<strong>HTML file processed successfully:</strong> ${file.name}`;
+                                        fileInfo.className = 'file-info success';
+                                        document.querySelector('[data-tab="formatted"]').click();
+                                        showStatus('HTML file processed successfully! Full formatting preserved.', 'success');
+                                    };
+                                    reader.onerror = function (ev) {
+                                        console.error('HTML read error:', ev);
+                                        fileInfo.innerHTML = `<strong>Error reading HTML file:</strong> ${file.name}`;
+                                        fileInfo.className = 'file-info error';
+                                        showStatus('Error reading HTML file. Please try again.', 'error');
+                                    };
+                                    reader.readAsText(file);
+                                } catch (err) {
+                                    console.error('HTML processing error:', err);
+                                    fileInfo.innerHTML = `<strong>Error processing HTML file:</strong> ${file.name}`;
+                                    fileInfo.className = 'file-info error';
+                                }
+                                return;
+                            }
+
+                            // .doc/.docx
+                            if (fileName.endsWith('.doc') || fileName.endsWith('.docx')) {
+                                try {
+                                    await ensureMammothLoaded();
+                                } catch (libErr) {
+                                    console.error('Mammoth load error:', libErr);
+                                    fileInfo.innerHTML = `<strong>Word processing library could not be loaded.</strong> Check your network and try again.`;
+                                    fileInfo.className = 'file-info error';
+                                    return;
+                                }
+                                fileInfo.innerHTML = `<strong>Processing Word document:</strong> ${file.name}<br>Extracting content with formatting preservation...`;
+                                fileInfo.className = 'file-info processing';
+                                try {
+                                    const { plainText, htmlContent, linkCount } = await processWordFile(file);
+                                    // For legacy .doc, Mammoth may fail: handle empty outputs
+                                    if (!plainText && !htmlContent) {
+                                        throw new Error('Unable to extract content from Word file');
+                                    }
+                                    blogContent.value = plainText || stripHtmlTags(htmlContent || '');
+                                    safeSetFormattedHTML(htmlContent || '');
+                                    updateContentStats();
+                                    showAutoProcessNotice();
+                                    showFormatNotice();
+                                    fileInfo.innerHTML = `<strong>Word document processed successfully:</strong> ${file.name}<br>${linkCount} hyperlinks preserved.`;
+                                    fileInfo.className = 'file-info success';
+                                    if (linkCount > 0) {
+                                        document.querySelector('[data-tab="formatted"]').click();
+                                    }
+                                    showStatus(`Word document processed successfully! ${linkCount} hyperlinks preserved.`, 'success');
+                                } catch (error) {
+                                    console.error('Error processing Word file:', error);
+                                    fileInfo.innerHTML = `<strong>Error processing Word document:</strong> ${file.name}<br>${fileName.endsWith('.doc') ? 'Legacy .doc files have limited support. Try saving as .docx and re-uploading.' : 'Please try again or paste your content directly.'}`;
+                                    fileInfo.className = 'file-info error';
+                                    showStatus('Error processing Word document. Please try again.', 'error');
+                                }
+                                return;
+                            }
+                        });
+
+                        // Helper function to strip HTML tags for textarea display
+                        function stripHtmlTags(html) {
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = html;
+                            return tempDiv.textContent || tempDiv.innerText || '';
+                        }
+
+                        // Analyze blog - Send both plain text and formatted view to n8n webhook
+                        analyzeBtn.addEventListener('click', async function () {
+                            const plainTextContent = blogContent.value.trim();
+                            const formattedBlogContent = formattedContent.innerHTML;
+
+                            // Check if we have content
+                            if (!plainTextContent) {
+                                showStatus('Please enter blog content or upload a file to analyze.', 'error');
+                                return;
+                            }
+
+                            // Show loading
+                            loadingSection.classList.remove('hidden');
+                            analyzeBtn.disabled = true;
+                            inputSection.style.opacity = '0.5';
+
+                            try {
+                                // Prepare base payload
+                                const basePayload = {
+                                    blogContent: plainTextContent,
+                                    formattedBlog: formattedBlogContent,
+                                    timestamp: new Date().toISOString(),
+                                    source: 'blog-analysis-tool'
+                                };
+
+                                // Add AIAgent to payload
+                                const payload = getPayloadWithAIAgent(basePayload);
+
+                                // Send data to n8n webhook
+                                const response = await sendToWebhook(analyzeWebhookUrl, payload);
+
+                                // Process the response from n8n
+                                if (response && Array.isArray(response)) {
+                                    updateAnalysisResults(response);
+                                    enableChatbot(); // Enable chatbot after analysis
+                                    showStatus('Blog analysis completed successfully!', 'success');
+                                } else {
+                                    throw new Error('Invalid response format from server');
+                                }
+                            } catch (error) {
+                                console.error('Error analyzing blog:', error);
+                                showStatus(`Analysis failed: ${error.message}`, 'error');
+                            } finally {
+                                // Hide loading
+                                loadingSection.classList.add('hidden');
+                                analyzeBtn.disabled = false;
+                                inputSection.style.opacity = '1';
+                            }
+                        });
+
+                        // NEW: Just update details button handler
+                        updateDetailsBtn.addEventListener('click', async function () {
+                            const perspective = document.getElementById('perspective-select').value;
+                            const selectedTones = Array.from(document.querySelectorAll('.tone-option.selected'))
+                                .map(el => el.getAttribute('data-tone'));
+                            const blogTitle = document.getElementById('title-input').value;
+                            const metaTitle = document.getElementById('meta-title-input').value;
+                            const metaDescription = document.getElementById('meta-description-input').value;
+                            const formattedBlog = formattedContent.innerHTML;
+
+                            if (!blogTitle || !metaTitle || !metaDescription) {
+                                showStatus('Please fill in all required fields.', 'error');
+                                return;
+                            }
+
+                            // Show loading
+                            loadingSection.classList.remove('hidden');
+                            updateDetailsBtn.disabled = true;
+                            updateCompleteBtn.disabled = true;
+
+                            try {
+                                // Prepare base payload for update details webhook
+                                const basePayload = {
+                                    optimizedData: {
+                                        perspective: perspective,
+                                        tone: selectedTones,
+                                        blogTitle: blogTitle,
+                                        metaTitle: metaTitle,
+                                        metaDescription: metaDescription
+                                    },
+                                    formattedBlog: formattedBlog,
+                                    timestamp: new Date().toISOString(),
+                                    source: 'blog-optimization-tool',
+                                    updateType: 'details-only'
+                                };
+
+                                // Add AIAgent to payload
+                                const payload = getPayloadWithAIAgent(basePayload);
+
+                                // Send data to update details webhook
+                                const response = await sendToWebhook(updateDetailsWebhookUrl, payload);
+
+                                if (response) {
+                                    // Display the updated blog content
+                                    displayUpdatedBlog(response);
+                                    showStatus('Blog details updated successfully!', 'success');
+                                } else {
+                                    throw new Error('No response from server');
+                                }
+                            } catch (error) {
+                                console.error('Error updating blog details:', error);
+                                showStatus(`Update details failed: ${error.message}`, 'error');
+                            } finally {
+                                // Hide loading
+                                loadingSection.classList.add('hidden');
+                                updateDetailsBtn.disabled = false;
+                                updateCompleteBtn.disabled = false;
+                            }
+                        });
+
+                        // Update complete blog button handler - UPDATED: Now includes focus and related keywords
+                        updateCompleteBtn.addEventListener('click', async function () {
+                            const perspective = document.getElementById('perspective-select').value;
+                            const selectedTones = Array.from(document.querySelectorAll('.tone-option.selected'))
+                                .map(el => el.getAttribute('data-tone'));
+                            const blogTitle = document.getElementById('title-input').value;
+                            const metaTitle = document.getElementById('meta-title-input').value;
+                            const metaDescription = document.getElementById('meta-description-input').value;
+                            const formattedBlog = formattedContent.innerHTML;
+
+                            // NEW: Get focus and related keywords from the editable interfaces
+                            const focusKeywords = focusKeywordsData;
+                            const relatedKeywords = relatedKeywordsData;
+
+                            if (!blogTitle || !metaTitle || !metaDescription) {
+                                showStatus('Please fill in all required fields.', 'error');
+                                return;
+                            }
+
+                            // Show loading
+                            loadingSection.classList.remove('hidden');
+                            updateDetailsBtn.disabled = true;
+                            updateCompleteBtn.disabled = true;
+
+                            try {
+                                // Prepare base payload for update complete webhook - UPDATED: Now includes keywords
+                                const basePayload = {
+                                    optimizedData: {
+                                        perspective: perspective,
+                                        tone: selectedTones,
+                                        blogTitle: blogTitle,
+                                        metaTitle: metaTitle,
+                                        metaDescription: metaDescription,
+                                        // NEW: Include keywords in the payload
+                                        focusKeywords: focusKeywords,
+                                        relatedKeywords: relatedKeywords
+                                    },
+                                    formattedBlog: formattedBlog,
+                                    timestamp: new Date().toISOString(),
+                                    source: 'blog-optimization-tool',
+                                    updateType: 'complete-blog'
+                                };
+
+                                // Add AIAgent to payload
+                                const payload = getPayloadWithAIAgent(basePayload);
+
+                                // Send data to update complete webhook
+                                const response = await sendToWebhook(updateCompleteWebhookUrl, payload);
+
+                                if (response) {
+                                    // Display the updated blog content
+                                    displayUpdatedBlog(response);
+                                    showStatus('Complete blog updated successfully!', 'success');
+                                } else {
+                                    throw new Error('No response from server');
+                                }
+                            } catch (error) {
+                                console.error('Error updating complete blog:', error);
+                                showStatus(`Complete blog update failed: ${error.message}`, 'error');
+                            } finally {
+                                // Hide loading
+                                loadingSection.classList.add('hidden');
+                                updateDetailsBtn.disabled = false;
+                                updateCompleteBtn.disabled = false;
+                            }
+                        });
+
+                        // Function to process Word files using Mammoth.js with HTML output
+                        async function processWordFile(file) {
+                            return new Promise((resolve, reject) => {
+                                const reader = new FileReader();
+
+                                reader.onload = function (loadEvent) {
+                                    const arrayBuffer = loadEvent.target.result;
+
+                                    // Use Mammoth to convert to HTML with preserved formatting
+                                    mammoth.convertToHtml({ arrayBuffer: arrayBuffer })
+                                        .then(function (result) {
+                                            const html = result.value; // The HTML content
+                                            const messages = result.messages;
+
+                                            // Extract plain text from HTML for textarea
+                                            const tempDiv = document.createElement('div');
+                                            tempDiv.innerHTML = html;
+                                            const plainText = tempDiv.textContent || tempDiv.innerText || '';
+
+                                            // Count links in the HTML
+                                            const linkMatches = html.match(/<a[^>]*href=["']([^"']*)["'][^>]*>/g) || [];
+                                            const linkCount = linkMatches.length;
+
+                                            // Log any processing messages
+                                            if (messages.length > 0) {
+                                                console.log('Word processing messages:', messages);
+                                            }
+
+                                            resolve({
+                                                plainText: plainText,
+                                                htmlContent: html,
+                                                linkCount: linkCount
+                                            });
+                                        })
+                                        .catch(function (error) {
+                                            reject(error);
+                                        });
+                                };
+
+                                reader.onerror = function (error) {
+                                    reject(error);
+                                };
+
+                                reader.readAsArrayBuffer(file);
+                            });
+                        }
+
+                        // Function to update content statistics
+                        function updateContentStats() {
+                            const content = blogContent.value;
+                            const words = content.trim() ? content.trim().split(/\s+/).length : 0;
+                            const characters = content.length;
+
+                            // Count links in plain text (basic detection)
+                            const linkMatches = content.match(/https?:\/\/[^\s]+/g) || [];
+                            const detectedLinks = linkMatches.length;
+
+                            wordCount.textContent = `${words} words`;
+                            charCount.textContent = `${characters} characters`;
+                            linkCount.textContent = `${detectedLinks} links detected`;
+                        }
+
+                        // Function to update formatted view from plain text
+                        function updateFormattedView() {
+                            const content = blogContent.value.trim();
+
+                            if (content) {
+                                // Convert plain text to basic HTML with link detection
+                                let htmlContent = content
+                                    .replace(/\n/g, '<br>')
+                                    .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>')
+                                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                    .replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+                                formattedContent.innerHTML = htmlContent;
+                            } else {
+                                formattedContent.innerHTML = '<p class="placeholder-text">Formatted content will appear here after processing a Word document or HTML file...</p>';
+                            }
+                        }
+
+                        // Function to show auto process notice
+                        function showAutoProcessNotice() {
+                            autoProcessNotice.classList.remove('hidden');
+                        }
+
+                        // Function to hide auto process notice
+                        function hideAutoProcessNotice() {
+                            autoProcessNotice.classList.add('hidden');
+                        }
+
+                        // Function to show format notice
+                        function showFormatNotice() {
+                            formatNotice.classList.remove('hidden');
+                        }
+
+                        // Function to hide format notice
+                        function hideFormatNotice() {
+                            formatNotice.classList.add('hidden');
+                        }
+
+                        // NEW: Function to update AI suggestions for both blog titles and meta titles
+                        function updateAISuggestions(blogTitleSuggestions, metaTitleSuggestions, metaDescriptionSuggestions) {
+                            // Update blog title suggestions - append and preserve existing
+                            if (blogTitleSuggestions && Array.isArray(blogTitleSuggestions)) {
+                                // Clear placeholder if present
+                                const placeholder = aiBlogTitleSuggestions.querySelector('.placeholder-text');
+                                if (placeholder) {
+                                    aiBlogTitleSuggestions.innerHTML = '';
+                                }
+                                // Collect existing suggestion texts to avoid duplicates
+                                const existingTexts = new Set(
+                                    Array.from(aiBlogTitleSuggestions.querySelectorAll('.suggestion-text'))
+                                        .map(el => (el.textContent || '').trim())
+                                );
+                                blogTitleSuggestions.forEach((suggestion) => {
+                                    const suggestionText = (suggestion || '').trim();
+                                    if (!suggestionText || existingTexts.has(suggestionText)) return;
+                                    const suggestionItem = document.createElement('div');
+                                    suggestionItem.className = 'suggestion-item ai-suggestion';
+                                    suggestionItem.setAttribute('data-target', 'title-input');
+                                    const textSpan = document.createElement('span');
+                                    textSpan.className = 'suggestion-text';
+                                    textSpan.textContent = suggestionText;
+                                    const addButton = document.createElement('button');
+                                    addButton.className = 'add-suggestion-btn';
+                                    addButton.innerHTML = '+';
+                                    addButton.title = 'Send to chatbot';
+                                    suggestionItem.appendChild(textSpan);
+                                    suggestionItem.appendChild(addButton);
+                                    aiBlogTitleSuggestions.appendChild(suggestionItem);
+                                    existingTexts.add(suggestionText);
+                                });
+                            }
+
+                            // Update meta title suggestions - append and preserve existing
+                            if (metaTitleSuggestions && Array.isArray(metaTitleSuggestions)) {
+                                // Clear placeholder if present
+                                const placeholder = aiMetaTitleSuggestions.querySelector('.placeholder-text');
+                                if (placeholder) {
+                                    aiMetaTitleSuggestions.innerHTML = '';
+                                }
+                                // Collect existing suggestion texts to avoid duplicates
+                                const existingTexts = new Set(
+                                    Array.from(aiMetaTitleSuggestions.querySelectorAll('.suggestion-text'))
+                                        .map(el => (el.textContent || '').trim())
+                                );
+                                metaTitleSuggestions.forEach((suggestion) => {
+                                    const suggestionText = (suggestion || '').trim();
+                                    if (!suggestionText || existingTexts.has(suggestionText)) return;
+                                    const suggestionItem = document.createElement('div');
+                                    suggestionItem.className = 'suggestion-item ai-suggestion';
+                                    suggestionItem.setAttribute('data-target', 'meta-title-input');
+                                    const textSpan = document.createElement('span');
+                                    textSpan.className = 'suggestion-text';
+                                    textSpan.textContent = suggestionText;
+                                    const addButton = document.createElement('button');
+                                    addButton.className = 'add-suggestion-btn';
+                                    addButton.innerHTML = '+';
+                                    addButton.title = 'Send to chatbot';
+                                    suggestionItem.appendChild(textSpan);
+                                    suggestionItem.appendChild(addButton);
+                                    aiMetaTitleSuggestions.appendChild(suggestionItem);
+                                    existingTexts.add(suggestionText);
+                                });
+                            }
+
+                            // Update description suggestions - append and preserve existing
+                            if (metaDescriptionSuggestions && Array.isArray(metaDescriptionSuggestions)) {
+                                // Clear placeholder if present
+                                const placeholder = aiDescriptionSuggestions.querySelector('.placeholder-text');
+                                if (placeholder) {
+                                    aiDescriptionSuggestions.innerHTML = '';
+                                }
+                                // Collect existing suggestion texts to avoid duplicates
+                                const existingTexts = new Set(
+                                    Array.from(aiDescriptionSuggestions.querySelectorAll('.suggestion-text'))
+                                        .map(el => (el.textContent || '').trim())
+                                );
+                                metaDescriptionSuggestions.forEach((suggestion) => {
+                                    const suggestionText = (suggestion || '').trim();
+                                    if (!suggestionText || existingTexts.has(suggestionText)) return;
+                                    const suggestionItem = document.createElement('div');
+                                    suggestionItem.className = 'suggestion-item ai-suggestion';
+                                    suggestionItem.setAttribute('data-target', 'meta-description-input');
+                                    const textSpan = document.createElement('span');
+                                    textSpan.className = 'suggestion-text';
+                                    textSpan.textContent = suggestionText;
+                                    const addButton = document.createElement('button');
+                                    addButton.className = 'add-suggestion-btn';
+                                    addButton.innerHTML = '+';
+                                    addButton.title = 'Send to chatbot';
+                                    suggestionItem.appendChild(textSpan);
+                                    suggestionItem.appendChild(addButton);
+                                    aiDescriptionSuggestions.appendChild(suggestionItem);
+                                    existingTexts.add(suggestionText);
+                                });
+                            }
+                        }
+
+                        // Function to send data to n8n webhook
+                        async function sendToWebhook(url, payload) {
+                            const response = await fetch(url, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify(payload)
+                            });
+
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+
+                            return await response.json();
+                        }
+
+                        // Function to display the updated blog content - UPDATED: Now uses iframe for proper HTML rendering
+                        function displayUpdatedBlog(response) {
+                            // Show the updated blog section
+                            updatedBlogSection.classList.remove('hidden');
+
+                            // Check if response is an array and get the first item
+                            let updatedBlogData = response;
+                            if (Array.isArray(response) && response.length > 0) {
+                                updatedBlogData = response[0];
+                            }
+
+                            // Update the meta information - FIXED: Added blog title and all fields
+                            if (updatedBlogData.title_plain) {
+                                optimizedBlogTitle.textContent = updatedBlogData.title_plain;
+                            } else if (updatedBlogData.blog_title) {
+                                optimizedBlogTitle.textContent = updatedBlogData.blog_title;
+                            } else {
+                                optimizedBlogTitle.textContent = 'Not provided';
+                            }
+
+                            if (updatedBlogData.meta_title) {
+                                optimizedMetaTitle.textContent = updatedBlogData.meta_title;
+                            } else {
+                                optimizedMetaTitle.textContent = 'Not provided';
+                            }
+
+                            if (updatedBlogData.meta_description) {
+                                optimizedMetaDescription.textContent = updatedBlogData.meta_description;
+                            } else {
+                                optimizedMetaDescription.textContent = 'Not provided';
+                            }
+
+                            // NEW: Display the updated blog content in an iframe for proper HTML rendering
+                            if (updatedBlogData.updated_blog) {
+                                // Store the HTML for download functionality
+                                currentUpdatedBlogHtml = updatedBlogData.updated_blog;
+
+                                // Use srcdoc to render the complete HTML document properly
+                                updatedBlogIframe.srcdoc = updatedBlogData.updated_blog;
+                            } else {
+                                updatedBlogIframe.srcdoc = '<div class="iframe-placeholder">No updated blog content received.</div>';
+                                currentUpdatedBlogHtml = '';
+                            }
+
+                            // Scroll to the updated blog section
+                            updatedBlogSection.scrollIntoView({ behavior: 'smooth' });
+                        }
+
+                        // NEW: Download functionality - Updated to use stored HTML
+                        downloadHtmlBtn.addEventListener('click', function () {
+                            if (!currentUpdatedBlogHtml) {
+                                showStatus('No optimized blog content available to download.', 'error');
+                                return;
+                            }
+
+                            const blogTitle = optimizedBlogTitle.textContent || 'optimized-blog';
+                            const fileName = `${blogTitle.replace(/\s+/g, '-').toLowerCase()}.html`;
+
+                            const blob = new Blob([currentUpdatedBlogHtml], { type: 'text/html' });
+                            const url = URL.createObjectURL(blob);
+
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = fileName;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+
+                            showStatus('Blog downloaded as HTML successfully!', 'success');
+                        });
+
+                        downloadTxtBtn.addEventListener('click', function () {
+                            if (!currentUpdatedBlogHtml) {
+                                showStatus('No optimized blog content available to download.', 'error');
+                                return;
+                            }
+
+                            // Extract text content from HTML
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = currentUpdatedBlogHtml;
+                            const blogContent = tempDiv.textContent || tempDiv.innerText || '';
+
+                            const blogTitle = optimizedBlogTitle.textContent || 'optimized-blog';
+                            const fileName = `${blogTitle.replace(/\s+/g, '-').toLowerCase()}.txt`;
+
+                            const blob = new Blob([blogContent], { type: 'text/plain' });
+                            const url = URL.createObjectURL(blob);
+
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = fileName;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+
+                            showStatus('Blog downloaded as Text successfully!', 'success');
+                        });
+
+                        // Function to update UI with analysis results from backend - UPDATED: Handle blog title and suggestions
+                        function updateAnalysisResults(responseArray) {
+                            // Process the array response format
+                            let perspective, tone, seoScore, title, metaTitle, metaDescription, focusKeywords, relatedKeywords, recommendations;
+                            let blogTitleSuggestions, metaTitleSuggestions, metaDescriptionSuggestions;
+
+                            responseArray.forEach(item => {
+                                if (item.perspective) perspective = item.perspective;
+                                if (item.tone) tone = item.tone;
+                                if (item.seoScore !== undefined) seoScore = item.seoScore;
+                                if (item.title) title = item.title;
+                                if (item.metaTitle) metaTitle = item.metaTitle;
+                                if (item.metaDescription) metaDescription = item.metaDescription;
+                                if (item.TitleSuggestions) blogTitleSuggestions = item.TitleSuggestions;
+                                if (item.metaTitleSuggestions) metaTitleSuggestions = item.metaTitleSuggestions;
+                                if (item.metaDescriptionSuggestions) metaDescriptionSuggestions = item.metaDescriptionSuggestions;
+                                if (item.focusKeywords) focusKeywords = item.focusKeywords;
+                                if (item.relatedKeywords) relatedKeywords = item.relatedKeywords;
+                                if (item.recommendations) recommendations = item.recommendations;
+                            });
+
+                            // Update perspective
+                            if (perspective) {
+                                document.getElementById('perspective-value').textContent = perspective;
+                                document.getElementById('perspective-value').className = 'metric-value';
+                                document.getElementById('perspective-select').value =
+                                    perspective.includes('1st') || perspective.includes('first') ? 'first' :
+                                        perspective.includes('2nd') || perspective.includes('second') ? 'second' : 'third';
+                            }
+
+                            // Update tone
+                            if (tone && Array.isArray(tone)) {
+                                document.getElementById('tone-value').textContent = tone.join(', ');
+                                document.getElementById('tone-value').className = 'metric-value';
+
+                                // Clear previous tone selections
+                                toneOptions.forEach(option => option.classList.remove('selected'));
+
+                                // Select tones based on analysis
+                                tone.forEach(toneName => {
+                                    const toneElement = document.querySelector(`.tone-option[data-tone="${toneName.toLowerCase()}"]`);
+                                    if (toneElement) toneElement.classList.add('selected');
+                                });
+                            }
+
+                            // Update SEO score
+                            if (seoScore !== undefined) {
+                                document.getElementById('seo-score-value').textContent = `${seoScore}/100`;
+                                document.getElementById('seo-score-value').className = 'metric-value';
+
+                                const scoreFill = document.getElementById('score-fill');
+                                scoreFill.style.width = `${seoScore}%`;
+
+                                // Set color based on score
+                                if (seoScore >= 80) {
+                                    scoreFill.className = 'score-fill score-good';
+                                } else if (seoScore >= 60) {
+                                    scoreFill.className = 'score-fill score-medium';
+                                } else {
+                                    scoreFill.className = 'score-fill score-poor';
+                                }
+                            }
+
+                            // NEW: Update blog title
+                            if (title) {
+                                document.getElementById('title-value').textContent = title;
+                                document.getElementById('title-value').className = '';
+                                document.getElementById('title-input').value = title;
+                            }
+
+                            // Update metadata - use exact data from webhook
+                            if (metaTitle) {
+                                document.getElementById('meta-title-value').textContent = metaTitle;
+                                document.getElementById('meta-title-value').className = '';
+                                document.getElementById('meta-title-input').value = metaTitle;
+                            }
+
+                            if (metaDescription) {
+                                // Use exact meta description from webhook
+                                document.getElementById('meta-description-value').textContent = metaDescription;
+                                document.getElementById('meta-description-value').className = '';
+                                document.getElementById('meta-description-input').value = metaDescription;
+                            }
+
+                            // NEW: Update Focus Keywords with editable interface
+                            if (focusKeywords && Array.isArray(focusKeywords)) {
+                                // Clear placeholder text
+                                const placeholder = document.getElementById('focus-keywords-value');
+                                if (placeholder) {
+                                    placeholder.style.display = 'none';
+                                }
+
+                                // Show editable interface
+                                focusKeywordsEditable.classList.remove('hidden');
+
+                                // Initialize data and render
+                                focusKeywordsData = [...focusKeywords];
+                                renderKeywordsList('focus');
+                            }
+
+                            // NEW: Update Related Keywords with editable interface
+                            if (relatedKeywords && Array.isArray(relatedKeywords)) {
+                                // Clear placeholder text
+                                const placeholder = document.getElementById('related-keywords-value');
+                                if (placeholder) {
+                                    placeholder.style.display = 'none';
+                                }
+
+                                // Show editable interface
+                                relatedKeywordsEditable.classList.remove('hidden');
+
+                                // Initialize data and render
+                                relatedKeywordsData = [...relatedKeywords];
+                                renderKeywordsList('related');
+                            }
+
+                            // NEW: Update AI suggestions for both blog titles and meta titles
+                            updateAISuggestions(blogTitleSuggestions, metaTitleSuggestions, metaDescriptionSuggestions);
+
+                            // Update recommendations
+                            if (recommendations && Array.isArray(recommendations)) {
+                                const recommendationsElement = document.getElementById('recommendations-value');
+                                recommendationsElement.innerHTML = '<ul></ul>';
+                                const recommendationsList = recommendationsElement.querySelector('ul');
+
+                                recommendations.forEach(rec => {
+                                    const listItem = document.createElement('li');
+                                    listItem.textContent = rec;
+                                    recommendationsList.appendChild(listItem);
+                                });
+                            }
+                        }
+
+                        // Function to show status messages
+                        function showStatus(message, type) {
+                            // Remove existing status messages
+                            const existingStatus = document.querySelector('.status-message');
+                            if (existingStatus) {
+                                existingStatus.remove();
+                            }
+
+                            // Create new status message
+                            const statusElement = document.createElement('div');
+                            statusElement.className = `status-message status-${type}`;
+                            statusElement.textContent = message;
+
+                            // Insert after the input section card
+                            inputSection.querySelector('.card').after(statusElement);
+
+                            // Auto-remove after 5 seconds
+                            setTimeout(() => {
+                                if (statusElement.parentNode) {
+                                    statusElement.remove();
+                                }
+                            }, 5000);
+                        }
+                    });
+                </script>
+                {% endblock %}
+                </body>
+
+                </html>

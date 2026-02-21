@@ -1,0 +1,125 @@
+/* Flowgen Button Effects
+   Implementation: CSS-only base states + JS-enhanced ripple
+   Usage: Apply to all primary action buttons using .btn-primary (Bootstrap) or [data-action="primary"]
+   Customization:
+     - Override CSS variables (--flowgen-primary, --flowgen-primary-2) for branding
+     - Adjust transition durations via --btn-transition
+     - Toggle ripple via [data-ripple="false"] on a specific button
+   Accessibility:
+     - High-contrast focus ring
+     - Respect reduced-motion preferences
+   Dependencies:
+     - None for CSS. JS ripple enhancement in static/js/effects.js (optional)
+*/
+
+:root {
+  --flowgen-primary: #0ea5e9; /* sky blue */
+  --flowgen-primary-2: #0284c7; /* deep cyan */
+  --flowgen-focus: rgba(14, 165, 233, 0.35);
+  --btn-transition: 180ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Prefer GPU-accelerated properties */
+.btn-primary,
+button[data-action="primary"] {
+  position: relative;
+  overflow: hidden;
+  will-change: transform, box-shadow;
+  transition: transform var(--btn-transition), box-shadow var(--btn-transition), filter var(--btn-transition);
+  background: linear-gradient(135deg, var(--flowgen-primary) 0%, var(--flowgen-primary-2) 100%);
+  border: none;
+  box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);
+}
+
+.btn-outline-primary,
+.btn-modal-primary {
+  position: relative;
+  overflow: hidden;
+  will-change: transform, box-shadow;
+  transition: transform var(--btn-transition), box-shadow var(--btn-transition), filter var(--btn-transition);
+}
+
+/* Flowgen Logo Styles */
+.flowgen-logo {
+  height: 40px;
+  width: auto;
+  position: relative;
+  z-index: 10;
+  opacity: 1;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  transition: transform var(--btn-transition), filter var(--btn-transition);
+  display: block; /* Ensure it behaves correctly */
+}
+
+.flowgen-logo:hover {
+  transform: scale(1.08);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.btn-outline-primary:hover,
+.btn-modal-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(2, 132, 199, 0.15);
+  filter: brightness(1.02);
+}
+
+.btn-outline-primary:active,
+.btn-modal-primary:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 6px 16px rgba(2, 132, 199, 0.12);
+}
+
+.btn-outline-primary:focus-visible,
+.btn-modal-primary:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px #ffffff,
+    0 0 0 6px var(--flowgen-focus),
+    0 10px 24px rgba(2, 132, 199, 0.2);
+}
+
+.btn-primary:hover,
+button[data-action="primary"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(2, 132, 199, 0.35);
+  filter: brightness(1.03);
+}
+
+.btn-primary:active,
+button[data-action="primary"]:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);
+  filter: brightness(0.98);
+}
+
+.btn-primary:focus-visible,
+button[data-action="primary"]:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px #ffffff,
+    0 0 0 6px var(--flowgen-focus),
+    0 10px 24px rgba(2, 132, 199, 0.35);
+}
+
+/* Ripple container (JS will inject a child .fg-ripple) */
+.fg-ripple {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.35) 40%, transparent 70%);
+  opacity: 0.6;
+  will-change: width, height, opacity, transform;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary,
+  button[data-action="primary"] {
+    transition: none;
+  }
+  .fg-ripple {
+    display: none !important;
+  }
+}

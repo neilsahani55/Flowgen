@@ -1,0 +1,1022 @@
+{% extends "base_dashboard.html" %}
+{% block title %}Landing Page Generator{% endblock %}
+
+{% block content %}
+<style>
+    /* Reset and full width setup */
+    .lp-page {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .lp-page .container {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    
+    .lp-page .header {
+        background-color: #3b82f6;
+        color: white;
+        text-align: center;
+        padding: 40px 30px;
+    }
+    
+    .lp-page .header h1 {
+        font-size: 32px;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+    
+    .lp-page .subtitle {
+        font-size: 15px;
+        opacity: 0.9;
+    }
+    
+    .lp-page .form-content {
+        padding: 40px;
+    }
+    
+    .lp-page .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+    
+    .lp-page .form-group {
+        margin-bottom: 0;
+    }
+    
+    .lp-page .full-width {
+        grid-column: 1 / -1;
+    }
+    
+    .lp-page label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2d3748;
+        font-size: 14px;
+    }
+    
+    .lp-page .required {
+        color: #e53e3e;
+    }
+    
+    .lp-page input,
+    .lp-page select,
+    .lp-page textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.2s ease;
+        background-color: #f7fafc;
+    }
+    
+    .lp-page input:focus,
+    .lp-page select:focus,
+    .lp-page textarea:focus {
+        outline: none;
+        border-color: #4a5568;
+        background-color: white;
+        box-shadow: 0 0 0 3px rgba(74, 85, 104, 0.1);
+    }
+    
+    .lp-page input[readonly] {
+        background-color: #edf2f7;
+        cursor: not-allowed;
+        color: #718096;
+    }
+    
+    .lp-page textarea {
+        resize: vertical;
+        min-height: 120px;
+        font-family: inherit;
+    }
+    
+    .lp-page .button-group {
+        text-align: center;
+        margin-top: 30px;
+    }
+    
+    .lp-page button {
+        background-color: #3b82f6;
+        color: white;
+        border: none;
+        padding: 14px 32px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .lp-page button:hover {
+        background-color: #2777f8;
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    
+    .lp-page button:active {
+        transform: translateY(0);
+    }
+    
+    .lp-page button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    .lp-page button .icon {
+        margin-right: 8px;
+        font-size: 16px;
+    }
+    
+    .lp-page .multiselect-wrapper {
+        position: relative;
+    }
+    
+    .lp-page .multiselect-display {
+        padding: 12px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        background-color: #f7fafc;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.2s ease;
+        min-height: 46px;
+    }
+    
+    .lp-page .multiselect-display:hover {
+        border-color: #cbd5e0;
+    }
+    
+    .lp-page .multiselect-display.active {
+        border-color: #4a5568;
+        background-color: white;
+        box-shadow: 0 0 0 3px rgba(74, 85, 104, 0.1);
+    }
+    
+    .lp-page .multiselect-display::after {
+        content: '\25BC';
+        font-size: 10px;
+        color: #718096;
+        transition: transform 0.2s ease;
+    }
+    
+    .lp-page .multiselect-display.active::after {
+        transform: rotate(180deg);
+    }
+    
+    .lp-page .multiselect-options {
+        position: absolute;
+        top: calc(100% + 4px);
+        left: 0;
+        right: 0;
+        background-color: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        max-height: 250px;
+        overflow-y: auto;
+        z-index: 10;
+        display: none;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .lp-page .multiselect-options.show {
+        display: block;
+        animation: slideDown 0.2s ease;
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .lp-page .multiselect-option {
+        padding: 12px 16px;
+        cursor: pointer;
+        transition: background-color 0.15s;
+        border-bottom: 1px solid #f7fafc;
+    }
+    
+    .lp-page .multiselect-option:last-child {
+        border-bottom: none;
+    }
+    
+    .lp-page .multiselect-option:hover {
+        background-color: #f7fafc;
+    }
+    
+    .lp-page .multiselect-option.selected {
+        background-color: #e6f2ff;
+        color: #2c5282;
+        font-weight: 600;
+    }
+    
+    .lp-page .multiselect-option.selected::before {
+        content: '\2713 ';
+        margin-right: 6px;
+    }
+    
+    .lp-page .result-container {
+        margin-top: 40px;
+        padding: 30px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        background-color: #f7fafc;
+        display: none;
+        width: 100%;
+        max-width: 100%;
+    }
+    
+    .lp-page .result-container.show {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .lp-page .result-header {
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .lp-page .result-header h2 {
+        color: #2d3748;
+        font-size: 22px;
+        margin: 0;
+    }
+    
+    .lp-page .copy-btn {
+        background-color: #38a169;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+    
+    .lp-page .copy-btn:hover {
+        background-color: #2f855a;
+        transform: translateY(-1px);
+    }
+    
+    .lp-page .result-content {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+        overflow-x: auto;
+    }
+    
+    .lp-page .formatted-content {
+        width: 100%;
+        max-width: 100%;
+        word-wrap: break-word;
+        overflow-wrap: anywhere;
+    }
+    
+    .lp-page .formatted-content img,
+    .lp-page .formatted-content table {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    .lp-page .formatted-content {
+        font-family: inherit;
+        line-height: 1.8;
+        color: #2d3748;
+    }
+    
+    .lp-page .formatted-content h1 {
+        font-size: 28px;
+        color: #1a202c;
+        margin: 24px 0 16px;
+        padding-bottom: 10px;
+        border-bottom: 3px solid #4a5568;
+        font-weight: 700;
+    }
+    
+    .lp-page .formatted-content h1:first-child {
+        margin-top: 0;
+    }
+    
+    .lp-page .formatted-content h2 {
+        font-size: 24px;
+        color: #2d3748;
+        margin: 20px 0 12px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #e2e8f0;
+        font-weight: 600;
+    }
+    
+    .lp-page .formatted-content h3 {
+        font-size: 20px;
+        color: #2d3748;
+        margin: 18px 0 10px;
+        font-weight: 600;
+    }
+    
+    .lp-page .formatted-content h4 {
+        font-size: 18px;
+        color: #4a5568;
+        margin: 16px 0 8px;
+        font-weight: 600;
+    }
+    
+    .lp-page .formatted-content p {
+        margin-bottom: 14px;
+        color: #4a5568;
+        line-height: 1.8;
+    }
+    
+    .lp-page .formatted-content ul,
+    .lp-page .formatted-content ol {
+        margin: 14px 0;
+        padding-left: 28px;
+    }
+    
+    .lp-page .formatted-content li {
+        margin-bottom: 8px;
+        color: #4a5568;
+        line-height: 1.7;
+    }
+    
+    .lp-page .formatted-content a {
+        color: #3182ce;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+    
+    .lp-page .formatted-content a:hover {
+        color: #2c5282;
+        text-decoration: underline;
+    }
+    
+    .lp-page .formatted-content strong {
+        font-weight: 600;
+        color: #2d3748;
+    }
+    
+    .lp-page .formatted-content em {
+        font-style: italic;
+    }
+    
+    .lp-page .formatted-content blockquote {
+        border-left: 4px solid #4a5568;
+        padding: 12px 16px;
+        margin: 16px 0;
+        background-color: #f7fafc;
+        border-radius: 0 6px 6px 0;
+        color: #4a5568;
+        font-style: italic;
+    }
+    
+    .lp-page .formatted-content code {
+        background-color: #f7fafc;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9em;
+        color: #e53e3e;
+    }
+    
+    .lp-page .formatted-content pre {
+        background-color: #2d3748;
+        color: #f7fafc;
+        padding: 16px;
+        border-radius: 6px;
+        overflow-x: auto;
+        margin: 16px 0;
+        display: none;
+    }
+    
+    .lp-page .formatted-content pre code {
+        background: none;
+        color: inherit;
+        padding: 0;
+    }
+    
+    .lp-page .loading {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 3px solid rgba(255, 255, 255, .3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 0.8s linear infinite;
+        margin-right: 8px;
+    }
+    
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+    
+    .lp-page .success-message {
+        color: #22543d;
+        background-color: #c6f6d5;
+        padding: 14px 18px;
+        border-radius: 8px;
+        margin-top: 16px;
+        border-left: 4px solid #38a169;
+        font-weight: 500;
+    }
+    
+    .lp-page .error-message {
+        color: #742a2a;
+        background-color: #fed7d7;
+        padding: 14px 18px;
+        border-radius: 8px;
+        margin-top: 16px;
+        border-left: 4px solid #e53e3e;
+        font-weight: 500;
+    }
+    
+    .lp-page .debug-info {
+        margin-top: 12px;
+        padding: 12px;
+        background-color: rgba(255, 255, 255, 0.5);
+        border-radius: 6px;
+        font-size: 13px;
+    }
+    
+    .lp-page .debug-info ul {
+        margin-top: 8px;
+        padding-left: 20px;
+    }
+    
+    .lp-page .debug-info li {
+        margin-bottom: 4px;
+    }
+    
+    /* Hover effects */
+    .lp-page input[type="text"]:hover,
+    .lp-page input[type="url"]:hover {
+        border-color: #3b82f6;
+    }
+    
+    .lp-page textarea:hover {
+        border-color: #3b82f6;
+    }
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .lp-page .form-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .lp-page .form-content {
+            padding: 25px;
+        }
+        
+        .lp-page .header {
+            padding: 30px 20px;
+        }
+        
+        .lp-page .header h1 {
+            font-size: 26px;
+        }
+        
+        .lp-page .result-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .lp-page .copy-btn {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .lp-page .result-content {
+            padding: 20px;
+        }
+    }
+    
+    /* Scrollbar styling */
+    .lp-page .multiselect-options::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    .lp-page .multiselect-options::-webkit-scrollbar-track {
+        background: #f7fafc;
+        border-radius: 8px;
+    }
+    
+    .lp-page .multiselect-options::-webkit-scrollbar-thumb {
+        background: #cbd5e0;
+        border-radius: 8px;
+    }
+    
+    .lp-page .multiselect-options::-webkit-scrollbar-thumb:hover {
+        background: #a0aec0;
+    }
+</style>
+
+<div class="lp-page">
+    <div class="container"> 
+        <div class="header"> 
+            <h1>Landing Page Generator</h1> 
+            <p class="subtitle">AI-powered professional landing page content generation</p> 
+        </div>
+         
+        <div class="form-content">
+            <form id="blogForm"> 
+                <input type="hidden" id="job_id" name="job_id" value=""> 
+                 
+                <div class="form-grid"> 
+                    <div class="form-group full-width"> 
+                        <label for="competitor_url">Competitor URL (Optional)</label> 
+                        <input type="url" id="competitor_url" name="competitor_url" placeholder="https://example.com/landing-page"> 
+                    </div>
+
+                    <!-- NEW: Focus Keywords field -->
+                    <div class="form-group full-width"> 
+                        <label for="focus_keywords">Focus Keywords <span class="required">*</span></label> 
+                        <input type="text" id="focus_keywords" name="focus_keywords" placeholder="e.g., VoIP services, cloud communication, business phone system"> 
+                    </div>
+
+                    <div class="form-group"> 
+                        <label for="domainContent">Domain & Content <span class="required">*</span></label> 
+                        <select id="domainContent" name="domainContent" required> 
+                            <option value="">Select domain...</option> 
+                            <option value="Ucaas / Virtual Number">UCaaS / Virtual Number</option> 
+                            <option value="Wholesale Voice / Wholesale VoIP">Wholesale Voice / Wholesale VoIP</option> 
+                        </select> 
+                    </div>
+
+                    <div class="form-group"> 
+                        <label for="contentType">Types of Content</label> 
+                        <input type="text" id="contentType" name="contentType" value="Commercial" readonly> 
+                    </div>
+
+                    <div class="form-group"> 
+                        <label for="entityName">Entity/Brand Name <span class="required">*</span></label> 
+                        <div class="multiselect-wrapper"> 
+                            <div class="multiselect-display" id="entityNameDisplay">Select a brand...</div> 
+                            <div class="multiselect-options" id="entityNameOptions"> 
+                                <div class="multiselect-option" data-value="mycountry mobile">MCM</div> 
+                                <div class="multiselect-option" data-value="Tkos">Tkos</div> 
+                                <div class="multiselect-option" data-value="call mama">Call mama</div> 
+                                <div class="multiselect-option" data-value="Teloz">Teloz</div> 
+                                <div class="multiselect-option" data-value="Ajoxi">Ajoxi</div> 
+                                <div class="multiselect-option" data-value="SoftTop">SoftTop</div> 
+                                <div class="multiselect-option" data-value="Letsdial">Letsdial</div> 
+                                <div class="multiselect-option" data-value="Twiching">Twiching</div> 
+                                <div class="multiselect-option" data-value="Rozper">Rozper</div> 
+                                <div class="multiselect-option" data-value="RingFlow">Ringflow</div> 
+                            </div> 
+                            <input type="hidden" id="entityName" name="entityName" value="" required> 
+                        </div> 
+                    </div>
+
+                    <div class="form-group"> 
+                        <label for="blogTone">Blog Tone</label> 
+                        <div class="multiselect-wrapper"> 
+                            <div class="multiselect-display" id="blogToneDisplay">Select tones...</div> 
+                            <div class="multiselect-options" id="blogToneOptions"> 
+                                <div class="multiselect-option" data-value="professional">Professional</div> 
+                                <div class="multiselect-option" data-value="casual">Casual</div> 
+                                <div class="multiselect-option" data-value="friendly">Friendly</div> 
+                                <div class="multiselect-option" data-value="authoritative">Authoritative</div> 
+                                <div class="multiselect-option" data-value="conversational">Conversational</div> 
+                            </div> 
+                            <input type="hidden" id="blogTone" name="blogTone" value=""> 
+                        </div> 
+                    </div>
+
+                    <div class="form-group"> 
+                        <label for="generateMeta">Generate Meta Tags</label> 
+                        <select id="generateMeta" name="generateMeta"> 
+                            <option value="yes">Yes</option> 
+                            <option value="no">No</option> 
+                        </select> 
+                    </div>
+
+                    <div class="form-group full-width"> 
+                        <label for="primaryGoal">Primary Goal (Optional)</label> 
+                        <input type="text" id="primaryGoal" name="primaryGoal" placeholder="e.g. Increase conversions, educate readers"> 
+                    </div>
+
+                    <div class="form-group full-width"> 
+                        <label for="instructions">Additional Instructions (Optional)</label> 
+                        <textarea id="instructions" name="instructions" placeholder="Any specific requirements or guidelines for your landing page..."></textarea> 
+                    </div>
+                </div>
+
+                <div class="button-group"> 
+                    <button type="submit" id="submitBtn" data-action="primary"> 
+                        <span class="icon">&#9658;</span> 
+                        <span>Generate Landing Page</span> 
+                    </button>
+                </div>
+                
+                <div id="result" class="result-container">
+                    <div class="result-header">
+                        <h2>Generated Landing Page</h2>
+                        <button type="button" class="copy-btn" id="copyBtn">
+                            <span class="icon">&#10003;</span>
+                            Copy Content
+                        </button>
+                    </div>
+                    <div class="result-content">
+                        <!-- Formatted content will be displayed here -->
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('job_id').value = 'job_' + Math.random().toString(36).substr(2, 9);
+        
+        setupMultiselect('entityName', 'entityNameDisplay', 'entityNameOptions', false);
+        setupMultiselect('blogTone', 'blogToneDisplay', 'blogToneOptions', true);
+        
+        document.getElementById('blogForm').addEventListener('submit', submitForm);
+        document.getElementById('copyBtn').addEventListener('click', copyContent);
+    });
+
+    function setupMultiselect(fieldId, displayId, optionsId, allowMultiple) {
+        const display = document.getElementById(displayId);
+        const options = document.getElementById(optionsId);
+        const hiddenInput = document.getElementById(fieldId);
+        
+        display.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isVisible = options.classList.contains('show');
+            
+            document.querySelectorAll('.multiselect-options').forEach(opt => {
+                opt.classList.remove('show');
+            });
+            document.querySelectorAll('.multiselect-display').forEach(disp => {
+                disp.classList.remove('active');
+            });
+            
+            if (!isVisible) {
+                options.classList.add('show');
+                display.classList.add('active');
+            }
+        });
+        
+        document.addEventListener('click', function(e) {
+            if (!display.contains(e.target) && !options.contains(e.target)) {
+                options.classList.remove('show');
+                display.classList.remove('active');
+            }
+        });
+        
+        const optionElements = options.querySelectorAll('.multiselect-option');
+        optionElements.forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const value = this.getAttribute('data-value');
+                const text = this.textContent.replace(/\u2713 /, '');
+                
+                if (allowMultiple) {
+                    this.classList.toggle('selected');
+                    
+                    const selectedOptions = options.querySelectorAll('.selected');
+                    const selectedValues = Array.from(selectedOptions).map(el => el.getAttribute('data-value'));
+                    hiddenInput.value = selectedValues.join(',');
+                    
+                    if (selectedValues.length > 0) {
+                        const displayText = Array.from(selectedOptions).map(el => el.textContent.replace(/\u2713 /, '')).join(', ');
+                        display.textContent = displayText;
+                    } else {
+                        display.textContent = 'Select tones...';
+                    }
+                } else {
+                    optionElements.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                    hiddenInput.value = value;
+                    display.textContent = text;
+                    options.classList.remove('show');
+                    display.classList.remove('active');
+                }
+            });
+        });
+    }
+
+    function submitForm(e) {
+        e.preventDefault();
+        
+        const submitBtn = document.getElementById('submitBtn');
+        const originalBtnText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<span class="loading"></span>Generating...';
+        submitBtn.disabled = true;
+        
+        const formData = new FormData(document.getElementById('blogForm'));
+        const formObject = {};
+        
+        formData.forEach((value, key) => {
+            formObject[key] = value;
+        });
+        
+        if (!formObject.domainContent || !formObject.entityName) {
+            showError('Please fill in all required fields.');
+            resetButton();
+            return;
+        }
+        
+        fetch('https://mcmflow.app.n8n.cloud/webhook/landingpage', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(formObject)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok: ' + response.status + ' ' + response.statusText);
+            }
+            
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('application/json')) {
+                return response.json();
+            } else {
+                return response.text().then(text => {
+                    try {
+                        return JSON.parse(text);
+                    } catch (e) {
+                        return { text: text };
+                    }
+                });
+            }
+        })
+        .then(data => {
+            displayResult(data);
+            showSuccess('Landing Page generated successfully!');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showError('There was an error generating your landing page. Please try again. Error: ' + error.message);
+        })
+        .finally(() => {
+            resetButton();
+        });
+        
+        function resetButton() {
+            submitBtn.innerHTML = originalBtnText;
+            submitBtn.disabled = false;
+        }
+    }
+
+    function displayResult(data) {
+        const resultContainer = document.getElementById('result');
+        const resultContent = resultContainer.querySelector('.result-content');
+        
+        resultContent.innerHTML = '';
+        resultContainer.classList.add('show');
+        
+        try {
+            let content = '';
+            
+            if (Array.isArray(data) && data.length > 0) {
+                const item = data[0];
+                content = item['Final_content '] || item.Final_content || item.content || JSON.stringify(item, null, 2);
+            } else if (data && typeof data === 'object') {
+                content = data['Final_content '] || data.Final_content || data.content || data.text || JSON.stringify(data, null, 2);
+            } else {
+                content = String(data) || 'No content received';
+            }
+            
+            const formattedContent = processContent(content);
+            resultContent.appendChild(formattedContent);
+            
+            resultContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } catch (error) {
+            console.error('Error displaying result:', error);
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = 'Error displaying content: ' + error.message;
+            resultContent.appendChild(errorDiv);
+        }
+    }
+
+    function processContent(content) {
+        const container = document.createElement('div');
+        container.className = 'formatted-content';
+        
+        let cleanContent = String(content);
+        
+        cleanContent = cleanContent.replace(/<!--[\s\S]*?-->/g, '');
+        cleanContent = cleanContent.replace(/\bVn\b/g, '');
+        
+        // Handle markdown headers
+        cleanContent = cleanContent.replace(/^#### (.*?)$/gm, '<h4>$1</h4>');
+        cleanContent = cleanContent.replace(/^### (.*?)$/gm, '<h3>$1</h3>');
+        cleanContent = cleanContent.replace(/^## (.*?)$/gm, '<h2>$1</h2>');
+        cleanContent = cleanContent.replace(/^# (.*?)$/gm, '<h1>$1</h1>');
+        
+        // Process bold and italic
+        cleanContent = cleanContent.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>');
+        cleanContent = cleanContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        cleanContent = cleanContent.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        
+        // Process links
+        cleanContent = cleanContent.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+        
+        // Process code blocks
+        cleanContent = cleanContent.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+        cleanContent = cleanContent.replace(/`([^`]+)`/g, '<code>$1</code>');
+        
+        // Split into sections
+        const sections = cleanContent.split(/\n\s*\n+/);
+        
+        sections.forEach(section => {
+            const trimmedSection = section.trim();
+            if (!trimmedSection || trimmedSection === '<br>') return;
+            
+            // Already processed headers
+            if (trimmedSection.match(/^<h[1-4]>/)) {
+                container.innerHTML += trimmedSection;
+                return;
+            }
+            
+            // Already processed code blocks
+            if (trimmedSection.startsWith('<pre>')) {
+                container.innerHTML += trimmedSection;
+                return;
+            }
+            
+            // Check for bullet points
+            const bulletPattern = /^[\s]*[-*\u2022]\s+/;
+            const lines = trimmedSection.split('\n');
+            const isList = lines.some(line => bulletPattern.test(line));
+            
+            if (isList) {
+                const list = document.createElement('ul');
+                lines.forEach(line => {
+                    const cleanLine = line.replace(bulletPattern, '').trim();
+                    if (cleanLine) {
+                        const li = document.createElement('li');
+                        li.innerHTML = cleanLine;
+                        list.appendChild(li);
+                    }
+                });
+                container.appendChild(list);
+                return;
+            }
+            
+            // Check for numbered lists
+            const numberedPattern = /^\d+\.\s+/;
+            const isNumberedList = lines.some(line => numberedPattern.test(line));
+            
+            if (isNumberedList) {
+                const list = document.createElement('ol');
+                lines.forEach(line => {
+                    const cleanLine = line.replace(numberedPattern, '').trim();
+                    if (cleanLine) {
+                        const li = document.createElement('li');
+                        li.innerHTML = cleanLine;
+                        list.appendChild(li);
+                    }
+                });
+                container.appendChild(list);
+                return;
+            }
+            
+            // Check for blockquotes
+            if (trimmedSection.toLowerCase().includes('insight:') || 
+                trimmedSection.toLowerCase().includes('note:') ||
+                trimmedSection.startsWith('>')) {
+                const blockquote = document.createElement('blockquote');
+                blockquote.innerHTML = trimmedSection.replace(/^>\s*/gm, '');
+                container.appendChild(blockquote);
+                return;
+            }
+            
+            // Regular paragraph
+            if (trimmedSection) {
+                const p = document.createElement('p');
+                p.innerHTML = trimmedSection;
+                container.appendChild(p);
+            }
+        });
+        
+        return container;
+    }
+
+    function copyContent() {
+        const resultContent = document.querySelector('.result-content');
+        const textToCopy = resultContent.innerText;
+        
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => {
+                    showCopySuccess();
+                })
+                .catch(err => {
+                    console.error('Clipboard API failed:', err);
+                    fallbackCopy(textToCopy);
+                });
+        } else {
+            fallbackCopy(textToCopy);
+        }
+    }
+
+    function fallbackCopy(text) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        
+        try {
+            document.execCommand('copy');
+            showCopySuccess();
+        } catch (err) {
+            console.error('Fallback copy failed:', err);
+            showError('Failed to copy content to clipboard');
+        }
+        
+        document.body.removeChild(textarea);
+    }
+
+    function showCopySuccess() {
+        const copyBtn = document.getElementById('copyBtn');
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<span class="icon">\u2713</span> Copied!';
+        
+        setTimeout(() => {
+            copyBtn.innerHTML = originalText;
+        }, 2000);
+    }
+
+    function showSuccess(message) {
+        const existingMsg = document.querySelector('.success-message');
+        if (existingMsg) existingMsg.remove();
+        
+        const successDiv = document.createElement('div');
+        successDiv.className = 'success-message';
+        successDiv.textContent = message;
+        
+        const result = document.getElementById('result');
+        result.appendChild(successDiv);
+        
+        setTimeout(() => {
+            if (successDiv.parentNode) {
+                successDiv.remove();
+            }
+        }, 5000);
+    }
+
+    function showError(message) {
+        const resultContainer = document.getElementById('result');
+        resultContainer.innerHTML = '<div class="result-header"><h2></h2></div><div class="result-content"><div class="error-message"><strong>Error:</strong> ' + message + '</div><div class="debug-info"><p><strong>tips:</strong></p><ul><li>Check your internet connection</li><li>Verify all required fields are filled</li><li>Try refreshing the page and submitting again</li><li>Check the browser console for details (F12 then Console)</li></ul></div></div>';
+        resultContainer.classList.add('show');
+    }
+</script>
+{% endblock %}

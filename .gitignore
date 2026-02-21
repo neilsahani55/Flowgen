@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+
+# Environment and local settings
+.env
+.env.*
+
+# Django / SQLite
+db.sqlite3
+*.sqlite3
+
+# Logs and temporary files
+nohup.out
+*.log
+
+# OS-specific
+.DS_Store
+Thumbs.db
+

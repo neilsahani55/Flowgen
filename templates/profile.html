@@ -1,0 +1,23 @@
+<!-- In your profile.html, update the usage stats section -->
+<div class="profile-stats">
+    <div class="stat-card">
+        <div class="stat-number">{{ user_profile.usage_count|default:0 }}</div>
+        <div class="stat-label">Flowgen Generations</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">
+            {% if user_profile.last_login_date %}
+                {{ user_profile.last_login_date|timesince }}
+            {% else %}
+                Never
+            {% endif %}
+        </div>
+        <div class="stat-label">Last Active</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-number">
+            <span class="badge-subscription">{{ user_profile.get_subscription_type_display|default:"Free" }}</span>
+        </div>
+        <div class="stat-label">Subscription Plan</div>
+    </div>
+</div>

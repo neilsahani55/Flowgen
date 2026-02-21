@@ -1,0 +1,1122 @@
+{% extends "base_dashboard.html" %}
+{% block title %}n8n Meta Maker - AI Content Generator{% endblock %}
+{% block content %}
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --success-color: #16a34a;
+            --danger-color: #dc2626;
+            --warning-color: #ca8a04;
+            --info-color: #0891b2;
+            --dark-color: #1f2937;
+            --light-gray: #f8fafc;
+            --border-color: #e2e8f0;
+            --gradient-bg: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+            --sidebar-width: 260px;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #1e293b 0%, #334155 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s;
+            z-index: 1000;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .sidebar-logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .sidebar-logo i {
+            color: #60a5fa;
+        }
+
+        .sidebar-menu {
+            padding: 1rem 0;
+        }
+
+        .menu-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .menu-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #94a3b8;
+            padding: 0 1.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .menu-item {
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .menu-item. {
+            background-color: rgba(96, 165, 250, 0.1);
+            color: white;
+            border-left-color: #60a5fa;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 1.5rem;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .page-title h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
+        }
+
+        .page-title p {
+            color: #64748b;
+            margin-bottom: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 0;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* n8n Meta Maker Styles */
+        .required::after {
+            content: " *";
+            color: var(--danger-color);
+        }
+
+        .char-count {
+            text-align: right;
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 6px;
+        }
+
+        .response-format {
+            background: #e0f2fe;
+            border-left: 4px solid #0369a1;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 16px 0;
+            font-size: 0.9rem;
+        }
+
+        .format-option {
+            display: inline-block;
+            background: white;
+            padding: 4px 12px;
+            margin: 4px;
+            border-radius: 6px;
+            border: 1px solid #0369a1;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .format-option.active {
+            background: #0369a1;
+            color: white;
+        }
+
+        .raw-output-container {
+            background: var(--light-gray);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .raw-output-header {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .toggle-raw {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-raw:hover {
+            background: var(--secondary-color);
+        }
+
+        .raw-output-content {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: #64748b;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            display: none;
+        }
+
+        .raw-output-content.show {
+            display: block;
+        }
+
+        .input-summary {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            padding: 24px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .input-summary strong {
+            color: var(--dark-color);
+            font-size: 1.05rem;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .info-item {
+            margin: 8px 0;
+            color: #78350f;
+        }
+
+        .info-item strong {
+            font-size: 0.95rem;
+            display: inline;
+        }
+        
+        
+        input[type="text"]:hover,
+        input[type="url"]:hover {
+            border-color: #3b82f6;
+        }
+        textarea:hover {
+            border-color: #3b82f6;
+        }
+        
+        
+        
+        /* ULTRA COMPACT Styles for the AI-generated content */
+        .ai-content {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            line-height: 1.2;
+            max-width: 100%;
+            margin: 0 auto;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            padding: 12px;
+        }
+
+        .ai-content h1 {
+            font-size: 1.8em;
+            color: #006c69;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .ai-content h2 {
+            font-size: 1.3em;
+            color: #01b7ff;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 3px;
+        }
+
+        .ai-content h3 {
+            font-size: 1.1em;
+            color: #fc6a0d;
+            margin-top: 12px;
+            margin-bottom: 6px;
+        }
+
+        .ai-content p {
+            margin-bottom: 6px;
+        }
+
+        .ai-content ul {
+            list-style-type: disc;
+            margin-left: 18px;
+            margin-bottom: 6px;
+        }
+
+        .ai-content ul li {
+            margin-bottom: 2px;
+        }
+
+        .seo-preview {
+            background-color: #fff;
+            padding: 12px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+            border: 1px solid #eee;
+            margin-bottom: 12px;
+        }
+
+        .seo-preview p strong {
+            color: #006c69;
+        }
+
+        /* ULTRA COMPACT Suggestion Set Styles */
+        .suggestion-set {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            margin-bottom: 12px;
+            border-left: 3px solid #2563eb;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .suggestion-set:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .suggestion-set h3 {
+            color: #1e293b;
+            margin-top: 0;
+            margin-bottom: 8px;
+            padding-bottom: 3px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 1.1rem;
+        }
+
+        .suggestion-item {
+            display: flex;
+            margin-bottom: 4px;
+            align-items: flex-start;
+        }
+
+        .suggestion-label {
+            font-weight: 600;
+            color: #1e293b;
+            min-width: 110px;
+            font-size: 0.85rem;
+            padding-top: 2px;
+        }
+
+        .suggestion-content {
+            flex: 1;
+            font-size: 0.9rem;
+            line-height: 1.3;
+            color: #374151;
+        }
+
+        .copy-buttons {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .copy-buttons .btn {
+            flex: 1;
+            min-width: 150px;
+            font-size: 0.85rem;
+            padding: 8px 12px;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 1.2rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+                overflow: visible;
+            }
+            
+            .sidebar-logo span, 
+            .menu-title, 
+            .menu-item span {
+                display: none;
+            }
+            
+            .main-content {
+                margin-left: 70px;
+            }
+
+            .copy-buttons {
+                flex-direction: column;
+            }
+
+            .copy-buttons .btn {
+                width: 100%;
+                min-width: auto;
+            }
+
+            .ai-content h1 {
+                font-size: 1.5em;
+            }
+
+            .ai-content h2 {
+                font-size: 1.2em;
+            }
+            
+            .suggestion-item {
+                flex-direction: column;
+            }
+            
+            .suggestion-label {
+                min-width: auto;
+                margin-bottom: 2px;
+            }
+        }
+    </style>
+    {% comment %} Main Content Block {% endcomment %}
+            <div class="content-header">
+                <div class="page-title">
+                    <h1>n8n Meta Maker</h1>
+                    <p>Generate optimized SEO content using n8n workflow</p>
+                </div>
+            </div>
+
+            <div class="content-card">
+                <div class="card-header">
+                    <h3 class="card-title">Content Generation Form</h3>
+                </div>
+                
+                <div id="errorAlert" class="alert alert-danger" style="display: none;">
+                    <div id="errorMessage"></div>
+                </div>
+
+                <form id="metaForm">
+                    <div class="mb-3">
+                        <label for="focus_keywords" class="form-label required">Focus Keywords</label>
+                        <input type="text" 
+                               class="form-control"
+                               id="focus_keywords" 
+                               name="focus_keywords" 
+                               placeholder="Enter main keywords (comma separated)"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="related_keywords" class="form-label">Related Keywords</label>
+                        <input type="text" 
+                               class="form-control"
+                               id="related_keywords" 
+                               name="related_keywords" 
+                               placeholder="Enter related keywords (comma separated)">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="page_content" class="form-label required">Page Content</label>
+                        <textarea class="form-control"
+                                  id="page_content" 
+                                  name="page_content" 
+                                  placeholder="Paste your page content here..."
+                                  rows="6"
+                                  required></textarea>
+                        <div class="char-count">
+                            <span id="charCount">0</span> characters
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="content_type" class="form-label required">Content Type</label>
+                        <select class="form-select" id="content_type" name="content_type" required>
+                            <option value="">Select content type</option>
+                            <option value="Blog">Blog Post</option>
+                            <option value="Page">Web Page</option>
+                            <option value="Article">Article</option>
+                            <option value="Product">Product Description</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100" id="submitBtn">
+                        <i class="fas fa-bolt me-2"></i>Generate Content
+                    </button>
+                </form>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p><strong>Generating content...</strong> Please wait</p>
+                    <p style="font-size: 0.9rem; color: #64748b; margin-top: 8px;">
+                        This may take 30-60 seconds...
+                    </p>
+                </div>
+            </div>
+
+            <div id="resultsContainer" class="content-card result-container" style="display: none;">
+                <div class="card-header">
+                    <h3 class="card-title">Generated Results</h3>
+                </div>
+                
+                <!-- Response Format Selector -->
+                <div class="response-format">
+                    <strong>Response Format:</strong>
+                    <div style="margin-top: 8px;">
+                        <span class="format-option active" onclick="switchFormat('html')">HTML View</span>
+                        <span class="format-option" onclick="switchFormat('raw')">Raw Response</span>
+                    </div>
+                </div>
+
+                <!-- Input Summary -->
+                <div class="input-summary" id="inputSummary" style="display: none;">
+                    <!-- Input details will be inserted here -->
+                </div>
+
+                <!-- HTML Content Display -->
+                <div id="htmlView" class="content-view">
+                    <div id="htmlContent" class="ai-content">
+                        <!-- HTML content will be inserted here -->
+                    </div>
+
+                    <div class="copy-buttons">
+                        <button onclick="copyAllContent()" class="btn btn-success">
+                            <i class="fas fa-copy me-2"></i>Copy All Content
+                        </button>
+                        <button onclick="copySEOContent()" class="btn btn-success">
+                            <i class="fas fa-copy me-2"></i>Copy SEO Preview
+                        </button>
+                        <button onclick="copyMasterSelection()" class="btn btn-secondary">
+                            <i class="fas fa-copy me-2"></i>Copy Master Selection
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Raw Response View -->
+                <div id="rawView" class="content-view" style="display: none;">
+                    <div class="raw-output-container">
+                        <div class="raw-output-header">
+                            <span>Raw Response</span>
+                            <button class="toggle-raw" onclick="toggleRawOutput()">Show Raw Data</button>
+                        </div>
+                        <div class="raw-output-content" id="rawResponseContent">
+                            <!-- Raw response will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Loading Spinner -->
+            <div class="loading-spinner" id="loadingSpinner">
+                <div class="spinner"></div>
+                <p class="text-muted mt-2">Processing your request... Please wait</p>
+            </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Configuration - Update this URL to your n8n webhook URL
+        const N8N_WEBHOOK_URL = 'https://mcmflow.app.n8n.cloud/webhook/meta_maker';
+        
+        // DOM Elements
+        const form = document.getElementById('metaForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const errorAlert = document.getElementById('errorAlert');
+        const errorMessage = document.getElementById('errorMessage');
+        const htmlContent = document.getElementById('htmlContent');
+        const inputSummary = document.getElementById('inputSummary');
+        
+        // Character count for page content
+        const pageContent = document.getElementById('page_content');
+        const charCount = document.getElementById('charCount');
+        
+        if (pageContent && charCount) {
+            pageContent.addEventListener('input', function() {
+                charCount.textContent = this.value.length.toLocaleString();
+            });
+            
+            // Initialize character count
+            charCount.textContent = pageContent.value.length.toLocaleString();
+        }
+
+        // Form submission handler
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Hide any previous errors
+            hideError();
+            
+            // Validate form
+            if (!validateForm()) {
+                return;
+            }
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generating...';
+            loading.style.display = 'block';
+            
+            // Hide previous results
+            resultsContainer.style.display = 'none';
+            
+            // Prepare payload
+            const payload = {
+                focus_keywords: document.getElementById('focus_keywords').value.trim(),
+                related_keywords: document.getElementById('related_keywords').value.trim(),
+                page_content: document.getElementById('page_content').value.trim(),
+                content_type: document.getElementById('content_type').value
+            };
+            
+            // Send request to n8n
+            sendRequestToN8n(payload);
+        });
+
+        function validateForm() {
+            const focusKeywords = document.getElementById('focus_keywords').value.trim();
+            const pageContent = document.getElementById('page_content').value.trim();
+            const contentType = document.getElementById('content_type').value;
+            
+            if (!focusKeywords) {
+                showError('Focus keywords are required.');
+                return false;
+            }
+            
+            if (!pageContent) {
+                showError('Page content is required.');
+                return false;
+            }
+            
+            if (!contentType) {
+                showError('Content type is required.');
+                return false;
+            }
+            
+            return true;
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorAlert.style.display = 'flex';
+            
+            // Scroll to error
+            errorAlert.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function hideError() {
+            errorAlert.style.display = 'none';
+        }
+
+        async function sendRequestToN8n(payload) {
+            try {
+                console.log('Sending request to n8n...');
+                
+                const response = await fetch(N8N_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                // Get response as text (since it's HTML)
+                const responseText = await response.text();
+                
+                // Process successful response
+                handleSuccessResponse(responseText, payload);
+
+            } catch (error) {
+                // Handle errors
+                handleErrorResponse(error);
+            } finally {
+                // Reset loading state
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-bolt me-2"></i>Generate Content';
+                loading.style.display = 'none';
+            }
+        }
+
+        function handleSuccessResponse(htmlContent, payload) {
+            // Show results container
+            resultsContainer.style.display = 'block';
+            
+            // Update input summary
+            updateInputSummary(payload);
+            
+            // Display HTML content
+            displayHTMLContent(htmlContent);
+            
+            // Update raw response view
+            document.getElementById('rawResponseContent').textContent = htmlContent;
+            
+            // Scroll to results
+            resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function handleErrorResponse(error) {
+            console.error('Error:', error);
+            showError(`Failed to generate content: ${error.message}`);
+        }
+
+        function updateInputSummary(payload) {
+            let html = '<strong>Input Details</strong>';
+            
+            html += `<div class="info-item"><strong>Focus Keywords:</strong> ${payload.focus_keywords}</div>`;
+            html += `<div class="info-item"><strong>Related Keywords:</strong> ${payload.related_keywords || 'None'}</div>`;
+            html += `<div class="info-item"><strong>Content Type:</strong> ${payload.content_type}</div>`;
+            html += `<div class="info-item"><strong>Content Length:</strong> ${payload.page_content.length} characters</div>`;
+            
+            inputSummary.innerHTML = html;
+            inputSummary.style.display = 'block';
+        }
+
+        function displayHTMLContent(html) {
+            // Clean and display the HTML content
+            const cleanHTML = html
+                .replace(/<style scoped>[\s\S]*?<\/style>/g, '') // Remove scoped styles
+                .replace(/<section class="ai-block">|<\/section>/g, '') // Remove section wrapper
+                .trim();
+            
+            // Convert to ultra compact format
+            const formattedHTML = convertToUltraCompactFormat(cleanHTML);
+            
+            htmlContent.innerHTML = formattedHTML;
+            
+            // Add animations to suggestion sets
+            const sets = htmlContent.querySelectorAll('.suggestion-set');
+            sets.forEach((set, index) => {
+                set.style.animationDelay = `${index * 0.1}s`;
+                set.classList.add('fade-in');
+            });
+        }
+
+ function convertToUltraCompactFormat(html) {
+    console.log('Original HTML:', html);
+    
+    // If the HTML contains suggestion sets, convert them to ultra compact format
+    if (html.includes('Suggestion Set') || html.includes('Meta Title') || html.includes('Meta Description') || html.includes('H1 Title')) {
+        let result = '';
+        
+        // More flexible pattern to capture suggestion sets
+        const setRegex = /Suggestion Set\s*(\d+)([\s\S]*?)(?=Suggestion Set\s*\d+|<\/section>|$)/gi;
+        let match;
+        let setCount = 0;
+        
+        while ((match = setRegex.exec(html)) !== null) {
+            setCount++;
+            const setNumber = match[1];
+            const setContent = match[2];
+            
+            console.log(`Processing Set ${setNumber}:`, setContent);
+            
+            // More robust extraction patterns that handle various HTML formats
+            const metaTitleMatch = setContent.match(/Meta Title:\s*<\/strong>\s*([^<]+)/i) || 
+                                  setContent.match(/Meta Title:\s*([^<\n]+)/i) ||
+                                  setContent.match(/<strong>Meta Title:<\/strong>\s*([^<]+)/i);
+            
+            const metaDescMatch = setContent.match(/Meta Description:\s*<\/strong>\s*([^<]+)/i) || 
+                                 setContent.match(/Meta Description:\s*([^<\n]+)/i) ||
+                                 setContent.match(/<strong>Meta Description:<\/strong>\s*([^<]+)/i);
+            
+            const h1TitleMatch = setContent.match(/H1 Title:\s*<\/strong>\s*([^<]+)/i) || 
+                                setContent.match(/H1 Title:\s*([^<\n]+)/i) ||
+                                setContent.match(/<strong>H1 Title:<\/strong>\s*([^<]+)/i);
+            
+            const metaTitle = metaTitleMatch ? metaTitleMatch[1].trim() : 'Not found';
+            const metaDesc = metaDescMatch ? metaDescMatch[1].trim() : 'Not found';
+            const h1Title = h1TitleMatch ? h1TitleMatch[1].trim() : 'Not found';
+            
+            console.log(`Set ${setNumber} - Title: "${metaTitle}", Desc: "${metaDesc}", H1: "${h1Title}"`);
+            
+            // Create the suggestion set in ultra compact format
+            result += `
+                <div class="suggestion-set">
+                    <h3>Suggestion Set ${setNumber}</h3>
+                    <div class="suggestion-item">
+                        <div class="suggestion-label">Meta Title:</div>
+                        <div class="suggestion-content">${metaTitle}</div>
+                    </div>
+                    <div class="suggestion-item">
+                        <div class="suggestion-label">Meta Description:</div>
+                        <div class="suggestion-content">${metaDesc}</div>
+                    </div>
+                    <div class="suggestion-item">
+                        <div class="suggestion-label">H1 Title:</div>
+                        <div class="suggestion-content">${h1Title}</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // If no sets were found with the regex, try a fallback approach
+        if (setCount === 0) {
+            console.log('No suggestion sets found with regex, trying fallback parsing...');
+            result = fallbackParsing(html);
+        }
+        
+        return result || `<div class="alert alert-warning">Unable to parse suggestion sets. Showing raw content:</div><div class="raw-content">${html}</div>`;
+    }
+    
+    return html; // Return original HTML if no conversion needed
+}
+
+// Fallback parsing function for different HTML structures
+function fallbackParsing(html) {
+    let result = '';
+    
+    // Try to find all sections with ai-block class
+    const sections = html.split('<section class="ai-block">');
+    
+    sections.forEach((section, index) => {
+        if (index === 0) return; // Skip the first part (before first section)
+        
+        // Extract set number
+        const setNumberMatch = section.match(/Suggestion Set\s*(\d+)/i);
+        const setNumber = setNumberMatch ? setNumberMatch[1] : index;
+        
+        // Extract content using more flexible patterns
+        const metaTitle = extractContent(section, 'Meta Title');
+        const metaDesc = extractContent(section, 'Meta Description');
+        const h1Title = extractContent(section, 'H1 Title');
+        
+        result += `
+            <div class="suggestion-set">
+                <h3>Suggestion Set ${setNumber}</h3>
+                <div class="suggestion-item">
+                    <div class="suggestion-label">Meta Title:</div>
+                    <div class="suggestion-content">${metaTitle}</div>
+                </div>
+                <div class="suggestion-item">
+                    <div class="suggestion-label">Meta Description:</div>
+                    <div class="suggestion-content">${metaDesc}</div>
+                </div>
+                <div class="suggestion-item">
+                    <div class="suggestion-label">H1 Title:</div>
+                    <div class="suggestion-content">${h1Title}</div>
+                </div>
+            </div>
+        `;
+    });
+    
+    return result;
+}
+
+// Helper function to extract content for a given field
+function extractContent(section, fieldName) {
+    // Multiple patterns to try
+    const patterns = [
+        new RegExp(`${fieldName}:\\s*<\\/strong>\\s*([^<]+)`),
+        new RegExp(`<strong>${fieldName}:<\\/strong>\\s*([^<]+)`),
+        new RegExp(`${fieldName}:\\s*([^<\\n]+)`),
+        new RegExp(`${fieldName}[^<]*<\\/strong>[^<]*<p>([^<]+)`),
+        new RegExp(`${fieldName}[^<]*<\\/strong>[^<]*<br>\\s*([^<]+)`)
+    ];
+    
+    for (let pattern of patterns) {
+        const match = section.match(pattern);
+        if (match && match[1]) {
+            return match[1].trim();
+        }
+    }
+    
+    return 'Not available';
+}
+
+        function createSuggestionSetHTML(set) {
+            return `
+                <div class="suggestion-set">
+                    <h3>Suggestion Set ${set.number}</h3>
+                    <div class="suggestion-item">
+                        <div class="suggestion-label">Meta Title:</div>
+                        <div class="suggestion-content">${set.metaTitle || 'Not available'}</div>
+                    </div>
+                    <div class="suggestion-item">
+                        <div class="suggestion-label">Meta Description:</div>
+                        <div class="suggestion-content">${set.metaDesc || 'Not available'}</div>
+                    </div>
+                    <div class="suggestion-item">
+                        <div class="suggestion-label">H1 Title:</div>
+                        <div class="suggestion-content">${set.h1Title || 'Not available'}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // UI Functions
+        function switchFormat(format) {
+            // Update active button
+            document.querySelectorAll('.format-option').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Show/hide views
+            document.getElementById('htmlView').style.display = format === 'html' ? 'block' : 'none';
+            document.getElementById('rawView').style.display = format === 'raw' ? 'block' : 'none';
+        }
+
+        function toggleRawOutput() {
+            const rawContent = document.getElementById('rawResponseContent');
+            const toggleBtn = document.querySelector('.toggle-raw');
+            
+            if (rawContent.classList.contains('show')) {
+                rawContent.classList.remove('show');
+                toggleBtn.textContent = 'Show Raw Data';
+            } else {
+                rawContent.classList.add('show');
+                toggleBtn.textContent = 'Hide Raw Data';
+            }
+        }
+
+        // Copy functions
+        function copyAllContent() {
+            const htmlContent = document.getElementById('htmlContent');
+            const textContent = htmlContent.textContent || htmlContent.innerText;
+            
+            if (textContent.trim()) {
+                copyToClipboard(textContent.trim(), 'All content copied to clipboard!');
+            } else {
+                showFeedback('No content to copy!', 'warning');
+            }
+        }
+
+        function copySEOContent() {
+            const seoPreview = document.querySelector('.seo-preview');
+            if (seoPreview) {
+                const textContent = seoPreview.textContent || seoPreview.innerText;
+                copyToClipboard(textContent.trim(), 'SEO preview copied to clipboard!');
+            } else {
+                showFeedback('No SEO preview found!', 'warning');
+            }
+        }
+
+        function copyMasterSelection() {
+            const masterDetails = document.querySelector('.master-details');
+            if (masterDetails) {
+                const textContent = masterDetails.textContent || masterDetails.innerText;
+                copyToClipboard(textContent.trim(), 'Master selection copied to clipboard!');
+            } else {
+                showFeedback('No master selection found!', 'warning');
+            }
+        }
+
+        function copyToClipboard(text, message) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showFeedback(message);
+                }).catch(() => {
+                    fallbackCopy(text, message);
+                });
+            } else {
+                fallbackCopy(text, message);
+            }
+        }
+
+        function fallbackCopy(text, message) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.left = '-999999px';
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showFeedback(message);
+            } catch (err) {
+                showFeedback('Failed to copy content', 'warning');
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function showFeedback(message, type = 'success') {
+            const colors = {
+                'success': 'var(--success-color)',
+                'warning': 'var(--warning-color)',
+                'error': 'var(--danger-color)'
+            };
+            
+            const backgroundColor = colors[type] || colors.success;
+            
+            const feedback = document.createElement('div');
+            feedback.style.cssText = `
+                position: fixed;
+                top: 24px;
+                right: 24px;
+                background: ${backgroundColor};
+                color: white;
+                padding: 16px 24px;
+                border-radius: 10px;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                z-index: 10000;
+                font-weight: 600;
+                animation: fadeInUp 0.3s ease-out;
+                max-width: 300px;
+            `;
+            feedback.textContent = message;
+            document.body.appendChild(feedback);
+            
+            setTimeout(() => {
+                feedback.style.animation = 'fadeOut 0.3s ease-out';
+                setTimeout(() => feedback.remove(), 300);
+            }, 3000);
+        }
+
+        // Auto-focus on first input
+        const firstInput = document.getElementById('focus_keywords');
+        if (firstInput) {
+            firstInput.focus();
+        }
+
+        // Add CSS for fade-in animation
+        const style = document.createElement('style');
+        style.textContent = `
+            .fade-in {
+                animation: fadeInUp 0.6s ease-out both;
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+{% endblock %}
